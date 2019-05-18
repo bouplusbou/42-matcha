@@ -30,20 +30,24 @@ router.route('/api')
 
 
 router.route('/api/users')
-.get(function(req,res){
+.get((req,res) => {
       db.getUsers().then((users) => {
             res.json({message : "List all users", data: users});
       }).catch(() => {
             console.log(error)
       })
 })
-.post(function(req,res){
-      res.json({message : "Add a new user"});
+.post((req,res) => {
+      // db.createUser(req.body).then((users) => {
+      //       res.json({message : "List all users", data: users});
+      // }).catch(() => {
+      //       console.log(error)
+      // })
 })
-.put(function(req,res){ 
+.put((req,res) => { 
       res.json({message : "Update a user"});
 })
-.delete(function(req,res){ 
+.delete((req,res) => { 
 res.json({message : "Delete a user"});  
 }); 
 
@@ -51,7 +55,7 @@ res.json({message : "Delete a user"});
 
 
 router.route('/api/users/:id_user')
-.get(function(req,res){
+.get((req,res) => {
       db.getUser(req.params.id_user).then((user) => {
             console.log(user)
             res.json({message : "Info for user #" + req.params.id_user, data: user});
@@ -59,10 +63,10 @@ router.route('/api/users/:id_user')
             console.log(error)
       })
 })
-.put(function(req,res){ 
+.put((req,res) => { 
 	  res.json({message : "Update info for user #" + req.params.id_user});
 })
-.delete(function(req,res){ 
+.delete((req,res) => { 
 	  res.json({message : "Delete user #" + req.params.id_user});
 });
 
