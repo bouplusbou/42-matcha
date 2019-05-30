@@ -14,7 +14,7 @@ db.pool.query(
     CREATE TABLE users (
       id_user SERIAL PRIMARY KEY,
       email TEXT NOT NULL,
-      user_name VARCHAR( 40 ) NOT NULL,
+      username VARCHAR( 40 ) NOT NULL,
       first_name VARCHAR( 50 ) NOT NULL,
       last_name VARCHAR( 50 ) NOT NULL,
       password TEXT NOT NULL,
