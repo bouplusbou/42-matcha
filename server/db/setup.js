@@ -9,7 +9,7 @@ db.pool.query(
     DROP TABLE IF EXISTS users;
     DROP TYPE IF EXISTS genre_enum;
     DROP TYPE IF EXISTS sexual_orientation_enum;
-    CREATE TYPE genre_enum AS ENUM ('male', 'female', 'non_binary');
+    CREATE TYPE genre_enum AS ENUM ('male', 'female', 'nonbinary');
     CREATE TYPE sexual_orientation_enum AS ENUM ('hetero', 'homo', 'bi');
     CREATE TABLE users (
       id_user SERIAL PRIMARY KEY,
@@ -29,7 +29,7 @@ db.pool.query(
       image_3 TEXT,
       image_4 TEXT,
       image_5 TEXT,
-      profile_pics_number NUMERIC,
+      profile_pic_number NUMERIC,
       fame_score NUMERIC,
       latitude NUMERIC,
       longitude NUMERIC

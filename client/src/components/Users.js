@@ -58,7 +58,7 @@ class Users extends Component {
         <div>
           <h2>Users</h2>
           <div className={classes.wrapper}>
-              {this.state.users.slice(0, 20).map( user => 
+              {this.state.users.slice(0, 50).map( user => 
                 <Card key={user.id_user} className={classes.card}>
                   <CardActionArea>
                     <Link to={`/users/${user.id_user}`}>

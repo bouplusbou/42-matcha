@@ -34,8 +34,6 @@ app.use(
   })
 )
 
-
-
 // router.route('/')
 // .all(authenticate, (req,res) => { 
 //       res.json({message : "Please go to /"});
