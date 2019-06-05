@@ -155,8 +155,8 @@ router.route('/api/search')
       
 })
 .post((req,res) => {
-      const { age, fame } = req.body
-      User.getUsers(age, fame).then( users => {
+      const { age, fame, latlng } = req.body
+      User.getUsers(age, fame, latlng).then( users => {
             res.json({message : "List all users", data: users});
       }).catch(error => { console.log(error) })
 })

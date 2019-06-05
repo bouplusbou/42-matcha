@@ -23,13 +23,19 @@ async function emailExists(email) {
   }
 }
 
-async function getUsers(age = [18, 100], fame = [0, 1000]) { 
+async function getUsers(age = [18, 100], fame = [0, 1000], latlng = [48.856697, 2.351462]) { 
+  const latMin = latlng[0] - 0.1
+  const latMax = latlng[0] + 0.1
+  const lngMin = latlng[1] - 0.3
+  const lngMax = latlng[1] + 0.3
   const text = `
     SELECT *
     FROM "users"
     WHERE "age" >= $1 AND "age" <= $2
-    AND "fame_score" >= $3 AND "fame_score" <= $4 `
-  const values = [age[0], age[1], fame[0], fame[1]]
+    AND "fame" >= $3 AND "fame" <= $4 
+    AND "latitude" >= $5 AND "latitude" <= $6 
+    AND "longitude" >= $7 AND "longitude" <= $8 `
+  const values = [age[0], age[1], fame[0], fame[1], latMin, latMax, lngMin, lngMax]
   try {
     const res = await db.pool.query(text, values)
     return res.rows

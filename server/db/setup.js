@@ -30,7 +30,8 @@ db.pool.query(
       image_4 TEXT,
       image_5 TEXT,
       profile_pic_number NUMERIC,
-      fame_score NUMERIC,
+      fame NUMERIC,
+      city TEXT,
       latitude NUMERIC,
       longitude NUMERIC
     );

@@ -1,4 +1,4 @@
-import React, {Component} from 'react'
+import React, {Component, useReducer} from 'react'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
 import { withStyles } from '@material-ui/core/styles'
@@ -9,6 +9,7 @@ import 'rc-slider/assets/index.css';
 import 'rc-tooltip/assets/bootstrap.css';
 import Slider from 'rc-slider';
 import Button from '@material-ui/core/Button'
+import AlgoliaPlaces from 'algolia-places-react';
 
 
 const styles = theme => ({
@@ -67,7 +68,7 @@ class Users extends Component {
       users: [],
       age: [18, 100],
       fame: [0, 1000],
-      search: [18, 100],
+      latlng: [48.856697, 2.351462],
     }
 
    componentDidMount() {
@@ -79,10 +80,11 @@ class Users extends Component {
 
     handleAgeChange = async (value) => {
       await this.setState({ age: value })
-      const { age, fame } = this.state
+      const { age, fame, latlng } = this.state
       const search = {
         age: age,
         fame: fame,
+        latlng: latlng,
       }
       axios.post(`/search`, search)
         .then(res => {
@@ -92,10 +94,11 @@ class Users extends Component {
 
     handleFameChange = async (value) => {
       await this.setState({ fame: value })
-      const { age, fame } = this.state
+      const { age, fame, latlng } = this.state
       const search = {
         age: age,
         fame: fame,
+        latlng: latlng,
       }
       axios.post(`/search`, search)
         .then(res => {
@@ -103,6 +106,19 @@ class Users extends Component {
         })
     }
 
+    handleLatlngChange = async ({suggestion}) => {
+      await this.setState({ latlng: [suggestion.latlng.lat, suggestion.latlng.lng] })
+      const { age, fame, latlng } = this.state
+      const search = {
+        age: age,
+        fame: fame,
+        latlng: latlng,
+      }
+      axios.post(`/search`, search)
+        .then(res => {
+          this.setState({ users: res.data.data })
+        })
+    }
 
 
     render() {
@@ -131,6 +147,18 @@ class Users extends Component {
               tipFormatter={value => `${value}`} 
             />
             <p>City</p>
+            <AlgoliaPlaces
+              placeholder='Search a city here'
+              options={{
+                appId: 'plGGWNJECAIH',
+                apiKey: 'ecb0baaa5b936ebb8dcc52e94b0b3b75',
+                language: 'fr',
+                countries: ['fr'],
+                type: 'city',
+              }}
+              onChange={this.handleLatlngChange}
+            />
+            <p>Distance</p>
             <p>Interests</p>
           </div>
           <div className={classes.wrapper}>
@@ -144,7 +172,7 @@ class Users extends Component {
                         title="Profile picture"
                       />
                       <div className={classes.overlay}>
-                         {user.username}, {user.age}
+                         {user.username}, {user.age}, <br /> {user.city}
                       </div>
                     </Link>
                   </CardActionArea>
