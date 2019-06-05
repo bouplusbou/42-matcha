@@ -73,7 +73,7 @@ class SignupForm extends React.Component {
     this.setState({ 
       email: undefined,
       errorEmail: true,
-      helperEmail: 'This email is already used. Wanna <a href="#">login</a> ?',
+      helperEmail: 'This email is already used',
     })
   }
   emailIsSet = email => {
@@ -256,11 +256,10 @@ class SignupForm extends React.Component {
       axios.post(`/users`, newUser)
       .then(res => {
         if (res.status === 200) {
-          this.props.history.push('/')
+          this.props.history.push('/login')
         } 
       })
       .catch(error => {
-        console.log(error.response.data)
         const res = error.response.data
         if (res.emailKO) {
           this.emailError()
@@ -276,6 +275,12 @@ class SignupForm extends React.Component {
         }
         if (res.passwordKO) {
           this.passwordError()
+        }
+        if (res.usernameTaken) {
+          this.usernameTaken()
+        }
+        if (res.emailTaken) {
+          this.emailTaken()
         }
       })
     } else {

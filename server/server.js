@@ -102,125 +102,45 @@ const passwordIsOK = password => {
       return regex.test(String(password))
 }
 
-// const newUserIsOK = (email, firstName, lastName, username, password) => {
-//       // email = 'sd'
-//       // firstName = 'd'
-//       // password = 'dsds'
-//       const helpers = {}
-//       if (!emailIsOK(email)) {
-//             helpers.emailKO = true
-//       }
-//       if (!firstNameIsOK(firstName)) {
-//             helpers.firstNameKO = true
-//       }
-//       if (!lastNameIsOK(lastName)) {
-//             helpers.lastNameKO = true
-//       }
-//       if (!usernameIsOK(username)) {
-//             helpers.usernameKO = true
-//       }
-//       if (!passwordIsOK(password)) {
-//             helpers.passwordKO = true
-//       }
-//       if (User.emailExists(email)) {
-//             helpers.emailTaken = true
-//       }
-//       if (User.usernameExists(username)) {
-//             helpers.usernameTaken = true
-//       }
-//       return helpers
-// }
-
-
-const newUserIsOK = (email, firstName, lastName, username, password) => {
-      return new Promise((resolve, reject) => {
-            // email = 'sd'
-            // firstName = 'd'
-            // password = 'dsds'
-            const helpers = {}
-            if (!emailIsOK(email)) {
-                  helpers.emailKO = true
-            }
-            if (!firstNameIsOK(firstName)) {
-                  helpers.firstNameKO = true
-            }
-            if (!lastNameIsOK(lastName)) {
-                  helpers.lastNameKO = true
-            }
-            if (!usernameIsOK(username)) {
-                  helpers.usernameKO = true
-            }
-            if (!passwordIsOK(password)) {
-                  helpers.passwordKO = true
-            }
-            if (User.emailExists(email)) {
-                  helpers.emailTaken = true
-            }
-            if (User.usernameExists(username)) {
-                  helpers.usernameTaken = true
-            }
-            resolve(helpers)
-      })
+const newUserIsOK = async (email, firstName, lastName, username, password) => {
+      const helpers = {}
+      if (!emailIsOK(email)) { helpers.emailKO = true }
+      if (!firstNameIsOK(firstName)) { helpers.firstNameKO = true }
+      if (!lastNameIsOK(lastName)) { helpers.lastNameKO = true }
+      if (!usernameIsOK(username)) { helpers.usernameKO = true }
+      if (!passwordIsOK(password)) { helpers.passwordKO = true }
+      const emailUser = await User.emailExists(email)
+      if (emailUser) { helpers.emailTaken = true }
+      const usernameUser = await User.usernameExists(username)
+      if (usernameUser) { helpers.usernameTaken = true }
+      return helpers
 }
-
-
-
-
 
 router.route('/api/users')
 .get(authenticate, (req,res) => {
-      User.getUsers().then((users) => {
+      User.getUsers().then( users => {
             res.json({message : "List all users", data: users});
       }).catch(error => { console.log(error) })
 })
 .post((req,res) => {
+      const manageNewUser = async (email, firstName, lastName, username, password) => {
+            const helpers = await newUserIsOK(email, firstName, lastName, username, password)
+            if (helpers.emailKO
+                  || helpers.firstNameKO
+                  || helpers.lastNameKO
+                  || helpers.usernameKO
+                  || helpers.passwordKO
+                  || helpers.usernameTaken
+                  || helpers.emailTaken) {
+                    res.status(400).json(helpers)
+                    return
+            }
+            const user = await User.createUser(email, firstName, lastName, username, password)
+            res.status(200).json({ message: 'User created' })
+      }
       const { email, firstName, lastName, username, password } = req.body
-      newUserIsOK(email, firstName, lastName, username, password)
-      .then( response => {
-            if (response.emailKO
-                  || response.firstNameKO
-                  || response.lastNameKO
-                  || response.usernameKO
-                  || response.passwordKO
-                  || response.usernameTaken
-                  || response.emailTaken) {
-                    res.status(400).json(response)
-              }
-      })
-      .then( response => {
-            
-      })
-
-
-      // User.createUser(email, firstName, lastName, username, password)
-      //       .then(response => {
-      //             res.status(200).json({ message: 'User created' })
-      //       })
-      //       .catch(error => { 
-      //             console.log(error)
-      //       })
+      manageNewUser(email, firstName, lastName, username, password)
 })
-// .post((req,res) => {
-//       const { email, firstName, lastName, username, password } = req.body
-//       const checkNewUser = newUserIsOK(email, firstName, lastName, username, password)
-//       console.log(checkNewUser)
-//       if (checkNewUser.emailKO
-//           || checkNewUser.firstNameKO
-//           || checkNewUser.lastNameKO
-//           || checkNewUser.usernameKO
-//           || checkNewUser.passwordKO
-//           || checkNewUser.usernameTaken
-//           || checkNewUser.emailTaken) {
-//             res.status(400).json(checkNewUser)
-//       }
-//       User.createUser(email, firstName, lastName, username, password)
-//             .then(response => {
-//                   res.status(200).json({ message: 'User created' })
-//             })
-//             .catch(error => { 
-//                   console.log(error)
-//             })
-// })
 .put((req,res) => { 
       res.json({message : "Update a user"});
 })
