@@ -150,6 +150,18 @@ router.route('/api/users')
 
 
 
+router.route('/api/search')
+.get((req,res) => {
+      
+})
+.post((req,res) => {
+      const { age, fame } = req.body
+      User.getUsers(age, fame).then( users => {
+            res.json({message : "List all users", data: users});
+      }).catch(error => { console.log(error) })
+})
+
+
 
 router.route('/api/users/:id_user')
 .get((req,res) => {

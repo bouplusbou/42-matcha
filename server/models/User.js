@@ -23,10 +23,15 @@ async function emailExists(email) {
   }
 }
 
-async function getUsers() { 
-  const text = `SELECT * FROM users ORDER BY id_user ASC`
+async function getUsers(age = [18, 100], fame = [0, 1000]) { 
+  const text = `
+    SELECT *
+    FROM "users"
+    WHERE "age" >= $1 AND "age" <= $2
+    AND "fame_score" >= $3 AND "fame_score" <= $4 `
+  const values = [age[0], age[1], fame[0], fame[1]]
   try {
-    const res = await db.pool.query(text)
+    const res = await db.pool.query(text, values)
     return res.rows
   } catch(err) {
     console.log(err.stack)
