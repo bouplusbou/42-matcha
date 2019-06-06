@@ -4,6 +4,7 @@ import Home from './Home'
 import UsersSwitch from './UsersSwitch'
 import Signup from './Signup'
 import Login from './Login'
+import SelectComp from './test'
 
 // The Main component renders one of the three provided
 // Routes (provided that one matches). Both the /roster
@@ -13,6 +14,7 @@ import Login from './Login'
 const Main = () => (
   <main>
     <Switch>
+      <Route exact path='/test' component={SelectComp}/>
       <Route exact path='/' component={Home}/>
       <Route exact path='/login' component={Login}/>
       <Route exact path='/signup' component={Signup}/>

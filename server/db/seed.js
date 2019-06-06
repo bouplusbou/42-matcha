@@ -163,3 +163,106 @@ for (i = 0; i < 200; i++) {
   seedNonbinary(i + 1)
 }
 
+
+
+
+
+
+const tags = [
+  'burritos',
+  'volcans',
+  'canards',
+  'sousmarins',
+  'physiquequantique',
+  'pingouins',
+  'unionsovietique',
+  'fingerskateboarding',
+  'pokemon',
+  'country',
+  'dragons',
+  'meduses',
+  'chasseacourre',
+  'lego',
+  'lamas',
+  'dinosaures',
+  'tauromachie',
+  'quichelorraine',
+  'cassoulet',
+  'anarchie',
+  'choucroute',
+  'espace',
+  'evasionfiscale',
+  'rechauffementclimatique',
+  'yolo',
+  '5G',
+  'paradisfiscaux',
+  'fortran',
+  'robocop',
+  'sorcellerie',
+  'harissa',
+  'pisciculture',
+  'CNRS',
+  'frites',
+  'rhododendron',
+  'magienoire',
+  'flechettes',
+  'avalanches',
+  'fauconnerie',
+  'bodybuilding',
+  'cobol',
+  'alcoolisme',
+  'genealogie',
+  'philatelie',
+  'yoga',
+  'yaourts',
+  'confucianisme',
+  'cancerducolon',
+  'kibbutz',
+  'tofu',
+  'jacobinisme',
+  'meteorites',
+  'ordoliberalisme',
+  'collapsologie',
+  'burpees',
+  'chlamydia',
+]
+
+async function seedTags(tag) { 
+  const text = `
+    INSERT INTO tags (name) 
+    VALUES ($1) `
+  const values = [tag]
+  try {
+    const res = await db.pool.query(text, values)
+    console.log(`Tag '${tag}' created`)
+  } catch(err) {
+    console.log(err.stack)
+  }
+}
+
+for (tag of tags) {
+  seedTags(tag)
+}
+
+
+async function seedUsersTags(id_user, id_tag) { 
+  const text = `
+    INSERT INTO users_tags (id_user, id_tag) 
+    VALUES ($1, $2) `
+  const values = [id_user, id_tag]
+  try {
+    const res = await db.pool.query(text, values)
+    console.log(`User ${id_user} get assigned tag '${id_tag}'`)
+  } catch(err) {
+    console.log(err.stack)
+  }
+}
+
+  
+for (i = 1; i < 1000; i++) {
+  seedUsersTags(i, Math.floor(Math.random() * 50) + 1)
+  seedUsersTags(i, Math.floor(Math.random() * 50) + 1)
+  seedUsersTags(i, Math.floor(Math.random() * 50) + 1)
+  seedUsersTags(i, Math.floor(Math.random() * 50) + 1)
+  seedUsersTags(i, Math.floor(Math.random() * 50) + 1)
+}

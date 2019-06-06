@@ -2,8 +2,8 @@ const db = require('./database.js')
 
 db.pool.query(
     `
-    DROP TABLE IF EXISTS user_interests;
-    DROP TABLE IF EXISTS interests;
+    DROP TABLE IF EXISTS users_tags;
+    DROP TABLE IF EXISTS tags;
     DROP TABLE IF EXISTS likers;
     DROP TABLE IF EXISTS stalkers;
     DROP TABLE IF EXISTS users;
@@ -35,13 +35,13 @@ db.pool.query(
       latitude NUMERIC,
       longitude NUMERIC
     );
-    CREATE TABLE interests (
-      id_interest SERIAL PRIMARY KEY,
+    CREATE TABLE tags (
+      id_tag SERIAL PRIMARY KEY,
       name TEXT NOT NULL UNIQUE
     );
-    CREATE TABLE user_interests (
+    CREATE TABLE users_tags (
       id_user INTEGER REFERENCES users,
-      id_interest INTEGER REFERENCES interests
+      id_tag INTEGER REFERENCES tags
     );
     CREATE TABLE likers (
       id_liker INTEGER REFERENCES users,
@@ -56,5 +56,5 @@ db.pool.query(
   if (error) {
     throw error
   }
-  console.log('Table users, interests, user_interests, likers, stalkers created')
+  console.log('Table users, tags, users_tags, likers, stalkers created')
 })

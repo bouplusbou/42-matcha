@@ -7,6 +7,7 @@ const urlencodedParser = bodyParser.urlencoded({ extended: false })
 const router = express.Router();
 const authenticate = require('./middlewares/authenticate')
 const User = require('./models/User')
+const Tag = require('./models/Tag')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const config = require('./middlewares/config')
@@ -155,8 +156,8 @@ router.route('/api/search')
       
 })
 .post((req,res) => {
-      const { age, fame, latlng } = req.body
-      User.getUsers(age, fame, latlng).then( users => {
+      const { age, fame, latlng, tags } = req.body
+      User.getUsers(age, fame, latlng, tags).then( users => {
             res.json({message : "List all users", data: users});
       }).catch(error => { console.log(error) })
 })
@@ -181,7 +182,34 @@ router.route('/api/users/:id_user')
 
 
 
+router.route('/api/tags')
+.post((req,res) => {
+      console.log(req.body)
+      Tag.getTags()
+            .then( tags => {
+                  for (tag of tags) {
+                        tag['value'] = tag['id_tag']
+                        delete tag['id_tag']
+                        tag['label'] = tag['name']
+                        delete tag['name']
+                  }
+                  return tags
+            })
+            .then( tags => {
+                  // console.log(tags)
+                  res.json({message : "List of tags", data: tags});
+            })
+            .catch(error => { console.log(error) })
+})
 
+
+
+
+const tags = [
+      { value: 'chocolate', label: 'Chocolate' },
+      { value: 'strawberry', label: 'Strawberry' },
+      { value: 'vanilla', label: 'Vanilla' }
+    ]
 
 app.use(router);  
 

@@ -23,19 +23,38 @@ async function emailExists(email) {
   }
 }
 
-async function getUsers(age = [18, 100], fame = [0, 1000], latlng = [48.856697, 2.351462]) { 
+async function getUsers(age = [18, 100], fame = [0, 1000], latlng = [48.856697, 2.351462], tags = []) { 
   const latMin = latlng[0] - 0.1
   const latMax = latlng[0] + 0.1
   const lngMin = latlng[1] - 0.3
   const lngMax = latlng[1] + 0.3
+  let tagQuery = ''
+  let values = [age[0], age[1], fame[0], fame[1], latMin, latMax, lngMin, lngMax]
+  if (tags.length == 1) {
+    values.push(tags[0])
+    tagQuery = `AND users_tags.id_tag = $9` 
+  } else if (tags.length > 1) {
+    for (tag of tags) {
+      values.push(tag)
+    }
+    const placeholders = []
+    for (i=0;i<tags.length;i++) {
+      placeholders.push(`$${i+9}`)
+    }
+    tagQuery = `AND users_tags.id_tag IN (${placeholders.join()})` 
+  }
+  console.log(tagQuery)
   const text = `
-    SELECT *
-    FROM "users"
-    WHERE "age" >= $1 AND "age" <= $2
-    AND "fame" >= $3 AND "fame" <= $4 
-    AND "latitude" >= $5 AND "latitude" <= $6 
-    AND "longitude" >= $7 AND "longitude" <= $8 `
-  const values = [age[0], age[1], fame[0], fame[1], latMin, latMax, lngMin, lngMax]
+    SELECT users.id_user, username, age, image_1, fame, city, latitude, longitude, array_agg(tags.name) as tags
+    FROM users
+    LEFT JOIN users_tags ON users.id_user = users_tags.id_user 
+    LEFT JOIN tags ON tags.id_tag = users_tags.id_tag 
+    WHERE age >= $1 AND age <= $2
+    AND fame >= $3 AND fame <= $4 
+    AND latitude >= $5 AND latitude <= $6 
+    AND longitude >= $7 AND longitude <= $8`
+    + tagQuery +
+    `GROUP BY users.id_user `
   try {
     const res = await db.pool.query(text, values)
     return res.rows
@@ -43,6 +62,7 @@ async function getUsers(age = [18, 100], fame = [0, 1000], latlng = [48.856697, 
     console.log(err.stack)
   }
 }
+
 
 async function getUser(id) { 
   const text = `SELECT * FROM users WHERE id_user = $1`

@@ -10,6 +10,7 @@ import 'rc-tooltip/assets/bootstrap.css';
 import Slider from 'rc-slider';
 import Button from '@material-ui/core/Button'
 import AlgoliaPlaces from 'algolia-places-react';
+import Select from 'react-select';
 
 
 const styles = theme => ({
@@ -69,12 +70,17 @@ class Users extends Component {
       age: [18, 100],
       fame: [0, 1000],
       latlng: [48.856697, 2.351462],
+      tags: []
     }
 
    componentDidMount() {
           axios.get(`/users`)
           .then(res => {
             this.setState({ users: res.data.data })
+          })
+          axios.post(`/tags`)
+          .then(res => {
+            this.setState({ tags: res.data.data })
           })
     }
 
@@ -88,6 +94,8 @@ class Users extends Component {
       }
       axios.post(`/search`, search)
         .then(res => {
+          // console.log(res.data.data)
+
           this.setState({ users: res.data.data })
         })
     }
@@ -120,10 +128,29 @@ class Users extends Component {
         })
     }
 
+    handleSelectChange = async (tags) => {
+      let tagIds = []
+      await tags.forEach( tag => {
+        tagIds.push(tag.value)
+      })
+      const { age, fame, latlng } = this.state
+      const search = {
+        age: age,
+        fame: fame,
+        latlng: latlng,
+        tags: tagIds
+      }
+      axios.post(`/search`, search)
+        .then(res => {
+          // console.log(res)
+          this.setState({ users: res.data.data })
+        })
+    }
+
 
     render() {
       const { classes } = this.props
-      const { users, age, fame } = this.state
+      const { users, age, fame, tags } = this.state
       return (
         <div className={classes.main}>
           <div className={classes.leftPanel}>
@@ -160,6 +187,15 @@ class Users extends Component {
             />
             <p>Distance</p>
             <p>Interests</p>
+            <Select
+              onChange={this.handleSelectChange}
+              defaultValue={[tags[1]]}
+              isMulti
+              name="colors"
+              options={tags}
+              className="basic-multi-select"
+              classNamePrefix="select"
+            />
           </div>
           <div className={classes.wrapper}>
               {users.slice(0, 50).map( user => 
@@ -172,7 +208,16 @@ class Users extends Component {
                         title="Profile picture"
                       />
                       <div className={classes.overlay}>
-                         {user.username}, {user.age}, <br /> {user.city}
+                        {user.username}, {user.age} 
+                        <br/> {user.city}
+                        {user.tags.map( tag =>
+                            <p>#{tag}</p>
+                        )}
+                        {/* <br/> #{user.tags[0]}
+                        <br/> #{user.tags[1]}
+                        <br/> #{user.tags[2]}
+                        <br/> #{user.tags[3]}
+                        <br/> #{user.tags[4]} */}
                       </div>
                     </Link>
                   </CardActionArea>
