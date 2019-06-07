@@ -1,4 +1,4 @@
-import React, {Component, useReducer} from 'react'
+import React, {Component} from 'react'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
 import { withStyles } from '@material-ui/core/styles'
@@ -8,7 +8,6 @@ import CardMedia from '@material-ui/core/CardMedia';
 import 'rc-slider/assets/index.css';
 import 'rc-tooltip/assets/bootstrap.css';
 import Slider from 'rc-slider';
-import Button from '@material-ui/core/Button'
 import AlgoliaPlaces from 'algolia-places-react';
 import Select from 'react-select';
 
@@ -50,6 +49,10 @@ const styles = theme => ({
   },
   media: {
     height: 300,
+  },
+  tag: {
+    fontSize: '0.8em',
+    fontWeight: '400',
   },
   wrapper: {
     // backgroundColor: 'green',
@@ -208,16 +211,11 @@ class Users extends Component {
                         title="Profile picture"
                       />
                       <div className={classes.overlay}>
+                        {user.tags.map( tag =>
+                            <p className={classes.tag}>#{tag}</p>
+                        )}
                         {user.username}, {user.age} 
                         <br/> {user.city}
-                        {user.tags.map( tag =>
-                            <p>#{tag}</p>
-                        )}
-                        {/* <br/> #{user.tags[0]}
-                        <br/> #{user.tags[1]}
-                        <br/> #{user.tags[2]}
-                        <br/> #{user.tags[3]}
-                        <br/> #{user.tags[4]} */}
                       </div>
                     </Link>
                   </CardActionArea>
