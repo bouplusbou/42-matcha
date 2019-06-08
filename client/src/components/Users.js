@@ -95,7 +95,7 @@ class Users extends Component {
         fame: fame,
         latlng: latlng,
       }
-      axios.post(`/search`, search)
+      axios.post(`/users/search`, search)
         .then(res => {
           // console.log(res.data.data)
 
@@ -111,7 +111,7 @@ class Users extends Component {
         fame: fame,
         latlng: latlng,
       }
-      axios.post(`/search`, search)
+      axios.post(`/users/search`, search)
         .then(res => {
           this.setState({ users: res.data.data })
         })
@@ -125,7 +125,7 @@ class Users extends Component {
         fame: fame,
         latlng: latlng,
       }
-      axios.post(`/search`, search)
+      axios.post(`/users/search`, search)
         .then(res => {
           this.setState({ users: res.data.data })
         })
@@ -143,7 +143,7 @@ class Users extends Component {
         latlng: latlng,
         tags: tagIds
       }
-      axios.post(`/search`, search)
+      axios.post(`/users/search`, search)
         .then(res => {
           // console.log(res)
           this.setState({ users: res.data.data })

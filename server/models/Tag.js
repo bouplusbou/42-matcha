@@ -13,5 +13,5 @@ async function getTags() {
   }
 
   module.exports = {
-    getTags,
+    getTags
 }
