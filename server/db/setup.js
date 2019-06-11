@@ -13,6 +13,7 @@ db.pool.query(
     CREATE TYPE sexual_orientation_enum AS ENUM ('hetero', 'homo', 'bi');
     CREATE TABLE users (
       id_user SERIAL PRIMARY KEY,
+      uuid TEXT NOT NULL,
       email TEXT NOT NULL,
       username VARCHAR( 40 ) NOT NULL,
       first_name VARCHAR( 50 ) NOT NULL,

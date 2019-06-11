@@ -1,31 +1,23 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
+import { actionIsAuthenticated } from '../actions/authActions';
 
 export default function Authenticate(ComponentToProtect) {
 
   return class extends Component {
-    constructor() {
-      super();
-      this.state = {
+    state = {
         loading: true,
         redirect: false,
       };
-    }
 
     componentDidMount() {
-      fetch('/auth/checkToken')
+      actionIsAuthenticated(localStorage.getItem('token'))
         .then(res => {
-          if (res.status === 200) {
-            this.setState({ loading: false });
-          } else {
-            const error = new Error(res.error);
-            throw error;
-          }
+          this.setState({ loading: false, redirect: false })
         })
         .catch(err => {
-          console.error(err);
-          this.setState({ loading: false, redirect: true });
-        });
+          this.setState({ loading: false, redirect: true })
+        })
     }
 
     render() {
@@ -43,5 +35,4 @@ export default function Authenticate(ComponentToProtect) {
       );
     }
   }
-
 }

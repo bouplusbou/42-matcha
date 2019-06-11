@@ -4,6 +4,8 @@ const db = require('./database.js')
 const unsplash = require('./unsplash.js')
 const names = require('./names.js')
 const axios = require('axios')
+const uuidv1 = require('uuid/v1')
+
 
 
 function gaussianRand() {
@@ -62,6 +64,7 @@ const coord = {
 
 
 async function seedWomen(i) { 
+  const uuid = uuidv1()
   const firstName = names.randomWomanFirstName()
   const lastName = faker.name.lastName()
   const email = `${firstName}.${lastName}@`+ emailProvider[Math.floor(Math.random() * emailProvider.length)]
@@ -80,9 +83,9 @@ async function seedWomen(i) {
   const latitude = coord[city][0] + Math.random() * 0.03
   const longitude = coord[city][1] + Math.random() * 0.05
 
-  const text = `INSERT INTO users (email, username, first_name, last_name, password, confirmed, hash, age, genre, sexual_orientation, bio, image_1, profile_pic_number, fame, city, latitude, longitude) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)`
-  const values = [email, username, firstName, lastName, password, confirmed, hash, age, genre, sexualOrientation, bio, image1, profilePicNumber, fame, city, latitude, longitude]
+  const text = `INSERT INTO users (uuid, email, username, first_name, last_name, password, confirmed, hash, age, genre, sexual_orientation, bio, image_1, profile_pic_number, fame, city, latitude, longitude) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)`
+  const values = [uuid, email, username, firstName, lastName, password, confirmed, hash, age, genre, sexualOrientation, bio, image1, profilePicNumber, fame, city, latitude, longitude]
   try {
     const res = await db.pool.query(text, values)
     console.log(`Woman ${i} created`)
@@ -91,7 +94,8 @@ async function seedWomen(i) {
   }
 }
 
-async function seedMen(i) { 
+async function seedMen(i) {
+  const uuid = uuidv1() 
   const firstName = names.randomManFirstName()
   const lastName = faker.name.lastName()
   const email = `${firstName}.${lastName}@`+ emailProvider[Math.floor(Math.random() * emailProvider.length)]
@@ -110,9 +114,9 @@ async function seedMen(i) {
   const latitude = coord[city][0] + Math.random() * 0.03
   const longitude = coord[city][1] + Math.random() * 0.05
 
-  const text = `INSERT INTO users (email, username, first_name, last_name, password, confirmed, hash, age, genre, sexual_orientation, bio, image_1, profile_pic_number, fame, city, latitude, longitude) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)`
-  const values = [email, username, firstName, lastName, password, confirmed, hash, age, genre, sexualOrientation, bio, image1, profilePicNumber, fame, city, latitude, longitude]
+  const text = `INSERT INTO users (uuid, email, username, first_name, last_name, password, confirmed, hash, age, genre, sexual_orientation, bio, image_1, profile_pic_number, fame, city, latitude, longitude) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)`
+  const values = [uuid, email, username, firstName, lastName, password, confirmed, hash, age, genre, sexualOrientation, bio, image1, profilePicNumber, fame, city, latitude, longitude]
   try {
     const res = await db.pool.query(text, values)
     console.log(`Man ${i} created`)
@@ -130,6 +134,7 @@ const gender = [names.randomManFirstName(), names.randomWomanFirstName()]
 const randomPicArr = [unsplash.randomManPic(), unsplash.randomWomanPic()]
 
 async function seedNonbinary(i) { 
+  const uuid = uuidv1()
   const firstName = gender[Math.floor(Math.random() * gender.length)]
   const lastName = faker.name.lastName()
   const email = `${firstName}.${lastName}@`+ emailProvider[Math.floor(Math.random() * emailProvider.length)]
@@ -148,9 +153,9 @@ async function seedNonbinary(i) {
   const latitude = coord[city][0] + Math.random() * 0.03
   const longitude = coord[city][1] + Math.random() * 0.05
 
-  const text = `INSERT INTO users (email, username, first_name, last_name, password, confirmed, hash, age, genre, sexual_orientation, bio, image_1, profile_pic_number, fame, city, latitude, longitude) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)`
-  const values = [email, username, firstName, lastName, password, confirmed, hash, age, genre, sexualOrientation, bio, image1, profilePicNumber, fame, city, latitude, longitude]
+  const text = `INSERT INTO users (uuid, email, username, first_name, last_name, password, confirmed, hash, age, genre, sexual_orientation, bio, image_1, profile_pic_number, fame, city, latitude, longitude) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)`
+  const values = [uuid, email, username, firstName, lastName, password, confirmed, hash, age, genre, sexualOrientation, bio, image1, profilePicNumber, fame, city, latitude, longitude]
   try {
     const res = await db.pool.query(text, values)
     console.log(`Nonbinary ${i} created`)

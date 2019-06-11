@@ -74,9 +74,25 @@ const oneUser = (req, res) => {
             .catch( error => { console.log(error) })
 }
 
+const profile = (req, res) => {
+      User.getProfile(req.params.uuid)
+            .then( user => { res.json({message : "Profile", data: user}) })
+            .catch( error => { console.log(error) })
+}
+
+const uploadPhoto = (req, res) => {
+      console.log(req.body)
+      // User.getProfile(req.params.uuid)
+      //       .then( user => { res.json({message : "Profile", data: user}) })
+      //       .catch( error => { console.log(error) })
+}
+
+
 module.exports = {
       allUsers,
       createUser,
       searchUsers,
-      oneUser
+      oneUser,
+      profile,
+      uploadPhoto,
 }

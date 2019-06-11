@@ -1,5 +1,6 @@
 const db = require('../db/database.js')
 const bcrypt = require('bcrypt')
+const uuidv1 = require('uuid/v1')
 
 async function usernameExists(username) { 
   const text = `SELECT * FROM users WHERE username = $1`
@@ -74,12 +75,25 @@ async function getUser(id) {
   }
 }
 
+async function getUserByUuid(uuid) { 
+  const text = `SELECT username FROM users WHERE uuid = $1`
+  const values = [uuid]
+  try {
+    const res = await db.pool.query(text, values)
+    return res.rows
+  } catch(err) {
+    console.log(err.stack)
+  }
+}
+
+
 async function createUser(email, firstName, lastName, username, password) {
   await bcrypt.hash(password, 10, (error, hash) => {
+      const uuid = uuidv1()
       const hashedPassword = hash
-      const text = `INSERT INTO users (email, username, first_name, last_name, password, confirmed, hash) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7)`
-      const values = [email, username, firstName, lastName, hashedPassword, 1, 'hash']
+      const text = `INSERT INTO users (uuid, email, username, first_name, last_name, password, confirmed, hash) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
+      const values = [uuid, email, username, firstName, lastName, hashedPassword, 1, 'hash']
       try {
         db.pool.query(text, values)
       } catch(err) {
@@ -88,10 +102,29 @@ async function createUser(email, firstName, lastName, username, password) {
   })
 }
 
+async function getProfile(uuid) {
+  const text = `
+    SELECT username, age, image_1, fame, city, latitude, longitude, array_agg(tags.name) as tags
+    FROM users
+    LEFT JOIN users_tags ON users.id_user = users_tags.id_user 
+    LEFT JOIN tags ON tags.id_tag = users_tags.id_tag 
+    WHERE uuid = $1
+    GROUP BY users.id_user`
+  const values = [uuid]
+  try {
+    const res = await db.pool.query(text, values)
+    return res.rows
+  } catch(err) {
+    console.log(err.stack)
+  }
+}
+
 module.exports = {
     usernameExists,
     emailExists,
     getUsers,
+    getUserByUuid,
     getUser,
-    createUser
+    createUser,
+    getProfile,
 }

@@ -10,13 +10,12 @@ const login = (req, res) => {
             if (user) {
                     bcrypt.compare(password, user.password, (err, result) => {
                         if (result) {
-                                const token = jwt.sign({
-                                    id: user.id_user,
-                                    username: user.username
-                                }, config.jwtSecret, { expiresIn: '6h'})
-                                res.cookie('token', token, { httpOnly: true }).sendStatus(200);
+                            const token = jwt.sign({
+                                uuid: user.uuid,
+                            }, config.jwtSecret, { expiresIn: '6h'})
+                            res.json({ token: token })
                         } else {
-                                res.status(401).json({ errors: 'Invalid Credentials' })
+                            res.status(401).json({ errors: 'Invalid Credentials' })
                         }
                     });
             } else {
@@ -26,7 +25,13 @@ const login = (req, res) => {
         .catch( err => { console.log(err) })
 }
 
+const uuidIsValid = (req, res) => {
+    User.getUserByUuid(req.params.uuid)
+        .then( user => { res.json({message : "Info for one user", data: user}) })
+        .catch( error => { console.log(error) })
+}
 
 module.exports = {
-    login
+    login,
+    uuidIsValid,
 }

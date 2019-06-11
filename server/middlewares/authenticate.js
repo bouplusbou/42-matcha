@@ -2,11 +2,7 @@ const jwt = require('jsonwebtoken')
 const config = require('./config')
 
 const authenticate = (req, res, next) => {
-  const token =
-    req.body.token ||
-    req.query.token ||
-    req.headers['x-access-token'] ||
-    req.cookies.token
+  const token = req.body.authToken || req.query.authToken
 
   if (!token) {
     res.status(401).send('Unauthorized: No token provided');
@@ -15,7 +11,6 @@ const authenticate = (req, res, next) => {
       if (err) {
         res.status(401).send('Unauthorized: Invalid token');
       } else {
-        // req.email = decoded.email;
         next()
       }
     });
@@ -23,3 +18,4 @@ const authenticate = (req, res, next) => {
 }
 
 module.exports = authenticate
+

@@ -4,6 +4,7 @@ import { withStyles } from '@material-ui/core/styles'
 import TextField from '@material-ui/core/TextField'
 import Button from '@material-ui/core/Button'
 import axios from 'axios'
+import { actionLogin } from '../actions/authActions'
 
 const styles = theme => ({
   container: {
@@ -38,16 +39,11 @@ class TextFields extends React.Component {
 
     const credentials = this.state
     axios.post(`/auth`, credentials)
-      .then(res => {
-        if (res.status === 200) {
-          this.props.history.push('/')
-        } else {
-          const error = new Error(res.error);
-          throw error
-        }
-      }).catch(err => {
-        console.error(err);
-        alert('Error logging in please try again');
+      .then(res => actionLogin(res.data.token))
+      .then(res => this.props.history.push('/'))
+      .catch((err) => {
+        console.error(err)
+        alert('Error logging in please try again')
       })
   }
 

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Switch, Route } from 'react-router-dom'
-import Users from './Users'
+
 import User from './User'
 import Authenticate from './Authenticate'
 
@@ -8,10 +8,9 @@ import Authenticate from './Authenticate'
 // depending on the full pathname
 const UsersSwitch = () => (
   <Switch>
-    <Route exact path='/users' component={Users}/>
     <Route path='/users/:id' component={Authenticate(User)}/>
+    {/* <Route path='/users/:id' component={User}/> */}
   </Switch>
 )
-
 
 export default UsersSwitch

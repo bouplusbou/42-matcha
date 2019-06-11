@@ -1,17 +1,17 @@
-import React, {Component} from 'react'
-import { Link } from 'react-router-dom'
-import axios from 'axios'
-import { withStyles } from '@material-ui/core/styles'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons'
-import { faBirthdayCake } from '@fortawesome/free-solid-svg-icons'
-import { faCircle } from '@fortawesome/free-solid-svg-icons'
-import { faArrowAltCircleRight } from '@fortawesome/free-solid-svg-icons'
-import { faArrowAltCircleLeft } from '@fortawesome/free-solid-svg-icons'
-import { faHeart } from '@fortawesome/free-regular-svg-icons'
-import Modal from '@material-ui/core/Modal'
-import Carousel from '@brainhubeu/react-carousel'
-import '@brainhubeu/react-carousel/lib/style.css'
+import React, {Component} from 'react';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
+import { withStyles } from '@material-ui/core/styles';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
+import { faBirthdayCake } from '@fortawesome/free-solid-svg-icons';
+import { faCircle } from '@fortawesome/free-solid-svg-icons';
+import { faArrowAltCircleRight } from '@fortawesome/free-solid-svg-icons';
+import { faArrowAltCircleLeft } from '@fortawesome/free-solid-svg-icons';
+import { faHeart } from '@fortawesome/free-regular-svg-icons';
+import Modal from '@material-ui/core/Modal';
+import Carousel from '@brainhubeu/react-carousel';
+import '@brainhubeu/react-carousel/lib/style.css';
 
 const styles = theme => ({
   main: {
@@ -78,7 +78,7 @@ const styles = theme => ({
 
 class User extends Component {
   constructor(props) {
-      super(props)
+      super(props);
       this.state = {
           id_user: this.props.match.params.id,
           user: [],
@@ -87,24 +87,24 @@ class User extends Component {
   }
 
   componentDidMount() {
-        axios.get(`/users/${this.state.id_user}`)
-        .then(res => {
-          const user = res.data.data[0];
-          this.setState({ user });
-        })
-    }
+    axios.get(`/users/${this.state.id_user}`)
+      .then(res => {
+        const user = res.data.data[0];
+        this.setState({ user });
+      })
+  }
 
   handleClickPhoto = () => {
-    this.setState({ openModal: true })
+    this.setState({ openModal: true });
   }
 
   handleCloseModal = () => {
-    this.setState({ openModal: false })
+    this.setState({ openModal: false });
   }
 
   render() {
-    const { classes } = this.props
-    let { user, openModal } = this.state
+    const { classes } = this.props;
+    let { user, openModal } = this.state;
       return (
         <div className={classes.main}>
               <Modal
@@ -117,9 +117,9 @@ class User extends Component {
                       arrowRight={<FontAwesomeIcon style={{cursor: 'pointer', fontSize: '3vw', margin: '0 3vw', color: '#F5F5F5'}} icon={faArrowAltCircleRight} />}
                       addArrowClickHandler
                   >
-                    <img style={{height: '30vw', borderRadius: 13}} src={user.image_1} />
-                    <img style={{height: '30vw', borderRadius: 13}} src={user.image_1} />
-                    <img style={{height: '30vw', borderRadius: 13}} src={user.image_1} />
+                    <img style={{height: '30vw', borderRadius: 13}} src={user.image_1} alt="user profile 1" />
+                    <img style={{height: '30vw', borderRadius: 13}} src={user.image_1} alt="user profile 2" />
+                    <img style={{height: '30vw', borderRadius: 13}} src={user.image_1} alt="user profile 3" />
                   </Carousel>
                 </div>
               </Modal>
@@ -129,7 +129,8 @@ class User extends Component {
               className={classes.photo} 
               style ={ { backgroundImage: `url(${user.image_1})`, cursor: 'pointer' } }
               onClick={this.handleClickPhoto} 
-            ></div>
+            >
+            </div>
             <dir className={classes.basicInfos} >
               <p style={{textTransform: 'capitalize'}}><FontAwesomeIcon style={{color: '#FB8585', margin: '0 8px'}} icon={faMapMarkerAlt} /> {user.city}</p>
               <p><FontAwesomeIcon style={{color: '#FB8585', margin: '0 8px'}} icon={faBirthdayCake} /> {user.age} ans</p>
@@ -144,11 +145,9 @@ class User extends Component {
             <p className={classes.bioTitle}>Bio</p>
             <p>{user.bio}</p>
           </div>
-          <div className={classes.margin}><Link to='/users'>Back</Link></div>
         </div>
       );
   }
 }
 
-
-export default withStyles(styles)(User)
+export default withStyles(styles)(User);
