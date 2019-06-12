@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import axios from 'axios';
 import { withStyles } from '@material-ui/core/styles';
-import { actionIsAuthenticated } from '../actions/authActions';
+// import { actionIsAuthenticated } from '../actions/authActions';
 import UploadImage from './Upload';
 import Modal from '@material-ui/core/Modal';
 
@@ -76,12 +76,13 @@ class ProfilePage extends Component {
   state = {
     user: [],
     openModal: false,
-  }
+    authToken: localStorage.getItem('token'),
+  };
 
   async componentDidMount() {
-      const uuid = await actionIsAuthenticated(localStorage.getItem('token'));
-      const user = await axios.get(`/users/profile/${uuid}`);
-      console.log(user.data);
+      const { authToken } = this.state;
+      const user = await axios.get(`/users/profile?authToken=${authToken}`);
+      console.log(user);
       this.setState({ user: {username: user.data.data[0].username} });
   }
 
@@ -94,8 +95,8 @@ class ProfilePage extends Component {
   }
 
   render() {
-    const { classes } = this.props
-    const { user, openModal } = this.state
+    const { classes } = this.props;
+    const { user, openModal } = this.state;
     return (
       <div className={classes.main} >
         <Modal
@@ -195,11 +196,3 @@ class ProfilePage extends Component {
 }
 
 export default withStyles(styles)(ProfilePage);
-
-
-
-
-
-
-
-

@@ -1,34 +1,32 @@
-const User = require('../models/User')
-const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
-const config = require('../middlewares/config')
+const User = require('../models/User');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const config = require('../middlewares/config');
 
 const login = (req, res) => {
-    const { username, password } = req.body
+    const { username, password } = req.body;
     User.usernameExists(username)
-        .then( user =>  {
+        .then(user =>  {
             if (user) {
                     bcrypt.compare(password, user.password, (err, result) => {
                         if (result) {
-                            const token = jwt.sign({
-                                uuid: user.uuid,
-                            }, config.jwtSecret, { expiresIn: '6h'})
-                            res.json({ token: token })
+                            const token = jwt.sign({ uuid: user.uuid }, config.jwtSecret, { expiresIn: '6h' });
+                            res.json({ token: token });
                         } else {
-                            res.status(401).json({ errors: 'Invalid Credentials' })
+                            res.status(401).json({ errors: 'Invalid Credentials' });
                         }
                     });
             } else {
-                    res.status(401).json({ errors: 'Invalid Credentials' })
+                    res.status(401).json({ errors: 'Invalid Credentials' });
             }
         })
-        .catch( err => { console.log(err) })
+        .catch(err => { console.log(err) });
 }
 
 const uuidIsValid = (req, res) => {
     User.getUserByUuid(req.params.uuid)
         .then( user => { res.json({message : "Info for one user", data: user}) })
-        .catch( error => { console.log(error) })
+        .catch( error => { console.log(error) });
 }
 
 module.exports = {

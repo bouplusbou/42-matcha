@@ -1,12 +1,15 @@
 const User = require('../models/User')
+const jwt = require('jsonwebtoken');
+const config = require('../middlewares/config');
 
 const allUsers = (req, res) => { 
       User.getUsers()
-            .then( users => { res.json({message : "List all users", data: users}) })
-            .catch( error => { console.log(error) })
+            .then(users => { res.json({message : "List all users", data: users}) })
+            .catch(err => { console.log(err) })
 }
 
 const createUser = (req, res) => {
+      console.log(req);
       const emailIsOK = email => {
             const regex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             return regex.test(String(email).toLowerCase())
@@ -64,29 +67,40 @@ const createUser = (req, res) => {
 const searchUsers = (req, res) => {
       const { age, fame, latlng, tags } = req.body
       User.getUsers(age, fame, latlng, tags)
-            .then( users => { res.json({message : "Search through users", data: users}) })
-            .catch( error => { console.log(error) })
+            .then(users => { res.json({message : "Search through users", data: users}) })
+            .catch(err => { console.log(err) })
 }
 
 const oneUser = (req, res) => {
       User.getUser(req.params.id_user)
-            .then( user => { res.json({message : "Info for one user", data: user}) })
-            .catch( error => { console.log(error) })
+            .then(user => { res.json({message : "Info for one user", data: user}) })
+            .catch(err => { console.log(err) })
 }
 
-const profile = (req, res) => {
-      User.getProfile(req.params.uuid)
-            .then( user => { res.json({message : "Profile", data: user}) })
-            .catch( error => { console.log(error) })
+const profile = async (req, res) => {
+      const token = req.body.authToken || req.query.authToken;
+      const uuid = await jwt.verify(token, config.jwtSecret, (err, decoded) => {
+            if (err) res.status(401).send('Unauthorized: Invalid token');
+            return decoded.uuid;
+      });
+      if (uuid) {
+            User.getProfile(uuid)
+                  .then(user => { res.json({message : "Profile", data: user}) })
+                  .catch(err => { console.log(err) })
+      }
 }
 
-const uploadPhoto = (req, res) => {
-      console.log(req.body)
-      // User.getProfile(req.params.uuid)
-      //       .then( user => { res.json({message : "Profile", data: user}) })
-      //       .catch( error => { console.log(error) })
+const uploadPhoto = async (req, res) => {
+      const token = req.body.authToken || req.query.authToken;
+      const uuid = await jwt.verify(token, config.jwtSecret, (err, decoded) => {
+            if (err) res.status(401).send('Unauthorized: Invalid token');
+            return decoded.uuid;
+      });
+      if (uuid) {
+            console.log({uuid})
+            console.log(req.file);
+      }
 }
-
 
 module.exports = {
       allUsers,

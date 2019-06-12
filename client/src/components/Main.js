@@ -1,14 +1,14 @@
-import React from 'react'
-import { Switch, Route } from 'react-router-dom'
-import Home from './Home'
-import UsersSwitch from './UsersSwitch'
-import Signup from './Signup'
-import Login from './Login'
-import SelectComp from './test'
-import Search from './Search'
-import Logout from './Logout'
-import Authenticate from './Authenticate'
-import Profile from './Profile'
+import React from 'react';
+import { Switch, Route } from 'react-router-dom';
+import Home from './Home';
+import UsersSwitch from './UsersSwitch';
+import Signup from './Signup';
+import Login from './Login';
+import SelectComp from './test';
+import Search from './Search';
+import Logout from './Logout';
+import Authenticate from './Authenticate';
+import Profile from './Profile';
 
 const Main = () => (
   <main>
@@ -23,6 +23,6 @@ const Main = () => (
       <Route path='/users' component={Authenticate(UsersSwitch)}/>
     </Switch>
   </main>
-)
+);
 
-export default Main
+export default Main;

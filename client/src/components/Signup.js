@@ -1,9 +1,9 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import { withStyles } from '@material-ui/core/styles'
-import TextField from '@material-ui/core/TextField'
-import Button from '@material-ui/core/Button'
-import axios from 'axios'
+import React from 'react';
+import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
+import axios from 'axios';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import IconButton from '@material-ui/core/IconButton';
@@ -48,7 +48,7 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'center',
   },
-})
+});
 
 
 class SignupForm extends React.Component {
@@ -60,193 +60,180 @@ class SignupForm extends React.Component {
 
   emailIsOK = email => {
     const regex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return regex.test(String(email).toLowerCase())
+    return regex.test(String(email).toLowerCase());
   }
   emailError = () => {
     this.setState({ 
       email: undefined,
       errorEmail: true,
       helperEmail: 'Enter a proper email',
-    })
+    });
   }
   emailTaken = () => {
     this.setState({ 
       email: undefined,
       errorEmail: true,
       helperEmail: 'This email is already used',
-    })
+    });
   }
   emailIsSet = email => {
     this.setState({ 
       email: email,
       errorEmail: false,
       helperEmail: '',
-     })
+    });
   }
   handleEmailBlur = email => event => {
     if (this.emailIsOK(event.target.value)) {
-      this.emailIsSet(event.target.value)
+      this.emailIsSet(event.target.value);
     } else {
-      this.emailError()
+      this.emailError();
     }
   }
   handleEmailChange = email => event => {
-    if (this.emailIsOK(event.target.value)) {
-      this.emailIsSet(event.target.value)
-    }
+    if (this.emailIsOK(event.target.value)) this.emailIsSet(event.target.value);
   }
 
 
   firstNameIsOK = firstName => {
-    const regex = /^[A-Za-zÀ-ÖØ-öø-ÿ-]{3,15}$/
-    return regex.test(String(firstName))
+    const regex = /^[A-Za-zÀ-ÖØ-öø-ÿ-]{3,15}$/;
+    return regex.test(String(firstName));
   }
   firstNameError = () => {
     this.setState({ 
       firstName: undefined,
       errorFirstName: true,
       helperFirstName: 'Between 3 and 15 characters, only letters and "-"',
-    })
+    });
   }
   firstNameIsSet = firstName => {
     this.setState({ 
       firstName: firstName,
       errorFirstName: false,
       helperFirstName: '',
-     })
+     });
   }
   handleFirstNameBlur = firstName => event => {
     if (this.firstNameIsOK(event.target.value)) {
-      this.firstNameIsSet(event.target.value)
+      this.firstNameIsSet(event.target.value);
     } else {
-      this.firstNameError()
+      this.firstNameError();
     }
   }
   handleFirstNameChange = firstName => event => {
-    if (this.firstNameIsOK(event.target.value)) {
-      this.firstNameIsSet(event.target.value)
-    }
+    if (this.firstNameIsOK(event.target.value)) this.firstNameIsSet(event.target.value);
   }
 
 
   lastNameIsOK = lastName => {
-    const regex = /^[A-Za-zÀ-ÖØ-öø-ÿ]{3,15}$/
-    return regex.test(String(lastName))
+    const regex = /^[A-Za-zÀ-ÖØ-öø-ÿ]{3,15}$/;
+    return regex.test(String(lastName));
   }
   lastNameError = () => {
     this.setState({
       lastName: undefined,
       errorLastName: true,
       helperLastName: 'Between 3 and 15 characters, only letters',
-    })
+    });
   }
   lastNameIsSet = lastName => {
     this.setState({ 
       lastName: lastName,
       errorLastName: false,
       helperLastName: '',
-    })
+    });
   }
   handleLastNameBlur = lastName => event => {
     if (this.lastNameIsOK(event.target.value)) {
-      this.lastNameIsSet(event.target.value)
+      this.lastNameIsSet(event.target.value);
     } else {
-      this.lastNameError()
+      this.lastNameError();
     }
   }
   handleLastNameChange = lastName => event => {
-    if (this.lastNameIsOK(event.target.value)) {
-      this.lastNameIsSet(event.target.value)
-    }
+    if (this.lastNameIsOK(event.target.value)) this.lastNameIsSet(event.target.value);
   }
 
 
   usernameIsOK = username => {
-    const regex = /^[A-Za-zÀ-ÖØ-öø-ÿ]{5,10}$/
-    return regex.test(String(username))
+    const regex = /^[A-Za-zÀ-ÖØ-öø-ÿ]{5,10}$/;
+    return regex.test(String(username));
   }
   usernameError = () => {
     this.setState({
       username: undefined,
       errorUsername: true,
       helperUsername: 'Between 6 and 10 characters, only letters',
-    })
+    });
   }
   usernameTaken = () => {
     this.setState({
       username: undefined,
       errorUsername: true,
       helperUsername: 'This username is already taken',
-    })
+    });
   }
   usernameIsSet = username => {
     this.setState({ 
       username: username,
       errorUsername: false,
       helperUsername: '',
-    })
+    });
   }
   handleUsernameBlur = username => event => {
     if (this.usernameIsOK(event.target.value)) {
-      this.usernameIsSet(event.target.value)
+      this.usernameIsSet(event.target.value);
     } else {
-      this.usernameError()
+      this.usernameError();
     }
   }
   handleUsernameChange = username => event => {
-    if (this.usernameIsOK(event.target.value)) {
-      this.usernameIsSet(event.target.value)
-    }
+    if (this.usernameIsOK(event.target.value)) this.usernameIsSet(event.target.value);
   }
 
   passwordIsOK = password => {
-    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/
-    return regex.test(String(password))
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/;
+    return regex.test(String(password));
   }
   passwordError = () => {
     this.setState({ 
       password: undefined,
       errorPassword: true,
       helperPassword: 'Minimum 6 characters, at least one uppercase letter, one lowercase letter and one number',
-    })
+    });
   }
   passwordIsSet = password => {
     this.setState({ 
       password: password,
       errorPassword: false,
       helperPassword: '',
-    })
+    });
   }
   handlePasswordBlur = password => event => {
     if (this.passwordIsOK(event.target.value)) {
-      this.passwordIsSet(event.target.value)
+      this.passwordIsSet(event.target.value);
     } else {
-      this.passwordError()
+      this.passwordError();
     }
   }
   handlePasswordChange = password => event => {
-    if (this.passwordIsOK(event.target.value)) {
-      this.passwordIsSet(event.target.value)
-    }
+    if (this.passwordIsOK(event.target.value)) this.passwordIsSet(event.target.value);
   }
   handleClickShowPassword = () => {
-    this.setState({ 
-      showPassword: !this.state.showPassword
-     })
-  };
-
+    this.setState({ showPassword: !this.state.showPassword });
+  }
 
 
   handleSubmit = event => {
     event.preventDefault();
-    
+    const { email, firstName, lastName, username, password } = this.state;
     const newUser = { 
-      email: this.state.email,
-      firstName: this.state.firstName,
-      lastName: this.state.lastName,
-      username: this.state.username,
-      password: this.state.password
-    }
+      email,
+      firstName,
+      lastName,
+      username,
+      password
+    };
 
     if (newUser.email 
         && newUser.firstName 
@@ -254,56 +241,28 @@ class SignupForm extends React.Component {
         && newUser.username
         && newUser.password) {
       axios.post(`/users`, newUser)
-      .then(res => {
-        if (res.status === 200) {
-          this.props.history.push('/login')
-        } 
-      })
-      .catch(error => {
-        const res = error.response.data
-        if (res.emailKO) {
-          this.emailError()
-        }
-        if (res.firstNameKO) {
-          this.firstNameError()
-        }
-        if (res.lastNameKO) {
-          this.lastNameError()
-        }
-        if (res.usernameKO) {
-          this.usernameError()
-        }
-        if (res.passwordKO) {
-          this.passwordError()
-        }
-        if (res.usernameTaken) {
-          this.usernameTaken()
-        }
-        if (res.emailTaken) {
-          this.emailTaken()
-        }
-      })
+        .then(res => { if (res.status === 200) this.props.history.push('/login'); })
+        .catch(error => {
+          const res = error.response.data;
+          if (res.emailKO) this.emailError();
+          if (res.firstNameKO) this.firstNameError();
+          if (res.lastNameKO) this.lastNameError();
+          if (res.usernameKO) this.usernameError();
+          if (res.passwordKO) this.passwordError();
+          if (res.usernameTaken) this.usernameTaken();
+          if (res.emailTaken) this.emailTaken();
+        });
     } else {
-      if (!newUser.email) {
-        this.emailError()
-      }
-      if (!newUser.firstName) {
-        this.firstNameError()
-      }
-      if (!newUser.lastName) {
-        this.lastNameError()
-      }
-      if (!newUser.username) {
-        this.usernameError()
-      }
-      if (!newUser.password) {
-        this.passwordError()
-      }
+      if (!newUser.email) this.emailError();
+      if (!newUser.firstName) this.firstNameError();
+      if (!newUser.lastName) this.lastNameError();
+      if (!newUser.username) this.usernameError();
+      if (!newUser.password) this.passwordError();
     }
   }
 
   render() {
-    const { classes } = this.props
+    const { classes } = this.props;
 
     return (
       <div className={classes.wrapper}>
@@ -381,16 +340,15 @@ class SignupForm extends React.Component {
             <Button type="submit" variant="contained" className={classes.button}>
                 Signup
             </Button>
-
           </form>
         </div>
       </div>
-    )
+    );
   }
 }
 
 SignupForm.propTypes = {
   classes: PropTypes.object.isRequired,
-}
+};
 
-export default withStyles(styles)(SignupForm)
+export default withStyles(styles)(SignupForm);

@@ -1,22 +1,16 @@
-const jwt = require('jsonwebtoken');
 const axios = require('axios');
 
-
-const actionLogin = (token) => {
+const actionLogin = token => {
     localStorage.setItem('token', token);
 }
 
-async function actionIsAuthenticated(token) {
-    let uuid = '';
-    await jwt.verify(token, 'secretkey', (err, decoded) => {
-        uuid = decoded.uuid;
-    });
-
-    const res = await axios.get(`/auth/${uuid}`)
-    if (res.data.data[0]) {
-        return uuid;
+const actionIsAuthenticated = async (authToken) => {
+    if (authToken) {
+        const isAuthenticated = await axios.get(`/auth?authToken=${authToken}`);
+        return !!isAuthenticated;
+    } else {
+        return false;
     }
-    return false;
 }
 
 const actionLogout = () => {

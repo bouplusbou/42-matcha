@@ -1,6 +1,6 @@
-import { Component } from 'react'
-import { withRouter } from 'react-router'
-import { actionLogout } from '../actions/authActions'
+import { Component } from 'react';
+import { withRouter } from 'react-router';
+import { actionLogout } from '../actions/authActions';
 
 class LogoutPage extends Component {
 
@@ -14,4 +14,4 @@ class LogoutPage extends Component {
   }
 }
 
-export default withRouter(LogoutPage)
+export default withRouter(LogoutPage);

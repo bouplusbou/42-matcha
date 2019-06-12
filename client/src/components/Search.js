@@ -58,7 +58,7 @@ const styles = theme => ({
     flexWrap: 'wrap',
     justifyContent: 'center',
   },
-})
+});
 
 const createSliderWithTooltip = Slider.createSliderWithTooltip;
 const Range = createSliderWithTooltip(Slider.Range);
@@ -74,11 +74,12 @@ class Search extends Component {
   };
 
   componentDidMount() {
-    axios.get(`/users?authToken=${this.state.authToken}`)
+    const { authToken } = this.state;
+    axios.get(`/users?authToken=${authToken}`)
       .then(res => {
         this.setState({ users: res.data.data });
       });
-    axios.post(`/tags`)
+    axios.post(`/tags?authToken=${authToken}`)
       .then(res => {
         this.setState({ tags: res.data.data });
       });

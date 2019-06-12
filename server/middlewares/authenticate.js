@@ -1,21 +1,21 @@
-const jwt = require('jsonwebtoken')
-const config = require('./config')
+const jwt = require('jsonwebtoken');
+const config = require('./config');
+const User = require('../models/User');
 
 const authenticate = (req, res, next) => {
-  const token = req.body.authToken || req.query.authToken
-
+  const token = req.body.authToken || req.query.authToken;
   if (!token) {
     res.status(401).send('Unauthorized: No token provided');
   } else {
-    jwt.verify(token, config.jwtSecret, (err, decoded) => {
-      if (err) {
+    jwt.verify(token, config.jwtSecret, async (err, decoded) => {
+      try {
+        const uuidIsValid = await User.getUserByUuid(decoded.uuid);
+        uuidIsValid ? next() : res.status(401).send('Unauthorized: Invalid token');
+      } catch {
         res.status(401).send('Unauthorized: Invalid token');
-      } else {
-        next()
       }
     });
   }
 }
 
-module.exports = authenticate
-
+module.exports = authenticate;

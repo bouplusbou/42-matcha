@@ -1,10 +1,10 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import { withStyles } from '@material-ui/core/styles'
-import TextField from '@material-ui/core/TextField'
-import Button from '@material-ui/core/Button'
-import axios from 'axios'
-import { actionLogin } from '../actions/authActions'
+import React from 'react';
+import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
+import axios from 'axios';
+import { actionLogin } from '../actions/authActions';
 
 const styles = theme => ({
   container: {
@@ -22,33 +22,34 @@ const styles = theme => ({
   menu: {
     width: 200,
   },
-})
+});
 
 
 class TextFields extends React.Component {
 
   handleUsernameChange = username => event => {
-    this.setState({ [username]: event.target.value })
+    this.setState({ [username]: event.target.value });
   }
+
   handlePasswordChange = password => event => {
-    this.setState({ [password]: event.target.value })
+    this.setState({ [password]: event.target.value });
   }
 
   handleSubmit = event => {
     event.preventDefault();
 
-    const credentials = this.state
+    const credentials = this.state;
     axios.post(`/auth`, credentials)
       .then(res => actionLogin(res.data.token))
       .then(res => this.props.history.push('/'))
       .catch((err) => {
         console.error(err)
         alert('Error logging in please try again')
-      })
+      });
   }
 
   render() {
-    const { classes } = this.props
+    const { classes } = this.props;
 
     return (
       <form className={classes.container} noValidate autoComplete="off" onSubmit={this.handleSubmit} >
@@ -73,7 +74,7 @@ class TextFields extends React.Component {
         </Button>
 
       </form>
-    )
+    );
   }
 }
 
@@ -81,4 +82,4 @@ TextFields.propTypes = {
   classes: PropTypes.object.isRequired,
 }
 
-export default withStyles(styles)(TextFields)
+export default withStyles(styles)(TextFields);

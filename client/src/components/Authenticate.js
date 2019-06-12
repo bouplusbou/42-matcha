@@ -12,12 +12,17 @@ export default function Authenticate(ComponentToProtect) {
 
     componentDidMount() {
       actionIsAuthenticated(localStorage.getItem('token'))
-        .then(res => {
-          this.setState({ loading: false, redirect: false })
+        .then(isAuthenticated => {
+          console.log(isAuthenticated);
+          if (isAuthenticated) {
+            this.setState({ loading: false, redirect: false });
+          } else {
+            this.setState({ loading: false, redirect: true });
+          }
         })
         .catch(err => {
-          this.setState({ loading: false, redirect: true })
-        })
+          this.setState({ loading: false, redirect: true });
+        });
     }
 
     render() {
