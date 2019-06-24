@@ -41,7 +41,7 @@ class TextFields extends React.Component {
     const credentials = this.state;
     axios.post(`/auth`, credentials)
       .then(res => actionLogin(res.data.token))
-      .then(res => this.props.history.push('/'))
+      .then(res => this.props.history.push('/search'))
       .catch((err) => {
         console.error(err)
         alert('Error logging in please try again')

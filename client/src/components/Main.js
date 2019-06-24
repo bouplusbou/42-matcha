@@ -5,7 +5,7 @@ import UsersSwitch from './UsersSwitch';
 import Signup from './Signup';
 import Login from './Login';
 import SelectComp from './test';
-import Search from './Search';
+import PageSearch from './PageSearch';
 import Logout from './Logout';
 import Authenticate from './Authenticate';
 import Profile from './Profile';
@@ -17,7 +17,7 @@ const Main = () => (
       <Route exact path='/' component={PageHome}/>
       <Route exact path='/login' component={Login}/>
       <Route exact path='/logout' component={Logout}/>
-      <Route exact path='/search' component={Authenticate(Search)}/>
+      <Route exact path='/search' component={Authenticate(PageSearch)}/>
       <Route exact path='/signup' component={Signup}/>
       <Route path='/profile' component={Authenticate(Profile)}/>
       <Route path='/users' component={Authenticate(UsersSwitch)}/>

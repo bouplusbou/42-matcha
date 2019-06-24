@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 
 const Header = styled.section`
   display: flex;
@@ -75,7 +76,7 @@ const PageHome =  () => (
         <p style={{margin: '0 10px'}}>matcha</p>
       </LogoWrapper>
       <LoginButton>
-        <p>Login</p>
+        <Link style={{textDecoration: 'none', color: 'rgba(255, 255, 255, 0.56)'}} to='/login'>Login</Link>
       </LoginButton>
     </Header>
     <Wrapper>
@@ -91,7 +92,7 @@ const PageHome =  () => (
           And yes we stole the Facebook Dating logo.</p>
         </Text>
         <CTA>
-          Start Dating
+          <Link style={{textDecoration: 'none', color: 'white'}} to='/signup'>Start Dating</Link>
         </CTA>
       </TextWrapper>
       <PhotoWrapper>
