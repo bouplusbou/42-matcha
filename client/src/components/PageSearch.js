@@ -129,7 +129,7 @@ const styles = theme => ({
 const createSliderWithTooltip = Slider.createSliderWithTooltip;
 const Range = createSliderWithTooltip(Slider.Range);
 
-class Search extends Component {
+class PageSearch extends Component {
   state = {
     users: [],
     age: [18, 100],
@@ -287,7 +287,7 @@ class Search extends Component {
   }
 }
 
-export default withStyles(styles)(Search);
+export default withStyles(styles)(PageSearch);
 
 
 {/* <div className={classes.wrapper}>
