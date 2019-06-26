@@ -11,6 +11,7 @@ import { faHeart } from '@fortawesome/free-regular-svg-icons';
 import Modal from '@material-ui/core/Modal';
 import Carousel from '@brainhubeu/react-carousel';
 import '@brainhubeu/react-carousel/lib/style.css';
+import Header from './Header';
 
 const styles = theme => ({
   main: {
@@ -18,6 +19,7 @@ const styles = theme => ({
     gridTemplateColumns: '0.5fr 0.8fr 2.2fr 0.5fr',
     gridTemplateRows: '1fr',
     gridTemplateAreas: '. . . .',
+    backgroundColor: '#F9F6FF',
   },
   margin: {
   },
@@ -63,11 +65,11 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    height: '8vw',
-    width: '8vw',
+    height: '7vw',
+    width: '7vw',
     borderRadius: '100%',
-    backgroundColor: '#FB8585',
-    filter: 'drop-shadow(0 0.7rem 0.6rem lightgrey)',
+    backgroundColor: '#FFFFFF',
+    // filter: 'drop-shadow(0 0.7rem 0.6rem lightgrey)',
   },
   insideModal: {
     outline: 'none',
@@ -75,7 +77,7 @@ const styles = theme => ({
   },
 });
 
-class User extends Component {
+class PageUser extends Component {
   state = {
     id_user: this.props.match.params.id,
     user: [],
@@ -104,48 +106,51 @@ class User extends Component {
     const { classes } = this.props;
     let { user, openModal } = this.state;
     return (
-      <div className={classes.main}>
-        <Modal
-          open={openModal}
-          onClose={this.handleCloseModal}
-        >
-          <div className={classes.insideModal}>
-            <Carousel
-                arrowLeft={<FontAwesomeIcon style={{cursor: 'pointer', fontSize: '3vw', margin: '0 3vw', color: '#F5F5F5'}} icon={faArrowAltCircleLeft} />}
-                arrowRight={<FontAwesomeIcon style={{cursor: 'pointer', fontSize: '3vw', margin: '0 3vw', color: '#F5F5F5'}} icon={faArrowAltCircleRight} />}
-                addArrowClickHandler
-            >
-              <img style={{height: '30vw', borderRadius: 13}} src={user.image_1} alt="user profile 1" />
-              <img style={{height: '30vw', borderRadius: 13}} src={user.image_1} alt="user profile 2" />
-              <img style={{height: '30vw', borderRadius: 13}} src={user.image_1} alt="user profile 3" />
-            </Carousel>
-          </div>
-        </Modal>
-        <div className={classes.margin}></div>
-        <div className={classes.photoColumn}>
-          <div  
-            className={classes.photo} 
-            style ={ { backgroundImage: `url(${user.image_1})`, cursor: 'pointer' } }
-            onClick={this.handleClickPhoto} 
+      <div>
+        <Header />
+        <div className={classes.main}>
+          <Modal
+            open={openModal}
+            onClose={this.handleCloseModal}
           >
+            <div className={classes.insideModal}>
+              <Carousel
+                  arrowLeft={<FontAwesomeIcon style={{cursor: 'pointer', fontSize: '3vw', margin: '0 3vw', color: '#F5F5F5'}} icon={faArrowAltCircleLeft} />}
+                  arrowRight={<FontAwesomeIcon style={{cursor: 'pointer', fontSize: '3vw', margin: '0 3vw', color: '#F5F5F5'}} icon={faArrowAltCircleRight} />}
+                  addArrowClickHandler
+              >
+                <img style={{height: '30vw', borderRadius: 13}} src={user.image_1} alt="user profile 1" />
+                <img style={{height: '30vw', borderRadius: 13}} src={user.image_1} alt="user profile 2" />
+                <img style={{height: '30vw', borderRadius: 13}} src={user.image_1} alt="user profile 3" />
+              </Carousel>
+            </div>
+          </Modal>
+          <div className={classes.margin}></div>
+          <div className={classes.photoColumn}>
+            <div  
+              className={classes.photo} 
+              style ={ { backgroundImage: `url(${user.image_1})`, cursor: 'pointer' } }
+              onClick={this.handleClickPhoto} 
+            >
+            </div>
+            <dir className={classes.basicInfos} >
+              <p style={{textTransform: 'capitalize'}}><FontAwesomeIcon style={{color: '#FB8585', margin: '0 8px'}} icon={faMapMarkerAlt} /> {user.city}</p>
+              <p><FontAwesomeIcon style={{color: '#FB8585', margin: '0 8px'}} icon={faBirthdayCake} /> {user.age} ans</p>
+            </dir>
           </div>
-          <dir className={classes.basicInfos} >
-            <p style={{textTransform: 'capitalize'}}><FontAwesomeIcon style={{color: '#FB8585', margin: '0 8px'}} icon={faMapMarkerAlt} /> {user.city}</p>
-            <p><FontAwesomeIcon style={{color: '#FB8585', margin: '0 8px'}} icon={faBirthdayCake} /> {user.age} ans</p>
-          </dir>
-        </div>
-        <div className={classes.infoColumn}>
-          <div className={classes.likeButton}>
-            <FontAwesomeIcon style={{color: 'white', fontSize: '3.5vw', margin: '0.7vw 0 0 0'}} icon={faHeart} />
+          <div className={classes.infoColumn}>
+            <div className={classes.likeButton}>
+              <FontAwesomeIcon style={{color: '#CBCBCB', fontSize: '3.5vw', margin: '0.7vw 0 0 0'}} icon={faHeart} />
+            </div>
+            <p className={classes.username}>{user.username} <FontAwesomeIcon style={{color: '#A6E05C', fontSize: '1vw', margin: '0 0 0 8px'}} icon={faCircle} /></p>
+            <p className={classes.fame}>Fame score: {user.fame}</p>
+            <p className={classes.bioTitle}>Bio</p>
+            <p>{user.bio}</p>
           </div>
-          <p className={classes.username}>{user.username} <FontAwesomeIcon style={{color: '#A6E05C', fontSize: '1vw', margin: '0 0 0 8px'}} icon={faCircle} /></p>
-          <p className={classes.fame}>Fame score: {user.fame}</p>
-          <p className={classes.bioTitle}>Bio</p>
-          <p>{user.bio}</p>
         </div>
       </div>
     );
   }
 }
 
-export default withStyles(styles)(User);
+export default withStyles(styles)(PageUser);

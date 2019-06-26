@@ -2,6 +2,10 @@ import React from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 
+const Body = styled.section`
+  display: flex;
+  flex-direction: column;
+`;
 const Header = styled.section`
   display: flex;
   justify-content: space-between;
@@ -16,8 +20,9 @@ const LogoWrapper = styled.p`
   color: white;
   font-size: 22px;
 `;
-const LoginButton = styled.p`
+const LoginButton = styled(Link)`
   display: flex;
+  text-decoration: none;
   justify-content: center;
   align-items: center;
   margin: 0;
@@ -28,78 +33,111 @@ const LoginButton = styled.p`
   border: solid 0.5px rgba(255, 255, 255, 0.56);
   border-radius: 10px;
   color: rgba(255, 255, 255, 0.56);
-  cursor: pointer;
   font-family: 'Roboto', sans-serif;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  &:hover {
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+    background-color: white;
+    color: #6F48BD;
+  }
 `;
 const Wrapper = styled.section`
+  padding: 0 10vw;
   display: flex;
   background-color: #6F48BD;
   height: 100vh;
+  color: white;
+  h1 {
+    font-family: 'Arbutus Slab', serif;
+    margin: 0;
+    margin-bottom: 30px;
+  };
+  p {
+    font-family: 'Open Sans', sans-serif;
+    margin-bottom: 100px;
+  };
+  @media screen and (min-width: 320px) {
+    h1 {
+      font-size: calc(70px + 6 * ((100vw - 320px) / 680));
+    }
+  }
+  @media screen and (min-width: 1000px) {
+    h1 {
+      font-size: 100px;
+    }
+  }
+  flex: 1 0 auto;
 `;
 const TextWrapper = styled.section`
-  margin: 10vw;
+  margin: 0;
+  padding: 10vw;
+  padding-right: 0;
   background-color: #6F48BD;
-  height: 100vh;
+  flex: 1 1;
 `;
 const PhotoWrapper = styled.section`
   background-color: #6F48BD;
-  height: 100vh;
+  flex: 1 2;
+  @media (max-width: 1500px) {
+    display: none;
+  }
+  img {
+    width: 100%;
+    margin: 0 auto;
+  }
 `;
-const Text = styled.p`
-  color: white;
-  font-family: 'Open Sans', sans-serif;
-`;
-const Title = styled.h1`
-  color: white;
-  font-size: 4vw;
-  font-family: 'Arbutus Slab', serif;
-`;
-const CTA = styled.p`
-  margin: 50px auto;
+const CTA = styled(Link)`
+  text-decoration: none;
+  display: block;
+  margin: 0;
+  margin-left: 8vw;
   background-color: #FF0041;
-  padding: 20px;
-  width: 130px;
+  padding: 20px 0;
+  width: 250px;
   height: 20px;
   text-align: center;
   border-radius: 100px;
   color: white;
   box-shadow: 0px 20px 20px rgba(0, 0, 0, 0.23);
-  cursor: pointer;
   font-family: 'Roboto', sans-serif;
+  transition: box-shadow 0.5s ease-in-out;
+  &:hover {
+    transition: box-shadow 0.5s ease-in-out;
+    box-shadow: none;
+  }
+`;
+const Footer = styled.section`
+  flex-shrink: 0;
+  background-color: white;
 `;
 
 const PageHome =  () => (
-  <div>
+  <Body>
     <Header>
       <LogoWrapper>
         <img src={'./logo_color.svg'} width="50px" height="50px" alt=""/>
         <p style={{margin: '0 10px'}}>matcha</p>
       </LogoWrapper>
-      <LoginButton>
-        <Link style={{textDecoration: 'none', color: 'rgba(255, 255, 255, 0.56)'}} to='/login'>Login</Link>
-      </LoginButton>
+      <LoginButton to='/login'>Login</LoginButton>
     </Header>
     <Wrapper>
       <TextWrapper>
-        <Title>
-          <h1>Go get <br/>some love.</h1>
-        </Title>
-        <Text>
-          <p>Matcha lets you find the perfect match for your life.<br/> 
-          Unlike any other dating app we don’t use any fancy technology.<br/>
-          Just some Node.js with Express and React.<br/>
-          This is a school project made by students at @42born2code<br/>
-          And yes we stole the Facebook Dating logo.</p>
-        </Text>
-        <CTA>
-          <Link style={{textDecoration: 'none', color: 'white'}} to='/signup'>Start Dating</Link>
-        </CTA>
+        <h1>Go get <br/>some love.</h1>
+        <p>Matcha lets you find the perfect match for your life.<br/> 
+        Unlike any other dating app we don’t use any fancy technology.<br/>
+        Just some Node.js with Express and React.<br/>
+        This is a school project made by students at @42born2code<br/>
+        And yes we stole the Facebook Dating logo.</p>
+        <CTA to='/signup'>Start Dating</CTA>
       </TextWrapper>
       <PhotoWrapper>
-        <img src={'./photo-1530013255753-3f6578d19059.jpg'} style={{clipPath: 'polygon(626px 463px,765px 236px,687px 31px,271px 100px,70px 10px,49px 250px,133px 406px,374px 462px,529px 393px)'}} alt="Photo of a couple"/>
+        <img src={'./home_photo.png'} alt="Photo of a couple"/>
       </PhotoWrapper>
     </Wrapper>
-  </div>
+    <Footer>
+      <p>My sticky footer can be found here.</p>
+    </Footer>
+  </Body>
 );
 
 export default PageHome;
