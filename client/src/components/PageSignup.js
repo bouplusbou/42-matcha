@@ -1,8 +1,7 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import PropTypes, { nominalTypeHack } from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-import Button from '@material-ui/core/Button';
 import axios from 'axios';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
@@ -12,17 +11,18 @@ import FormControl from '@material-ui/core/FormControl';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormHelperText from '@material-ui/core/FormHelperText';
-
+import HeaderNotConnected from './HeaderNotConnected';
 
 
 
 const styles = theme => ({
   formContainer: {
     padding: '50px',
-    borderRadius: '10px',
-    width: '500px',
-    height: '600px',
-    backgroundColor: '#fff',
+    borderRadius: '20px',
+    marginTop: '15vh',
+    width: '400px',
+    height: '650px',
+    backgroundColor: 'white',
   },
   form: {
     display: 'flex',
@@ -36,22 +36,39 @@ const styles = theme => ({
   button: {
     color: 'white',
     fontWeight: 900,
-    backgroundColor: '#EF2F53',
+    backgroundColor: '#6F48BD',
     marginTop: '40px',
     padding: '12px',
     borderRadius: '50px',
   },
   formTitle: {
     textAlign: 'center',
+    fontFamily: 'Roboto',
+    color: '#292929',
   },
   wrapper: {
     display: 'flex',
     justifyContent: 'center',
+    backgroundColor: '#6F48BD',
+    height: '100vh',
   },
+  button: {
+    textDecoration: 'none',
+    border: 'none',
+    display: 'block',
+    margin: '60px auto',
+    backgroundColor: '#FF0041',
+    width: '250px',
+    textAlign: 'center',
+    borderRadius: '100px',
+    color: 'white',
+    fontFamily: 'Roboto',
+    fontSize: '1em',
+  }
 });
 
 
-class SignupForm extends React.Component {
+class PageSignup extends React.Component {
   state = {
     showPassword: false,
     open: true,
@@ -265,90 +282,91 @@ class SignupForm extends React.Component {
     const { classes } = this.props;
 
     return (
-      <div className={classes.wrapper}>
-        <div className={classes.formContainer}>
-          <h1 className={classes.formTitle}>Signup</h1>
-          <form className={classes.form} noValidate autoComplete="off" onSubmit={this.handleSubmit} >
-            <TextField
-              id="standard-email"
-              label="Email"
-              required={true}
-              className={classes.textField}
-              onBlur={this.handleEmailBlur('email')}
-              onChange={this.handleEmailChange('email')}
-              error={this.state.errorEmail}
-              helperText={this.state.helperEmail}
-              margin="normal"
-            />
-
-            <TextField
-              id="standard-firstName"
-              label="First Name"
-              required={true}
-              className={classes.textField}
-              onBlur={this.handleFirstNameBlur('firstName')}
-              onChange={this.handleFirstNameChange('firstName')}
-              error={this.state.errorFirstName}
-              helperText={this.state.helperFirstName}
-              margin="normal"
-            />
-
-            <TextField
-              id="standard-lastName"
-              label="Last Name"
-              required={true}
-              className={classes.textField}
-              onBlur={this.handleLastNameBlur('lastName')}
-              onChange={this.handleLastNameChange('lastName')}
-              error={this.state.errorLastName}
-              helperText={this.state.helperLastName}
-              margin="normal"
-            />
-
-            <TextField
-              id="standard-username"
-              label="Username"
-              required={true}
-              className={classes.textField}
-              onBlur={this.handleUsernameBlur('username')}
-              onChange={this.handleUsernameChange('username')}
-              error={this.state.errorUsername}
-              helperText={this.state.helperUsername}
-              margin="normal"
-            />
-
-            <FormControl required={true} className={classes.textField}>
-              <InputLabel htmlFor="adornment-password">Password</InputLabel>
-              <Input
-                id="standard-password"
-
-                type={this.state.showPassword ? 'text' : 'password'}
-                onBlur={this.handlePasswordBlur('password')}
-                onChange={this.handlePasswordChange('password')}
-                error={this.state.errorPassword}
-                endAdornment={
-                  <InputAdornment position="end">
-                    <IconButton aria-label="Toggle password visibility" onClick={this.handleClickShowPassword}>
-                      {this.state.showPassword ? <Visibility /> : <VisibilityOff />}
-                    </IconButton>
-                  </InputAdornment>
-                }
+      <div>
+        <HeaderNotConnected />
+        <div className={classes.wrapper}>
+          <div className={classes.formContainer}>
+            <h1 className={classes.formTitle}>Signup</h1>
+            <form className={classes.form} noValidate autoComplete="off" onSubmit={this.handleSubmit} >
+              <TextField
+                id="standard-email"
+                label="Email"
+                required={true}
+                className={classes.textField}
+                onBlur={this.handleEmailBlur('email')}
+                onChange={this.handleEmailChange('email')}
+                error={this.state.errorEmail}
+                helperText={this.state.helperEmail}
+                margin="normal"
               />
-              <FormHelperText style={{color: 'red'}} id="password-helper-text">{this.state.helperPassword}</FormHelperText>
-            </FormControl>
 
-            <Button type="submit" variant="contained" className={classes.button}>
-                Signup
-            </Button>
-          </form>
+              <TextField
+                id="standard-firstName"
+                label="First Name"
+                required={true}
+                className={classes.textField}
+                onBlur={this.handleFirstNameBlur('firstName')}
+                onChange={this.handleFirstNameChange('firstName')}
+                error={this.state.errorFirstName}
+                helperText={this.state.helperFirstName}
+                margin="normal"
+              />
+
+              <TextField
+                id="standard-lastName"
+                label="Last Name"
+                required={true}
+                className={classes.textField}
+                onBlur={this.handleLastNameBlur('lastName')}
+                onChange={this.handleLastNameChange('lastName')}
+                error={this.state.errorLastName}
+                helperText={this.state.helperLastName}
+                margin="normal"
+              />
+
+              <TextField
+                id="standard-username"
+                label="Username"
+                required={true}
+                className={classes.textField}
+                onBlur={this.handleUsernameBlur('username')}
+                onChange={this.handleUsernameChange('username')}
+                error={this.state.errorUsername}
+                helperText={this.state.helperUsername}
+                margin="normal"
+              />
+
+              <FormControl required={true} className={classes.textField}>
+                <InputLabel htmlFor="adornment-password">Password</InputLabel>
+                <Input
+                  id="standard-password"
+                  type={this.state.showPassword ? 'text' : 'password'}
+                  onBlur={this.handlePasswordBlur('password')}
+                  onChange={this.handlePasswordChange('password')}
+                  error={this.state.errorPassword}
+                  endAdornment={
+                    <InputAdornment position="end">
+                      <IconButton aria-label="Toggle password visibility" onClick={this.handleClickShowPassword}>
+                        {this.state.showPassword ? <Visibility /> : <VisibilityOff />}
+                      </IconButton>
+                    </InputAdornment>
+                  }
+                />
+                <FormHelperText style={{color: 'red'}} id="password-helper-text">{this.state.helperPassword}</FormHelperText>
+              </FormControl>
+              <button type="submit" className={classes.button}>
+                <p>Signup</p>
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     );
   }
 }
 
-SignupForm.propTypes = {
+PageSignup.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(SignupForm);
+export default withStyles(styles)(PageSignup);

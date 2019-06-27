@@ -44,7 +44,6 @@ async function getUsers(age = [18, 100], fame = [0, 1000], latlng = [48.856697, 
     }
     tagQuery = `AND users_tags.id_tag IN (${placeholders.join()})` 
   }
-  // console.log(tagQuery)
   const text = `
     SELECT users.id_user, username, age, image_1, fame, city, latitude, longitude, array_agg(tags.name) as tags
     FROM users

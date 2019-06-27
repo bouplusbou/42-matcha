@@ -2,7 +2,7 @@ import React from 'react';
 import { Switch, Route } from 'react-router-dom';
 import PageHome from './PageHome';
 import UsersSwitch from './UsersSwitch';
-import Signup from './Signup';
+import PageSignup from './PageSignup';
 import Login from './Login';
 import SelectComp from './test';
 import PageSearch from './PageSearch';
@@ -18,7 +18,7 @@ const Main = () => (
       <Route exact path='/login' component={Login}/>
       <Route exact path='/logout' component={Logout}/>
       <Route exact path='/search' component={Authenticate(PageSearch)}/>
-      <Route exact path='/signup' component={Signup}/>
+      <Route exact path='/signup' component={PageSignup}/>
       <Route path='/profile' component={Authenticate(Profile)}/>
       <Route path='/users' component={Authenticate(UsersSwitch)}/>
     </Switch>

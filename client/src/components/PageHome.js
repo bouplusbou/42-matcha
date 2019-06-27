@@ -1,46 +1,14 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
+import HeaderNotConnected from './HeaderNotConnected';
 
 const Body = styled.section`
   display: flex;
   flex-direction: column;
 `;
-const Header = styled.section`
-  display: flex;
-  justify-content: space-between;
-  padding: 40px;
-  height: 30px;
-  background-color: #6F48BD;
-`;
-const LogoWrapper = styled.p`
-  margin: 0;
-  display: flex;
-  align-items: center;
-  color: white;
-  font-size: 22px;
-`;
-const LoginButton = styled(Link)`
-  display: flex;
-  text-decoration: none;
-  justify-content: center;
-  align-items: center;
-  margin: 0;
-  padding: 15px;
-  width: 50px;
-  height: 10px;
-  text-align: center;
-  border: solid 0.5px rgba(255, 255, 255, 0.56);
-  border-radius: 10px;
-  color: rgba(255, 255, 255, 0.56);
-  font-family: 'Roboto', sans-serif;
-  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
-  &:hover {
-    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
-    background-color: white;
-    color: #6F48BD;
-  }
-`;
+
+
 const Wrapper = styled.section`
   padding: 0 10vw;
   display: flex;
@@ -113,13 +81,7 @@ const Footer = styled.section`
 
 const PageHome =  () => (
   <Body>
-    <Header>
-      <LogoWrapper>
-        <img src={'./logo_color.svg'} width="50px" height="50px" alt=""/>
-        <p style={{margin: '0 10px'}}>matcha</p>
-      </LogoWrapper>
-      <LoginButton to='/login'>Login</LoginButton>
-    </Header>
+    <HeaderNotConnected />
     <Wrapper>
       <TextWrapper>
         <h1>Go get <br/>some love.</h1>
