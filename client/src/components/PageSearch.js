@@ -138,6 +138,7 @@ class PageSearch extends Component {
     axios.post(`/tags?authToken=${authToken}`)
       .then(res => {
         this.setState({ tags: res.data.data });
+        console.log(res.data.data);
       });
   }
 

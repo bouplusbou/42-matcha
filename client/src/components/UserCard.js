@@ -6,10 +6,8 @@ import { faFireAlt } from '@fortawesome/free-solid-svg-icons';
 import { CSSTransition } from 'react-transition-group';
 
 
-export default function UserCard(props) {
+export default function UserCard({ user }) {
   const [ showInfos, setShowInfos] = useState(false);
-
-  const { user } = props;
 
   const UserCard = styled.div`
     background-image: url(${user.photo});
@@ -23,6 +21,8 @@ export default function UserCard(props) {
     align-items: flex-end;
     border-radius: 20px;
     background-color: lightgrey;
+    position: relative;
+    z-index: 5;
   `;
   const Hover = styled.div`
     background-color: white;
