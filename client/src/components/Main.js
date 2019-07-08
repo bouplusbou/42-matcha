@@ -5,7 +5,7 @@ import UsersSwitch from './UsersSwitch';
 import PageSignup from './PageSignup';
 import Login from './Login';
 import SelectComp from './test';
-import PageSearch from './PageSearch';
+import PageSearch from './PageSearch/PageSearch';
 import Logout from './Logout';
 import Authenticate from './Authenticate';
 import Profile from './Profile';
