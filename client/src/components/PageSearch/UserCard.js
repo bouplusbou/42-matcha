@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
 import { faFireAlt } from '@fortawesome/free-solid-svg-icons';
-import { CSSTransition } from 'react-transition-group';
 
 
 export default function UserCard({ user }) {
@@ -34,24 +33,6 @@ export default function UserCard({ user }) {
     box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.15);
     position: relative;
     top: 20px;
-
-    &.coucou-enter {
-        opacity: 0;
-    }
-
-    &.coucou-enter-active {
-        opacity: 1;
-        transition: opacity 10000ms;
-    }
-
-    &.coucou-exit {
-      opacity: 1;
-    }
-
-    &.coucou-exit-active {
-      opacity: 0;
-      transition: opacity 10000ms;
-    }
   `;
   const Tags = styled.div`
     display: flex;
@@ -85,28 +66,22 @@ export default function UserCard({ user }) {
 
 
   return (
-    <CSSTransition
-      in={ showInfos }
-      timeout={ 10000 }
-      classNames="coucou"
+    <UserCard
+      onMouseEnter={toggleHover}  
+      onMouseLeave={toggleHover}  
     >
-      <UserCard
-        onMouseEnter={toggleHover}  
-        onMouseLeave={toggleHover}  
-      >
-        { showInfos && 
-          <Hover>
-            <Username>{user.username}</Username>
-            <Fame><FontAwesomeIcon style={{marginRight: '8px'}} icon={faMapMarkerAlt}/>{user.city} <FontAwesomeIcon style={{margin: '0 8px 0 15px'}} icon={faFireAlt}/>{user.fame}</Fame>
-            <Tags>
-              {user.tags.map( (tag, index) =>
-                <Tag>
-                  #{tag}
-                </Tag>
-              )}
-            </Tags>
-          </Hover> }
-      </UserCard>
-    </CSSTransition>
+      { showInfos && 
+        <Hover>
+          <Username>{user.username}</Username>
+          <Fame><FontAwesomeIcon style={{marginRight: '8px'}} icon={faMapMarkerAlt}/>{user.city} <FontAwesomeIcon style={{margin: '0 8px 0 15px'}} icon={faFireAlt}/>{user.fame}</Fame>
+          <Tags>
+            {user.tags.map( (tag, index) =>
+              <Tag>
+                #{tag}
+              </Tag>
+            )}
+          </Tags>
+        </Hover> }
+    </UserCard>
   );
 }
