@@ -53,16 +53,6 @@ const styles = theme => ({
     borderRadius: '20px',
     backgroundColor: 'white',
   },
-  overlay: {
-    position: 'absolute',
-    bottom: 20,
-    left: 20,
-    color: 'white',
-    fontSize: '1.3em',
-    fontWeight: '700',
-    textTransform: 'capitalize',
-    overflow: 'hidden',
-  },
   cityFame: {
     color: '#4A4A4A',
     fontFamily: 'Roboto',
@@ -148,6 +138,7 @@ class PageSearch extends Component {
     axios.post(`/tags?authToken=${authToken}`)
       .then(res => {
         this.setState({ tags: res.data.data });
+        console.log(res.data.data);
       });
   }
 
