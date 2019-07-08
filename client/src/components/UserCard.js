@@ -60,8 +60,8 @@ export default function UserCard({ user }) {
     ::-webkit-scrollbar: { display: none };
   `;
   const Tag = styled.p`
-    background-color: #FFD8D8;
-    color: #FF7070;
+    background-color: #E3D4FF;
+    color: #6F48BD;
     border-radius: 10px;
     padding: 5px;
     margin: 3px 5px 0 0;
