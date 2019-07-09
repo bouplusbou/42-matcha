@@ -21,6 +21,10 @@ export default function Filtering({filterAge, handleAgeChange, filterFame, handl
             font-weight: 500;
             color: #292929;
         }
+        @media (max-width: 630px) {
+            width: 180px;
+
+        }
     `
     const TextBox = styled.section`
         display: flex;
