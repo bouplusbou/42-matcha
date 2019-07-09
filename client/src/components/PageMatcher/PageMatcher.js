@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import UserCard from '../UserCard';
 import Sorting from '../Sorting';
 import Filtering from '../Filtering';
+import Results from '../Results';
+
 
 const usersArr = Array(30).fill({
   username: 'mimyK',
@@ -39,7 +40,8 @@ export default function PageSearch() {
     grid-template-areas:
       "filtering sorting"
       "filtering results";
-    @media (max-width: 750px) {
+    @media (max-width: 1080px) {
+      margin: 0;
       grid-gap: 50px;
       grid-template-columns: 1fr;
       grid-template-areas:
@@ -55,16 +57,14 @@ export default function PageSearch() {
   const SortingSection = styled.aside`
     grid-area: sorting;
     justify-self: end;
-    @media (max-width: 750px) {
+    @media (max-width: 1080px) {
       justify-self: center;
     }
   `;
   const ResultsSection = styled.section`
     grid-area: results;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
   `;
+
 
   const selectSorting = e => { setSortingChoice(e.target.innerText); };
   const handleAgeChange = values => { setFilterAge(values); };
@@ -95,13 +95,9 @@ export default function PageSearch() {
         />
       </SortingSection>
       <ResultsSection>
-        {users.map( user => 
-          <UserCard 
-            user={user}
-            width={250}
-            height={375}
-          />
-        )}
+        <Results 
+          users={users}
+        />
       </ResultsSection>
     </SearchSection>
   );

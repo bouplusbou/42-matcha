@@ -5,7 +5,7 @@ import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
 import { faFireAlt } from '@fortawesome/free-solid-svg-icons';
 
 
-export default function UserCard({ user }) {
+export default function UserCard({ user, width, height }) {
   const [ showInfos, setShowInfos] = useState(false);
 
   const UserCard = styled.div`
@@ -13,8 +13,8 @@ export default function UserCard({ user }) {
     background-size: cover;
     background-position: center center;
     position: relative;
-    width: 250px;
-    height: 375px;
+    width: ${width}px;
+    height: ${height}px;
     margin: 20px;
     display: flex;
     align-items: flex-end;
@@ -22,6 +22,10 @@ export default function UserCard({ user }) {
     background-color: lightgrey;
     position: relative;
     z-index: 5;
+    @media (max-width: 630px) {
+      width: 200px;
+      height: 300px;
+    }
   `;
   const Hover = styled.div`
     background-color: white;

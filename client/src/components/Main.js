@@ -6,6 +6,7 @@ import PageSignup from './PageSignup';
 import Login from './Login';
 import SelectComp from './test';
 import PageSearch from './PageSearch/PageSearch';
+import PageMatcher from './PageMatcher/PageMatcher';
 import Logout from './Logout';
 import Authenticate from './Authenticate';
 import Profile from './Profile';
@@ -18,6 +19,7 @@ const Main = () => (
       <Route exact path='/login' component={Login}/>
       <Route exact path='/logout' component={Logout}/>
       <Route exact path='/search' component={Authenticate(PageSearch)}/>
+      <Route exact path='/matcher' component={Authenticate(PageMatcher)}/>
       <Route exact path='/signup' component={PageSignup}/>
       <Route path='/profile' component={Authenticate(Profile)}/>
       <Route path='/users' component={Authenticate(UsersSwitch)}/>
