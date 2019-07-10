@@ -13,26 +13,16 @@ export default function Authenticate(ComponentToProtect) {
     componentDidMount() {
       actionIsAuthenticated(localStorage.getItem('token'))
         .then(isAuthenticated => {
-          console.log(isAuthenticated);
-          if (isAuthenticated) {
-            this.setState({ loading: false, redirect: false });
-          } else {
-            this.setState({ loading: false, redirect: true });
-          }
+          isAuthenticated ? this.setState({ loading: false, redirect: false }) : this.setState({ loading: false, redirect: true })
         })
-        .catch(err => {
-          this.setState({ loading: false, redirect: true });
-        });
+        .catch(err => this.setState({ loading: false, redirect: true }));
     }
 
     render() {
       const { loading, redirect } = this.state;
-      if (loading) {
-        return null;
-      }
-      if (redirect) {
-        return <Redirect to="/login" />;
-      }
+      if (loading) return null;
+      if (redirect) return <Redirect to="/login" />;
+      
       return (
         <React.Fragment>
           <ComponentToProtect {...this.props} />

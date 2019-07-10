@@ -5,6 +5,7 @@ const config = require('../middlewares/config');
 
 const login = (req, res) => {
     const { username, password } = req.body;
+    console.log(req.body);
     User.usernameExists(username)
         .then(user =>  {
             if (user) {

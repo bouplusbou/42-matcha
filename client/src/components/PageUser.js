@@ -11,7 +11,6 @@ import { faHeart } from '@fortawesome/free-regular-svg-icons';
 import Modal from '@material-ui/core/Modal';
 import Carousel from '@brainhubeu/react-carousel';
 import '@brainhubeu/react-carousel/lib/style.css';
-import Header from './Header';
 
 const styles = theme => ({
   main: {
@@ -107,7 +106,6 @@ class PageUser extends Component {
     let { user, openModal } = this.state;
     return (
       <div>
-        <Header />
         <div className={classes.main}>
           <Modal
             open={openModal}

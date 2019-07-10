@@ -11,9 +11,6 @@ import FormControl from '@material-ui/core/FormControl';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormHelperText from '@material-ui/core/FormHelperText';
-import HeaderNotConnected from './HeaderNotConnected';
-
-
 
 const styles = theme => ({
   formContainer: {
@@ -283,7 +280,6 @@ class PageSignup extends React.Component {
 
     return (
       <div>
-        <HeaderNotConnected />
         <div className={classes.wrapper}>
           <div className={classes.formContainer}>
             <h1 className={classes.formTitle}>Signup</h1>
