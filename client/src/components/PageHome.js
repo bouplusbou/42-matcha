@@ -1,13 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
-import HeaderNotConnected from './HeaderNotConnected';
 
 const Body = styled.section`
   display: flex;
   flex-direction: column;
 `;
-
 
 const Wrapper = styled.section`
   padding: 0 10vw;
@@ -81,7 +79,6 @@ const Footer = styled.section`
 
 const PageHome =  () => (
   <Body>
-    <HeaderNotConnected />
     <Wrapper>
       <TextWrapper>
         <h1>Go get <br/>some love.</h1>

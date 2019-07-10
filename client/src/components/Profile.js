@@ -1,15 +1,11 @@
 import React, {Component} from 'react';
 import axios from 'axios';
 import { withStyles } from '@material-ui/core/styles';
-// import { actionIsAuthenticated } from '../actions/authActions';
 import UploadImage from './Upload';
 import Modal from '@material-ui/core/Modal';
-import Header from './Header';
-
 
 const styles = theme => ({
   main: {
-    // backgroundColor: 'red',
     margin: '0 15vw'
   },
   row: {
@@ -101,7 +97,6 @@ class ProfilePage extends Component {
     const { user, openModal } = this.state;
     return (
       <div>
-        <Header />
         <div className={classes.main} >
           <Modal
             open={openModal}
