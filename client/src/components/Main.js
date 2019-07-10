@@ -2,7 +2,7 @@ import React from 'react';
 import { Switch, Route } from 'react-router-dom';
 import PageHome from './PageHome';
 import UsersSwitch from './UsersSwitch';
-import PageSignup from './PageSignup';
+import PageSignup from './PageSignup/PageSignup';
 import PageLogin from './PageLogin/PageLogin';
 import SelectComp from './test';
 import PageSearch from './PageSearch/PageSearch';
