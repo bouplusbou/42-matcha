@@ -1,6 +1,6 @@
-import React from 'react';
-import PropTypes, { nominalTypeHack } from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import styled from 'styled-components';
 import TextField from '@material-ui/core/TextField';
 import axios from 'axios';
 import Visibility from '@material-ui/icons/Visibility';
@@ -12,357 +12,240 @@ import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormHelperText from '@material-ui/core/FormHelperText';
 
-const styles = theme => ({
-  formContainer: {
-    padding: '50px',
-    borderRadius: '20px',
-    marginTop: '15vh',
-    width: '400px',
-    height: '650px',
-    backgroundColor: 'white',
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  textField: {
-    marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit,
-    width: '100%',
-  },
-  button: {
-    color: 'white',
-    fontWeight: 900,
-    backgroundColor: '#6F48BD',
-    marginTop: '40px',
-    padding: '12px',
-    borderRadius: '50px',
-  },
-  formTitle: {
-    textAlign: 'center',
-    fontFamily: 'Roboto',
-    color: '#292929',
-  },
-  wrapper: {
-    display: 'flex',
-    justifyContent: 'center',
-    backgroundColor: '#6F48BD',
-    height: '100vh',
-  },
-  button: {
-    textDecoration: 'none',
-    border: 'none',
-    display: 'block',
-    margin: '60px auto',
-    backgroundColor: '#FF0041',
-    width: '250px',
-    textAlign: 'center',
-    borderRadius: '100px',
-    color: 'white',
-    fontFamily: 'Roboto',
-    fontSize: '1em',
+const Hero = styled.section`
+  background-color: #6F48BD;
+  height: 100vh;
+`;
+const LoginSection = styled.section`
+  display: flex;
+  justify-content: center;
+  padding-top: 10%;
+`;
+const FormContainer = styled.section`
+  flex-basis: 400px;
+  padding: 50px;
+  background-color: white;
+  border-radius: 20px;
+  box-shadow: 0px 20px 20px rgba(0, 0, 0, 0.1);
+  h1 {
+    font-size: 2rem;
+    text-align: center;
+    font-family: Roboto;
+    color: #292929;
   }
-});
+`;
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+`;
+const SubmitButton = styled.button`
+  text-decoration: none;
+  border: none;
+  display: block;
+  margin: 0 auto;
+  margin-top: 40px;
+  background-color: #FF0041;
+  width: 50%;
+  text-align: center;
+  border-radius: 100px;
+  color: white;
+  font-family: Roboto;
+  font-size: 1em;
+`;
+const Redirect = styled.section`
+  margin-top: 100px;
+  color: #C6C6C6;
+  font-weight: 500;
+  text-align: center;
+  a {
+    text-decoration: none;
+    color: #C6C6C6;
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: 500;
+    text-decoration: underline;
+}
+`;
 
 
-class PageSignup extends React.Component {
-  state = {
+export default function PageSignup() {
+
+  const [values, setValues] = useState({
     showPassword: false,
-    open: true,
-  }
-
-
-  emailIsOK = email => {
-    const regex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return regex.test(String(email).toLowerCase());
-  }
-  emailError = () => {
-    this.setState({ 
-      email: undefined,
-      errorEmail: true,
-      helperEmail: 'Enter a proper email',
-    });
-  }
-  emailTaken = () => {
-    this.setState({ 
-      email: undefined,
-      errorEmail: true,
-      helperEmail: 'This email is already used',
-    });
-  }
-  emailIsSet = email => {
-    this.setState({ 
-      email: email,
-      errorEmail: false,
-      helperEmail: '',
-    });
-  }
-  handleEmailBlur = email => event => {
-    if (this.emailIsOK(event.target.value)) {
-      this.emailIsSet(event.target.value);
-    } else {
-      this.emailError();
-    }
-  }
-  handleEmailChange = email => event => {
-    if (this.emailIsOK(event.target.value)) this.emailIsSet(event.target.value);
-  }
-
-
-  firstNameIsOK = firstName => {
-    const regex = /^[A-Za-zÀ-ÖØ-öø-ÿ-]{3,15}$/;
-    return regex.test(String(firstName));
-  }
-  firstNameError = () => {
-    this.setState({ 
-      firstName: undefined,
-      errorFirstName: true,
-      helperFirstName: 'Between 3 and 15 characters, only letters and "-"',
-    });
-  }
-  firstNameIsSet = firstName => {
-    this.setState({ 
-      firstName: firstName,
-      errorFirstName: false,
-      helperFirstName: '',
-     });
-  }
-  handleFirstNameBlur = firstName => event => {
-    if (this.firstNameIsOK(event.target.value)) {
-      this.firstNameIsSet(event.target.value);
-    } else {
-      this.firstNameError();
-    }
-  }
-  handleFirstNameChange = firstName => event => {
-    if (this.firstNameIsOK(event.target.value)) this.firstNameIsSet(event.target.value);
-  }
-
-
-  lastNameIsOK = lastName => {
-    const regex = /^[A-Za-zÀ-ÖØ-öø-ÿ]{3,15}$/;
-    return regex.test(String(lastName));
-  }
-  lastNameError = () => {
-    this.setState({
-      lastName: undefined,
-      errorLastName: true,
-      helperLastName: 'Between 3 and 15 characters, only letters',
-    });
-  }
-  lastNameIsSet = lastName => {
-    this.setState({ 
-      lastName: lastName,
-      errorLastName: false,
-      helperLastName: '',
-    });
-  }
-  handleLastNameBlur = lastName => event => {
-    if (this.lastNameIsOK(event.target.value)) {
-      this.lastNameIsSet(event.target.value);
-    } else {
-      this.lastNameError();
-    }
-  }
-  handleLastNameChange = lastName => event => {
-    if (this.lastNameIsOK(event.target.value)) this.lastNameIsSet(event.target.value);
-  }
-
-
-  usernameIsOK = username => {
-    const regex = /^[A-Za-zÀ-ÖØ-öø-ÿ]{5,10}$/;
-    return regex.test(String(username));
-  }
-  usernameError = () => {
-    this.setState({
-      username: undefined,
-      errorUsername: true,
-      helperUsername: 'Between 6 and 10 characters, only letters',
-    });
-  }
-  usernameTaken = () => {
-    this.setState({
-      username: undefined,
-      errorUsername: true,
-      helperUsername: 'This username is already taken',
-    });
-  }
-  usernameIsSet = username => {
-    this.setState({ 
-      username: username,
-      errorUsername: false,
-      helperUsername: '',
-    });
-  }
-  handleUsernameBlur = username => event => {
-    if (this.usernameIsOK(event.target.value)) {
-      this.usernameIsSet(event.target.value);
-    } else {
-      this.usernameError();
-    }
-  }
-  handleUsernameChange = username => event => {
-    if (this.usernameIsOK(event.target.value)) this.usernameIsSet(event.target.value);
-  }
-
-  passwordIsOK = password => {
-    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/;
-    return regex.test(String(password));
-  }
-  passwordError = () => {
-    this.setState({ 
-      password: undefined,
-      errorPassword: true,
-      helperPassword: 'Minimum 6 characters, at least one uppercase letter, one lowercase letter and one number',
-    });
-  }
-  passwordIsSet = password => {
-    this.setState({ 
-      password: password,
-      errorPassword: false,
-      helperPassword: '',
-    });
-  }
-  handlePasswordBlur = password => event => {
-    if (this.passwordIsOK(event.target.value)) {
-      this.passwordIsSet(event.target.value);
-    } else {
-      this.passwordError();
-    }
-  }
-  handlePasswordChange = password => event => {
-    if (this.passwordIsOK(event.target.value)) this.passwordIsSet(event.target.value);
-  }
-  handleClickShowPassword = () => {
-    this.setState({ showPassword: !this.state.showPassword });
-  }
-
-
-  handleSubmit = event => {
-    event.preventDefault();
-    const { email, firstName, lastName, username, password } = this.state;
-    const newUser = { 
-      email,
-      firstName,
-      lastName,
-      username,
-      password
+    email: null,
+    firstName: null,
+    lastName: null,
+    username: null,
+    password: null,
+    emailError: false,
+    firstNameError: false,
+    lastNameError: false,
+    usernameError: false,
+    passwordError: false,
+    emailHelper: null,
+    firstNameHelper: null,
+    lastNameHelper: null,
+    passwordHelper: null,
+    usernameHelper: null,
+  });
+  
+  const valueIsOk = (name, value) => {
+    const regex = {
+      email: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+      firstName: /^[A-Za-zÀ-ÖØ-öø-ÿ-]{3,15}$/,
+      lastName: /^[A-Za-zÀ-ÖØ-öø-ÿ]{3,15}$/,
+      username: /^[A-Za-zÀ-ÖØ-öø-ÿ]{5,10}$/,
+      password: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/,
     };
+    return regex[name].test(String(value));
+  };
 
-    if (newUser.email 
-        && newUser.firstName 
-        && newUser.lastName
-        && newUser.username
-        && newUser.password) {
+  const valueError = nameArr => {    
+    const errorMsg = {
+      email: 'Enter a proper email',
+      firstName: 'Between 3 and 15 characters, only letters and "-"',
+      lastName: 'Between 3 and 15 characters, only letters',
+      username: 'Between 6 and 10 characters, only letters',
+      password: 'Minimum 6 characters, at least one uppercase letter, one lowercase letter and one number',
+    };
+    const stateArr = nameArr.map(name => {return { [name]: null, [`${name+'Error'}`]: true, [`${name+'Helper'}`]: errorMsg[name] }});
+    const state = stateArr.reduce((acc, curr) => {
+      acc = {...acc, ...curr};
+      return acc;
+    }, {});
+    setValues({ ...values, ...state });
+  };
+
+  const valueIsTaken = nameArr => {
+    const stateArr = nameArr.map(name => {return { [name]: null, [`${name+'Error'}`]: true, [`${name+'Helper'}`]: `This ${name} is already used` }});
+    const state = stateArr.reduce((acc, curr) => {
+      acc = {...acc, ...curr};
+      return acc;
+    }, {});
+    setValues({ ...values, ...state });
+  };
+
+  const valueIsSet = (name, value) => {
+    setValues({ ...values, [name]: value, [`${name+'Error'}`]: false, [`${name+'Helper'}`]: null });
+  };
+
+  const handleBlur = name => event => {
+    if (valueIsOk(name, event.target.value)) {
+      valueIsSet(name, event.target.value)
+    } else {
+      valueError([name]);
+    }
+  };
+
+  const handleChange = name => event => {
+    if (valueIsOk(name, event.target.value)) valueIsSet(name, event.target.value);
+  };
+
+  const toggleShowPassword = () => {
+    setValues({ ...values, showPassword: !values.showPassword });
+  };
+
+  const handleSubmit = event => {
+    event.preventDefault();
+    const newUser = { 
+      email: values.email,
+      firstName: values.firstName,
+      lastName: values.lastName,
+      username: values.username,
+      password: values.password
+    };
+    const emptyFields = Object.keys(newUser).filter(key => !newUser[key]);
+
+    if (emptyFields.length === 0) {
       axios.post(`/users`, newUser)
         .then(res => { if (res.status === 200) this.props.history.push('/login'); })
         .catch(error => {
           const res = error.response.data;
-          if (res.emailKO) this.emailError();
-          if (res.firstNameKO) this.firstNameError();
-          if (res.lastNameKO) this.lastNameError();
-          if (res.usernameKO) this.usernameError();
-          if (res.passwordKO) this.passwordError();
-          if (res.usernameTaken) this.usernameTaken();
-          if (res.emailTaken) this.emailTaken();
+          if (res.errors) valueError(res.errors);
+          if (res.taken) valueIsTaken(res.taken);
         });
     } else {
-      if (!newUser.email) this.emailError();
-      if (!newUser.firstName) this.firstNameError();
-      if (!newUser.lastName) this.lastNameError();
-      if (!newUser.username) this.usernameError();
-      if (!newUser.password) this.passwordError();
+      valueError(emptyFields);
     }
   }
 
-  render() {
-    const { classes } = this.props;
+  return (
+    <Hero>
+      <LoginSection>
+        <FormContainer>
+          <h1>Signup</h1>
+          <Form noValidate autoComplete="off" onSubmit={handleSubmit}>
+            <TextField
+              id="standard-email"
+              label="Email"
+              required={true}
+              onBlur={handleBlur('email')}
+              onChange={handleChange('email')}
+              error={values.emailError}
+              helperText={values.emailHelper}
+              margin="normal"
+            />
 
-    return (
-      <div>
-        <div className={classes.wrapper}>
-          <div className={classes.formContainer}>
-            <h1 className={classes.formTitle}>Signup</h1>
-            <form className={classes.form} noValidate autoComplete="off" onSubmit={this.handleSubmit} >
-              <TextField
-                id="standard-email"
-                label="Email"
-                required={true}
-                className={classes.textField}
-                onBlur={this.handleEmailBlur('email')}
-                onChange={this.handleEmailChange('email')}
-                error={this.state.errorEmail}
-                helperText={this.state.helperEmail}
-                margin="normal"
+            <TextField
+              id="standard-firstName"
+              label="First Name"
+              required={true}
+              onBlur={handleBlur('firstName')}
+              onChange={handleChange('firstName')}
+              error={values.firstNameError}
+              helperText={values.firstNameHelper}
+              margin="normal"
+            />
+
+            <TextField
+              id="standard-lastName"
+              label="Last Name"
+              required={true}
+              onBlur={handleBlur('lastName')}
+              onChange={handleChange('lastName')}
+              error={values.lastNameError}
+              helperText={values.lastNameHelper}
+              margin="normal"
+            />
+
+            <TextField
+              id="standard-username"
+              label="Username"
+              required={true}
+              onBlur={handleBlur('username')}
+              onChange={handleChange('username')}
+              error={values.usernameError}
+              helperText={values.usernameHelper}
+              margin="normal"
+            />
+
+            <FormControl required={true}>
+              <InputLabel htmlFor="adornment-password">Password</InputLabel>
+              <Input
+                id="standard-password"
+                type={values.showPassword ? 'text' : 'password'}
+                onBlur={handleBlur('password')}
+                onChange={handleChange('password')}
+                error={values.passwordError}
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton aria-label="Toggle password visibility" onClick={toggleShowPassword}>
+                      {values.showPassword ? <Visibility /> : <VisibilityOff />}
+                    </IconButton>
+                  </InputAdornment>
+                }
               />
-
-              <TextField
-                id="standard-firstName"
-                label="First Name"
-                required={true}
-                className={classes.textField}
-                onBlur={this.handleFirstNameBlur('firstName')}
-                onChange={this.handleFirstNameChange('firstName')}
-                error={this.state.errorFirstName}
-                helperText={this.state.helperFirstName}
-                margin="normal"
-              />
-
-              <TextField
-                id="standard-lastName"
-                label="Last Name"
-                required={true}
-                className={classes.textField}
-                onBlur={this.handleLastNameBlur('lastName')}
-                onChange={this.handleLastNameChange('lastName')}
-                error={this.state.errorLastName}
-                helperText={this.state.helperLastName}
-                margin="normal"
-              />
-
-              <TextField
-                id="standard-username"
-                label="Username"
-                required={true}
-                className={classes.textField}
-                onBlur={this.handleUsernameBlur('username')}
-                onChange={this.handleUsernameChange('username')}
-                error={this.state.errorUsername}
-                helperText={this.state.helperUsername}
-                margin="normal"
-              />
-
-              <FormControl required={true} className={classes.textField}>
-                <InputLabel htmlFor="adornment-password">Password</InputLabel>
-                <Input
-                  id="standard-password"
-                  type={this.state.showPassword ? 'text' : 'password'}
-                  onBlur={this.handlePasswordBlur('password')}
-                  onChange={this.handlePasswordChange('password')}
-                  error={this.state.errorPassword}
-                  endAdornment={
-                    <InputAdornment position="end">
-                      <IconButton aria-label="Toggle password visibility" onClick={this.handleClickShowPassword}>
-                        {this.state.showPassword ? <Visibility /> : <VisibilityOff />}
-                      </IconButton>
-                    </InputAdornment>
-                  }
-                />
-                <FormHelperText style={{color: 'red'}} id="password-helper-text">{this.state.helperPassword}</FormHelperText>
-              </FormControl>
-              <button type="submit" className={classes.button}>
-                <p>Signup</p>
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
-    );
-  }
+              <FormHelperText style={{color: 'red'}} id="password-helper-text">{values.passwordHelper}</FormHelperText>
+            </FormControl>
+            <SubmitButton type="submit">
+              <p>Signup</p>
+            </SubmitButton>
+          </Form>
+          <Redirect>
+            <p>Already a member ? <Link to="/login">Login here</Link></p>
+          </Redirect>
+        </FormContainer>
+      </LoginSection>
+    </Hero>
+  );
 }
-
-PageSignup.propTypes = {
-  classes: PropTypes.object.isRequired,
-};
-
-export default withStyles(styles)(PageSignup);
