@@ -10,7 +10,8 @@ export default function Header() {
 
     return (
         <React.Fragment>
-            { userState.connected ? <HeaderConnected /> : <HeaderNotConnected />}
+            { true ? <HeaderConnected /> : <HeaderNotConnected />}
+            {/* { userState.connected ? <HeaderConnected /> : <HeaderNotConnected />} */}
         </React.Fragment>
     );
 }

@@ -16,7 +16,6 @@ router.route('/search')
 router.route('/profile')
       .get(authenticate, (req, res) => { profile(req, res); });
 
-
 router.route('/uploadPhoto')
       .post(authenticate, upload.single('userPhoto'), (req, res, next) => { uploadPhoto(req, res); });
 
@@ -24,6 +23,5 @@ router.route('/uploadPhoto')
 // with params, put it last
 router.route('/:id_user')
       .get(authenticate, (req, res) => { oneUser(req, res); });
-
 
 module.exports = router;

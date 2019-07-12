@@ -5,8 +5,10 @@ const config = require('../middlewares/config');
 
 const login = (req, res) => {
     const { username, password } = req.body;
-    User.usernameExists(username)
+    User.userFromUsername(username)
         .then(user =>  {
+            // console.log(user);
+            // console.log(user.password, user.uuid);
             if (user) {
                     bcrypt.compare(password, user.password, (err, result) => {
                         if (result) {

@@ -68,7 +68,7 @@ const Redirect = styled.section`
 `;
 
 
-export default function PageSignup() {
+export default function PageSignup(props) {
 
   const [values, setValues] = useState({
     showPassword: false,
@@ -157,12 +157,14 @@ export default function PageSignup() {
     const emptyFields = Object.keys(newUser).filter(key => !newUser[key]);
 
     if (emptyFields.length === 0) {
+      // console.log(newUser);
       axios.post(`/users`, newUser)
-        .then(res => { if (res.status === 200) this.props.history.push('/login'); })
+        .then(res => { if (res.status === 200) props.history.push('/login'); })
         .catch(error => {
+          console.log(error);
           const res = error.response.data;
-          if (res.errors) valueError(res.errors);
-          if (res.taken) valueIsTaken(res.taken);
+          if (res.errors.length !== 0) valueError(res.errors);
+          if (res.taken.length !== 0) valueIsTaken(res.taken);
         });
     } else {
       valueError(emptyFields);
