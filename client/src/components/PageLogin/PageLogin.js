@@ -154,7 +154,7 @@ export default function PageLogin(props) {
 
             { values.error && 
               <ErrorBox>
-                <p>⚠️ wrong Username or Password</p>
+                <p> <span aria-label="Attention" role="img" >⚠️</span> wrong Username or Password</p>
               </ErrorBox>
             }
             <SubmitButton type="submit">
