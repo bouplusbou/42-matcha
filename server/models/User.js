@@ -75,12 +75,34 @@ async function userFromUsername(username) {
     
     const user = { password, uuid };
     return user;
-    // const singleRecord = res.records[0];
-    // console.log(node.properties.uuid);
-    // const node = singleRecord.get(0);
-    // console.log(node.properties.uuid);
-    // console.log(res.records[0]);
-    // return res.records[0];
+  } catch(err) { console.log(err.stack) }
+}
+
+async function uuidExists(uuid) { 
+  try {
+    const res = await session.run(`
+      MATCH (u:User)
+      WHERE u.uuid = '${uuid}'
+      RETURN u
+    `, { uuid: uuid });
+    session.close();
+    return !!res.records[0];
+  } catch(err) { console.log(err.stack) }
+}
+
+async function userFromUsername(username) { 
+  try {
+    const res = await session.run(`
+      MATCH (u:User)
+      WHERE u.username = '${username}'
+      RETURN u.password AS password, u.uuid AS uuid
+    `, { username: username });
+    session.close();
+    const password = res.records[0].get('password');
+    const uuid = res.records[0].get('uuid');
+    
+    const user = { password, uuid };
+    return user;
   } catch(err) { console.log(err.stack) }
 }
 
@@ -88,9 +110,9 @@ module.exports = {
   createUser,
   usernameExists,
   emailExists,
+  uuidExists,
   userFromUsername,
   // getUsers,
-  // getUserByUuid,
   // getUser,
   // getProfile,
 }
