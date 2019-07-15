@@ -6,7 +6,6 @@ import AppContext from '../../AppContext';
 export default function Header() {
 
     const userState = useContext(AppContext);
-    // console.log('connected? ' + userState.connected);
 
     return (
         <React.Fragment>

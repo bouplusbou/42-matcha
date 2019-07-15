@@ -1,17 +1,17 @@
-const db = require('../db/database.js')
+const driver = require('../db/database.js');
+const session = driver.session();
 
 async function getTags() { 
-    const text = `
-      SELECT *
-      FROM "tags" `
-    try {
-      const res = await db.pool.query(text)
-      return res.rows
-    } catch(err) {
-      console.log(err.stack)
-    }
-  }
+  try {
+    const res = await session.run(`
+      MATCH (t:Tag) 
+      RETURN collect(DISTINCT t.tag) AS tags
+    `);
+    session.close();
+    return res.records[0].get('tags');
+  } catch(err) { console.log(err.stack) }
+}
 
-  module.exports = {
-    getTags
+module.exports = {
+  getTags,
 }

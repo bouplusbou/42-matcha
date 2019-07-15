@@ -5,8 +5,10 @@ const config = require('../middlewares/config');
 
 const login = (req, res) => {
     const { username, password } = req.body;
-    User.usernameExists(username)
+    User.userFromUsername(username)
         .then(user =>  {
+            // console.log(user);
+            // console.log(user.password, user.uuid);
             if (user) {
                     bcrypt.compare(password, user.password, (err, result) => {
                         if (result) {
@@ -20,13 +22,13 @@ const login = (req, res) => {
                     res.status(401).json({ errors: 'Invalid Credentials' });
             }
         })
-        .catch(err => { console.log(err) });
+        .catch(err => { console.log(err); });
 }
 
 const uuidIsValid = (req, res) => {
     User.getUserByUuid(req.params.uuid)
-        .then( user => { res.json({message : "Info for one user", data: user}) })
-        .catch( error => { console.log(error) });
+        .then( user => { res.json({message : "Info for one user", data: user}); })
+        .catch( error => { console.log(error); });
 }
 
 module.exports = {
