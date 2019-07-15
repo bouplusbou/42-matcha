@@ -8,7 +8,7 @@ import Select from 'react-select';
 
 export default function Filtering({filterAge, handleAgeChange, filterFame, handleFameChange, filterDistance, handleDistanceChange, handleLatlngChange, filterTags, handleTagsChange}) {
 
-    const Filtering = styled.div`
+    const Filtering = styled.aside`
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -93,7 +93,7 @@ export default function Filtering({filterAge, handleAgeChange, filterFame, handl
                 <Slider 
                     dots
                     step={200} 
-                    defaultValue={50}
+                    // defaultValue={50}
                     min={0}
                     max={1000}
                     defaultValue={filterDistance}
@@ -104,11 +104,12 @@ export default function Filtering({filterAge, handleAgeChange, filterFame, handl
             <section>
                 <p>Interests</p>
                 <Select
-                    onChange={handleTagsChange}
+                    // onChange={handleTagsChange}
                     defaultValue={[]}
                     isMulti
                     name="colors"
                     options={filterTags}
+                    // options={}
                     className="basic-multi-select"
                     classNamePrefix="select"
                 />

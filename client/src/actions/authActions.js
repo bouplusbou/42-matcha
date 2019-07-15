@@ -2,7 +2,7 @@ const axios = require('axios');
 
 const actionLogin = token => {
     localStorage.setItem('token', token);
-}
+};
 
 const actionIsAuthenticated = async (authToken) => {
     if (authToken) {
@@ -11,14 +11,14 @@ const actionIsAuthenticated = async (authToken) => {
     } else {
         return false;
     }
-}
+};
 
 const actionLogout = () => {
     localStorage.removeItem('token');
-}
+};
 
 module.exports = {
     actionLogin,
     actionIsAuthenticated,
     actionLogout,
-}
+};

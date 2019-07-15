@@ -42,7 +42,7 @@ async function usernameExists(username) {
   try {
     const res = await session.run(`
       MATCH (u:User)
-      WHERE u.username = '${username}'
+      WHERE u.username = $username
       RETURN u
     `, { username: username });
     session.close();
@@ -54,7 +54,7 @@ async function emailExists(email) {
   try {
     const res = await session.run(`
       MATCH (u:User)
-      WHERE u.email = '${email}'
+      WHERE u.email = $email
       RETURN u
     `, { email: email });
     session.close();
@@ -66,7 +66,7 @@ async function userFromUsername(username) {
   try {
     const res = await session.run(`
       MATCH (u:User)
-      WHERE u.username = '${username}'
+      WHERE u.username = $username
       RETURN u.password AS password, u.uuid AS uuid
     `, { username: username });
     session.close();
@@ -82,7 +82,7 @@ async function uuidExists(uuid) {
   try {
     const res = await session.run(`
       MATCH (u:User)
-      WHERE u.uuid = '${uuid}'
+      WHERE u.uuid = $uuid
       RETURN u
     `, { uuid: uuid });
     session.close();
@@ -94,7 +94,7 @@ async function userFromUsername(username) {
   try {
     const res = await session.run(`
       MATCH (u:User)
-      WHERE u.username = '${username}'
+      WHERE u.username = $username
       RETURN u.password AS password, u.uuid AS uuid
     `, { username: username });
     session.close();

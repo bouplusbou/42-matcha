@@ -43,12 +43,6 @@ function seedTags(tag) {
     const resultPromise = session.run(`CREATE (t:Tag { tag: $tag })`, { tag: tag });
     resultPromise.then(result => {
         console.log(`Tag '${tag}' created`);
-    // session.close();
-    // const singleRecord = result.records[0];
-    // const node = singleRecord.get(0);
-    // console.log(node.properties.username);
-    // on application exit:
-    // driver.close();
     });
 }
 
@@ -127,12 +121,6 @@ function seedCities(city) {
       });
       resultPromise.then(result => {
           console.log(`City ${city} created`);
-      // session.close();
-      // const singleRecord = result.records[0];
-      // const node = singleRecord.get(0);
-      // console.log(node.properties.username);
-      // on application exit:
-      // driver.close();
       });
     } catch(err) {
       console.log(err.stack);
@@ -208,12 +196,6 @@ async function seedUser(firstName, gender, photo1, i) {
             });
             resultPromise.then(result => {
                 console.log(`${gender} user '${i}' created`);
-            // session.close();
-            // const singleRecord = result.records[0];
-            // const node = singleRecord.get(0);
-            // console.log(node.properties.username);
-            // on application exit:
-            // driver.close();
             });
         } catch(err) {
           console.log(err.stack)

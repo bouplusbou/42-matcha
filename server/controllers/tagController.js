@@ -1,17 +1,14 @@
-const Tag = require('../models/Tag')
+const Tag = require('../models/Tag');
 
 const allTags = (req, res) => {
     Tag.getTags()
           .then( tags => {
-                for (tag of tags) {
-                      tag['value'] = tag['id_tag']
-                      delete tag['id_tag']
-                      tag['label'] = tag['name']
-                      delete tag['name']
-                }
-                return tags
+                const formatedTags = tags.map((tag, key) => {
+                      return { value: key, label: tag}
+                });
+                return formatedTags;
           })
-          .then( tags => { res.json({message : "List of tags", data: tags}) })
+          .then( formatedTags => { res.json({message : "List of formatedTags", data: formatedTags}) })
           .catch( error => { console.log(error) })
 }
 

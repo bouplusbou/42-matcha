@@ -90,7 +90,7 @@ const PageHome =  () => (
         <CTA to='/signup'>Start Dating</CTA>
       </TextWrapper>
       <PhotoWrapper>
-        <img src={'./home_photo.png'} alt="Photo of a couple"/>
+        <img src={'./home_photo.png'} alt="A couple having fun"/>
       </PhotoWrapper>
     </Wrapper>
     <Footer>
