@@ -8,7 +8,8 @@ import SelectComp from './test';
 import PageSearch from './PageSearch/PageSearch';
 import PageMatcher from './PageMatcher/PageMatcher';
 import Authenticate from './Authenticate';
-import Profile from './Profile';
+import Profile from './PageProfile/PageProfile';
+import Account from './PageProfile/PageAccount';
 
 const Main = () => (
   <main>
@@ -19,8 +20,9 @@ const Main = () => (
       <Route exact path='/search' component={Authenticate(PageSearch)}/>
       <Route exact path='/matcher' component={Authenticate(PageMatcher)}/>
       <Route exact path='/signup' component={PageSignup}/>
-      <Route path='/profile' component={Authenticate(Profile)}/>
+      <Route path='/profile' component={Profile}/>
       <Route path='/users' component={Authenticate(UsersSwitch)}/>
+      <Route path='/account' component={Account}/>
     </Switch>
   </main>
 );
