@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
 
 import ProfileContext, { ProfileConsumer } from "../../../ProfileContext";
 import ConnectedIcon from './ConnectedIcon';
 import GenderIcon from './GenderIcon';
 import LikeButton from './LikeButton';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPencilAlt } from '@fortawesome/free-solid-svg-icons';
 
 
 const StyledRow = styled.div `
@@ -34,27 +36,29 @@ const Container = styled.div `
     align-items:center;
 `
 
+const EditButton = styled(FontAwesomeIcon) `
+
+`
 export default function UsernameRow(props) {
+
+    const profile = useContext(ProfileContext)
     return (
-        <ProfileConsumer>
-            {profil =>(
-
-            <StyledRow>
-                <Container>
-                    <ConnectedIcon 
-                        connected={profil.connected} 
-                        lastConnection={profil.lastConnection}
-                        size={"xs"}
-                    />
-                    <Username>{profil.username}</Username>
-                    <GenderIcon gender={profil.gender} size={"3x"}/>
-                </Container>
-                <Container>
-                    <LikeButton {...profil}/>
-                </Container>
-            </StyledRow>
-
-            )}
-        </ProfileConsumer>
+        <StyledRow>
+            <Container>
+                <ConnectedIcon 
+                    connected={profile.connected} 
+                    lastConnection={profile.lastConnection}
+                    size={"xs"}
+                />
+                <Username>{profile.username}</Username>
+                <GenderIcon gender={profile.gender} size={"3x"}/>
+            </Container>
+            <Container>
+                {profile.account ?
+                <EditButton icon={faPencilAlt} size={"2x"} onClick={profile.openEdit}/> :
+                <LikeButton {...profile}/>
+            }
+            </Container>
+        </StyledRow>
     )
 }

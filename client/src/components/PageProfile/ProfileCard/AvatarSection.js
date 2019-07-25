@@ -1,22 +1,25 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useState, useContext } from 'react';
 import styled from 'styled-components';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFireAlt } from '@fortawesome/free-solid-svg-icons';
 import { Modal } from '@material-ui/core';
 
-import ProfileContext, { ProfileConsumer } from '../ProfileContext';
+import ProfileContext from '../ProfileContext';
 import PhotosModal from './PhotosModal';
 
 const StyledSection = styled.section `
     display:flex;
-    height:500px;
+    min-width:300px;
 
     align-items:flex-end;
     
     background-image: url(${props => props.avatar});
     background-position: center center;
     background-size: cover;
+    @media (max-width: 1000px) { 
+        height:300px;
+    }
 `
 
 const ScoreContainer = styled.div `
@@ -44,38 +47,34 @@ const ScoreIcon = styled(FontAwesomeIcon) `
 `
 export default function AvatarSection(props) {
     const [open, setOpen] = useState(false);
+    const profile = useContext(ProfileContext);
     
-    const handleOpen = () => {
+    const OpenModal = () => {
         setOpen(true);
     }
 
-    const handleClose = (event) => {
+    const CloseModal = (event) => {
         if (event.target.tagName == "DIV")
             setOpen(false);
     }
 
     return (
-        <ProfileConsumer>
-        {profile => (
-            <Fragment>
-                <StyledSection avatar={profile.photos[profile.avatar]} onClick={handleOpen}>
-                    <ScoreContainer>
-                        <Score>
-                            <ScoreIcon icon={faFireAlt}/>
-                            <span>{profile.score}</span>
-                        </Score>
-                    </ScoreContainer>
-                    </StyledSection>
-
-                <Modal open={open} onClose={handleClose}>
-                    <PhotosModal 
-                        index={profile.avatar} 
-                        photos={profile.photos}
-                        handleClose={handleClose}
-                    />
-                </Modal>
-            </Fragment>
-        )}
-        </ProfileConsumer>
+        <Fragment>
+            <StyledSection avatar={profile.photos[profile.avatar]} onClick={OpenModal}>
+                <ScoreContainer>
+                    <Score>
+                        <ScoreIcon icon={faFireAlt}/>
+                        <span>{profile.score}</span>
+                    </Score>
+                </ScoreContainer>
+            </StyledSection>
+            <Modal open={open} onClose={CloseModal}>
+                <PhotosModal 
+                    index={profile.avatar} 
+                    photos={profile.photos}
+                    CloseModal={CloseModal}
+                />
+            </Modal>
+        </Fragment>
     )
 }

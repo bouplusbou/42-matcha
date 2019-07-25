@@ -27,7 +27,7 @@ export default function InfosSection(props) {
                         <InfosRow/>
                         <BiographyRow bio={profile.bio}/>
                         <TagsRow tags={profile.tags}/>
-                        <PhotosRow photos={profile.photos} avatar={profile.avatar}/>
+                        {/* <PhotosRow photos={profile.photos} avatar={profile.avatar}/> */}
                     </StyledSection>
 
                 )}

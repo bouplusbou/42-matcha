@@ -1,45 +1,128 @@
-import React, { useState, useEffect } from "react";
-import styled from "styled-components";
+import React, { Fragment, useState } from "react";
 
 import FakeData from "../../fakeData.json";
 import ProfileContext, { ProfileProvider } from './ProfileContext';
+import { faEye, faHeart } from '@fortawesome/free-solid-svg-icons';
 
 import Container from "../Container";
 import ProfileCard from './ProfileCard/ProfileCard';
+import UserList from './UserList'
+import styled from 'styled-components';
 
-const profilData = {...FakeData.woman};
+const GridContainer = styled.div `
+    display:grid;
+    margin-top:2rem;
 
-const StyledMain = styled.main `
+    grid-template-columns:1fr;
+    grid-template-rows:auto;
+    grid-row-gap:2rem;
+    @media (max-width: 1000px) {
+        grid-row-gap:0rem;
+        margin-top:0;    
+    }
 `
 
-const PageProfile = (props) => {
-    
-    const [profile, setProfile] = useState({...profilData});
+export default function PageProfile(props) {
 
-    async function UpdateLike() {
-        const liked = !profile.liked;
-        const likedBy = profile.likedBy;
-        const match = liked && likedBy;
-        setProfile({
-            ...profile,
-            liked: liked,
-            match: match})
+    const profilData = {...FakeData.woman};
+
+    const [profileState, setProfileState] = useState({
+        ...profilData,
+        likeHistory: [
+            FakeData.woman,
+            FakeData.woman,
+            FakeData.woman,
+            FakeData.woman,
+            FakeData.woman,
+            FakeData.woman,
+            FakeData.woman,
+            FakeData.woman,
+            FakeData.woman,
+            FakeData.woman,
+            FakeData.woman,
+            FakeData.woman,
+            FakeData.woman,
+            FakeData.woman,
+            FakeData.woman
+        ],
+        visitHistory: [
+            FakeData.woman,
+            FakeData.woman,
+            FakeData.woman,
+            FakeData.woman,
+            FakeData.woman,
+            FakeData.woman,
+            FakeData.woman,
+            FakeData.woman,
+            FakeData.woman,
+            FakeData.woman,
+            FakeData.woman,
+            FakeData.woman,
+            FakeData.woman,
+            FakeData.woman,
+            FakeData.woman,
+            FakeData.woman,
+            FakeData.woman
+        ],
+        handleLike: handleLike,
+        handleCancelLike: handleCancelLike,
+        openEdit: OpenEdit,
+        closeAndSaveEdit: CloseAndSaveEdit,
+        account: true,
+        edit: false,
+    });
+    
+    async function handleLike() {
+        setProfileState({
+            ...profileState,
+            liked: true
+        })
     }
 
-    const contextData = {
-        ...profile,
-        UpdateLike: UpdateLike
+    async function handleCancelLike() {
+        setProfileState({
+            ...profileState,
+            liked: false
+        })
+    }
+
+    async function OpenEdit() {
+        setProfileState({
+            ...profileState,
+            edit: true,
+        })
+    }
+
+    async function CloseAndSaveEdit(editState) {
+        setProfileState({
+            ...editState,
+            edit: false,
+        })
     }
 
     return (
-        <ProfileProvider value={{...contextData}}>
-            <StyledMain>
-                <Container>
+        <ProfileProvider value={{...profileState}}>
+            <Container>
+                <GridContainer>
                     <ProfileCard/>
-                </Container>
-            </StyledMain>
+                    {profileState.account &&
+                        <Fragment>
+                            <UserList
+                            title={"Users who likes you"} 
+                            list={profileState.likeHistory}
+                            icon={faHeart} 
+                            color={"#FF5B6C"} 
+                            />
+                            <UserList 
+                            title={"Users who visited your profile"}
+                            list={profileState.visitHistory}
+                            icon={faEye} 
+                            color={"#6f48bd"}
+                            />
+                        </Fragment>
+                    }
+                </GridContainer>
+            </Container>
         </ProfileProvider>
     )
 }
-
-export default PageProfile;

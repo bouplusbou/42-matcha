@@ -3,13 +3,13 @@ import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
 import UserListItem from './UserListItem';
+import Separator from './Separator';
 
 const StyledSection = styled.section `
     display:flex;
     flex-direction:column;
     box-sizing:border-box;
     width:100%;
-    margin-bottom:2em;
     padding:1rem;
 
     overflow:hidden;
@@ -24,28 +24,6 @@ const Title = styled.h2 `
 
     color: white;
     text-align:center;
-`
-
-const Line = styled.div `
-    flex:1;
-    height:1px;
-
-    border-top:1px solid white;
-`
-
-const Separator = styled.div `
-    display:flex;
-    width:100%;
-    margin-bottom:0.75rem;
-    
-    justify-content:center;
-    align-items:center;
-`
-
-const StyledIcon = styled(FontAwesomeIcon) `
-    padding:0 0.5rem;
-
-    color:white;
 `
 
 const ListContainer = styled.div `
@@ -100,11 +78,7 @@ export default function UserList(props) {
     return (
             <StyledSection color={props.color}>
                     <Title color={props.color}>{props.title}</Title>
-                    <Separator>
-                        <Line color={props.color}/>
-                            <StyledIcon icon={props.icon} size={"2x"} color={props.color}/>
-                        <Line color={props.color}/>
-                    </Separator>
+                    <Separator color={props.color} icon={props.icon} size={"2x"}/>
                     <ListContainer>
                         {Users}
                     </ListContainer>

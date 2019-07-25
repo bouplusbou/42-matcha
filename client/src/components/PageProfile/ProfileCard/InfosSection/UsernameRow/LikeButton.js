@@ -46,14 +46,14 @@ const LikeButton = (props) => {
         box-shadow: 0px 0px 20px -1px ${props => props.theme.color.red};
     `
 
-    if (props.match)
-        return (<CancelMatchButton onClick={props.UpdateLike}><FontAwesomeIcon icon={faHeart} size={"2x"}/></CancelMatchButton>)
+    if (props.liked && props.likedBy)
+        return (<CancelMatchButton onClick={props.handleCancelLike}><FontAwesomeIcon icon={faHeart} size={"2x"}/></CancelMatchButton>)
     if (!props.liked && !props.likedBy)
-        return (<LikeButton onClick={props.UpdateLike}><FontAwesomeIcon icon={faHeart} size={"2x"}/></LikeButton>)
+        return (<LikeButton onClick={props.handleLike}><FontAwesomeIcon icon={faHeart} size={"2x"}/></LikeButton>)
     if (props.liked && !props.likedBy)
-        return (<CancelLikeButton onClick={props.UpdateLike}><FontAwesomeIcon icon={faHeart} size={"2x"}/></CancelLikeButton>)
+        return (<CancelLikeButton onClick={props.handleCancelLike}><FontAwesomeIcon icon={faHeart} size={"2x"}/></CancelLikeButton>)
     if (!props.liked && props.likedBy)
-        return (<MatchButton onClick={props.UpdateLike}><FontAwesomeIcon icon={faHeart} size={"2x"}/></MatchButton>)
+        return (<MatchButton onClick={props.handleLike}><FontAwesomeIcon icon={faHeart} size={"2x"}/></MatchButton>)
 }
 
 export default LikeButton;

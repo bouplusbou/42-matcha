@@ -25,8 +25,8 @@ function App() {
     <AppProvider value={appState}>
       <ThemeProvider theme={Theme}>
        <div>
-          <Header />
-         <Main />
+        <Header />
+        <Main />
         </div>
       </ThemeProvider>
     </AppProvider>

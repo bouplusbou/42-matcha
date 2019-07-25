@@ -58,10 +58,19 @@ const LocalisationCase = (props) => {
 }
 
 const LookingForCase = (props) => {
+    let lookingFor = null;
+    if ((props.gender == "man" && props.orientation == "straight") || 
+        (props.gender == "woman" && props.orientation == "homosexual"))
+        lookingFor = "Woman";
+    else if ((props.gender == "woman" && props.orientation == "straight") || 
+            (props.gender == "man" && props.orientation == "homosexual"))
+        lookingFor = "Man";
+    else
+        lookingFor = "Woman & Man" 
     return (
         <StyledCase>
             <StyledIcon icon={props.icon} size={"2x"}/>
-            <StyledSpan><strong>{props.lookingFor}</strong></StyledSpan>
+            <StyledSpan><strong>{lookingFor}</strong></StyledSpan>
         </StyledCase>
     )      
 }
@@ -73,7 +82,7 @@ const InfosRow = (props) => {
                 <StyledRow>
                     <AgeCase icon={faCalendarAlt} age={profile.age}/>
                     <LocalisationCase icon={faMapMarkedAlt} localisation={profile.localisation}/>
-                    <LookingForCase icon={faSearch} lookingFor={profile.lookingFor}/>
+                    <LookingForCase icon={faSearch} gender={profile.gender} orientation={profile.orientation}/>
                 </StyledRow>
             )}
         </ProfileConsumer>
