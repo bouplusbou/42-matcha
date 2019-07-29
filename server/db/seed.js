@@ -50,16 +50,8 @@ for (tag of tags) {
     seedTags(tag);
 }
 
-
-function gaussianRand() {
-  let rand = 0;
-  for (let i = 0; i < 6; i++) {
-    rand += Math.random();
-  }
-  return rand / 6;
-}
-
-const orientationArr = ['hetero', 'homo', 'bi'];
+const orientationArr = ['heterosexual', 'homosexual', 'bisexual'];
+const genderArr = ['men', 'women', 'non-binary'];
 
 const emailProvider = [
   'hotmail.fr',
@@ -105,110 +97,126 @@ const coord = {
   'Toulon': [43.15, 5.93]
 };
 
-function seedCities(city) { 
-    const latitude = coord[city][0] + Math.random() * 0.03;
-    const longitude = coord[city][1] + Math.random() * 0.05;
+function randomDate(type) {
+  const year_start = type === 'birth' ? 1989 : 2018;
+  const year_end = type === 'birth' ? 2000 : 2018;
+  const YYYY = Math.floor(Math.random() * (year_start - year_end + 1) + year_end);
+  let MM = Math.floor(Math.random() * (12 - 1 + 1) + 1);
+  MM = MM < 10 ? `0${MM}` : `${MM}`;
+  let DD = Math.floor(Math.random() * (20 - 1 + 1) + 1);
+  DD = DD < 10 ? `0${DD}` : `${DD}`;
+  return `${YYYY}-${MM}-${DD}`;
+}
+
+async function seedUser(firstName, gender, photos, i) { 
+  await bcrypt.hash('password', 10, (error, hashedPassword) => {
+    const tagArr = tags.sort(() => Math.random() - 0.5).slice(0, 3);
+    const uuid = uuidv1();
+    const lastName = faker.name.lastName();
+    const email = `${firstName}.${lastName}@`+ emailProvider[Math.floor(Math.random() * emailProvider.length)];
+    const username = `${firstName}${lastName.slice(0,1)}`;
+    const confirmed = 1;
+    const hash = crypto.randomBytes(20).toString('hex');
+    const birthDate = randomDate('birth');
+    const lastConnection = randomDate('lastConnection');
+    const orientation = orientationArr[Math.floor(Math.random() * orientationArr.length)];
+    const lookingFor = genderArr[Math.floor(Math.random() * orientationArr.length)];
+    const bio = faker.lorem.paragraph();
+    const avatarIndex = 1;
+    const score = Math.floor(Math.random() * 50000);
+    const city = cities[Math.floor(Math.random() * cities.length)];
+    const lat = coord[city][0] + Math.random() * 0.03;
+    const lng = coord[city][1] + Math.random() * 0.05;
+    const latLng = [lat, lng];
     try {
       const resultPromise = session.run(`
-      CREATE (:City {
+      MATCH (t1:Tag {tag: $tag1})
+      MATCH (t2:Tag {tag: $tag2})
+      MATCH (t3:Tag {tag: $tag3})
+      CREATE (u:User {
+          uuid: $uuid,
           city: $city,
-          latitude: $latitude,
-          longitude: $longitude })
+          latLng: $latLng,
+          email: $email,
+          username: $username,
+          firstName: $firstName,
+          lastName: $lastName,
+          password: $password,
+          confirmed: $confirmed,
+          hash: $hash,
+          birthDate: $birthDate,
+          gender: $gender,
+          orientation: $orientation,
+          lookingFor: $lookingFor,
+          bio: $bio,
+          photos: $photos,
+          avatarIndex: $avatarIndex,
+          lastConnection: $lastConnection,
+          score: $score })
+      CREATE (u)-[:TAGGED]->(t1)
+      CREATE (u)-[:TAGGED]->(t2)
+      CREATE (u)-[:TAGGED]->(t3)
       `, {
+          tag1: tagArr[0],
+          tag2: tagArr[1],
+          tag3: tagArr[2],
           city: city,
-          latitude: latitude,
-          longitude: longitude 
+          latLng: latLng,
+          uuid: uuid,
+          email: email,
+          username: username,
+          firstName: firstName,
+          lastName: lastName,
+          password: hashedPassword,
+          confirmed: confirmed,
+          hash: hash,
+          birthDate: birthDate,
+          gender: gender,
+          orientation: orientation,
+          lookingFor: lookingFor,
+          bio: bio,
+          photos: photos,
+          avatarIndex: avatarIndex,
+          lastConnection: lastConnection,
+          score: score,
       });
       resultPromise.then(result => {
-          console.log(`City ${city} created`);
+          console.log(`${gender} user '${i}' created`);
       });
     } catch(err) {
-      console.log(err.stack);
+      console.log(err.stack)
     }
-}
-
-for (city of cities) {
-  seedCities(city);
-}
-
-
-async function seedUser(firstName, gender, photo1, i) { 
-    await bcrypt.hash('password', 10, (error, hashedPassword) => {
-        const tagArr = tags.sort(() => Math.random() - 0.5).slice(0, 3);
-        const uuid = uuidv1();
-        const lastName = faker.name.lastName();
-        const email = `${firstName}.${lastName}@`+ emailProvider[Math.floor(Math.random() * emailProvider.length)];
-        const username = `${firstName}${lastName.slice(0,1)}`;
-        const confirmed = 1;
-        const hash = crypto.randomBytes(20).toString('hex');
-        const age = Math.floor(gaussianRand()*(39 - 18)) + 18;
-        const orientation = orientationArr[Math.floor(Math.random() * orientationArr.length)];
-        const bio = faker.lorem.paragraph();
-        const profilePhotoIndex = 1;
-        const fame = Math.floor(Math.random() * 100);
-        const city = cities[Math.floor(Math.random() * cities.length)];
-        try {
-            const resultPromise = session.run(`
-            MATCH (t1:Tag {tag: $tag1})
-            MATCH (t2:Tag {tag: $tag2})
-            MATCH (t3:Tag {tag: $tag3})
-            MATCH (c:City {city: $city})
-            CREATE (u:User {
-                uuid: $uuid,
-                email: $email,
-                username: $username,
-                firstName: $firstName,
-                lastName: $lastName,
-                password: $password,
-                confirmed: $confirmed,
-                hash: $hash,
-                age: $age,
-                gender: $gender,
-                orientation: $orientation,
-                bio: $bio,
-                photo1: $photo1,
-                profilePhotoIndex: $profilePhotoIndex,
-                fame: $fame })
-            CREATE (u)-[:LIKES]->(t1)
-            CREATE (u)-[:LIKES]->(t2)
-            CREATE (u)-[:LIKES]->(t3)
-            CREATE (u)-[:LIVES_IN]->(c)
-            `, {
-                tag1: tagArr[0],
-                tag2: tagArr[1],
-                tag3: tagArr[2],
-                city: city,
-                uuid: uuid,
-                email: email,
-                username: username,
-                firstName: firstName,
-                lastName: lastName,
-                password: hashedPassword,
-                confirmed: confirmed,
-                hash: hash,
-                age: age,
-                gender: gender,
-                orientation: orientation,
-                bio: bio,
-                photo1: photo1,
-                profilePhotoIndex: profilePhotoIndex,
-                fame: fame,
-            });
-            resultPromise.then(result => {
-                console.log(`${gender} user '${i}' created`);
-            });
-        } catch(err) {
-          console.log(err.stack)
-        }
-    })
+  })
 }
 
 for (i = 0; i < 400; i++) {
-    seedUser(names.randomWomanFirstName(), 'woman', unsplash.randomWomanPic(), i);
+    seedUser(names.randomWomanFirstName(), 'female', [unsplash.randomWomanPic()], i);
 }
 for (i = 400; i < 800; i++) {
-    seedUser(names.randomManFirstName(), 'man', unsplash.randomManPic(), i);
+    seedUser(names.randomManFirstName(), 'male', [unsplash.randomManPic()], i);
 }
 for (i = 800; i < 1001; i++) {
-    seedUser(names.randomWomanFirstName(), 'non-binary', unsplash.randomWomanPic(), i);
+    seedUser(names.randomWomanFirstName(), 'non-binary', [unsplash.randomWomanPic()], i);
 }
+
+
+// async function seedRelationships() { 
+//   try {
+//     const resultPromise = session.run(`
+//     MATCH (t1:Tag {tag: $tag1})
+//     MATCH (t2:Tag {tag: $tag2})
+//     CREATE (u)-[:TAGGED]->(t1)
+//     CREATE (u)-[:TAGGED]->(t2)
+//     CREATE (u)-[:TAGGED]->(t3)
+//     `);
+//     resultPromise.then(result => {
+//         console.log(`${gender} user '${i}' created`);
+//     });
+//   } catch(err) {
+//     console.log(err.stack)
+//   }
+// }
+
+// for (i = 0; i < 400; i++) {
+//   seedRelationships();
+// }
