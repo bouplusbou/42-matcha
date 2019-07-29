@@ -10,7 +10,7 @@ export default function LogoutButton() {
 
     const LogoutButton = styled.button`
         display: inline-block;
-        padding: 10px 15px;
+        padding: 8px 10px;
         border: solid 0.5px #AE86FF;
         border-radius: 10px;
         background-color: #6F48BD;
