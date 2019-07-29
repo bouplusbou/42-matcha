@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authenticate = require('../../middlewares/authenticate');
-const { allUsers, createUser, searchUsers, oneUser, profile, uploadPhoto } = require('../../controllers/userController');
+const { allUsers, createUser, searchUsers, oneUser, profile, uploadPhoto, filtersMinMax } = require('../../controllers/userController');
 const upload = require('../../middlewares/multer');
 
 router.route('/')
@@ -12,6 +12,9 @@ router.route('/')
 
 router.route('/search')
       .post(authenticate, (req, res) => { searchUsers(req, res); });
+
+router.route('/filtersMinMax')
+      .get(authenticate, (req, res) => { filtersMinMax(req, res); });
       
 router.route('/profile')
       .get(authenticate, (req, res) => { profile(req, res); });

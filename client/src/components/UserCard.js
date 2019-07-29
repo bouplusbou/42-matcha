@@ -58,7 +58,7 @@ export default function UserCard({ user, width, height }) {
     font-family: Roboto;
     font-weight: 500px;
   `;
-  const Fame = styled.p`
+  const Score = styled.p`
     color: #4A4A4A;
     font-family: Roboto;
     font-weight: 500px;
@@ -72,12 +72,12 @@ export default function UserCard({ user, width, height }) {
   return (
     <UserCard
       onMouseEnter={toggleHover}  
-      onMouseLeave={toggleHover}  
+      onMouseLeave={toggleHover}
     >
       { showInfos && 
         <Hover>
           <Username>{user.username}</Username>
-          <Fame><FontAwesomeIcon style={{marginRight: '8px'}} icon={faMapMarkerAlt}/>{user.city} <FontAwesomeIcon style={{margin: '0 8px 0 15px'}} icon={faFireAlt}/>{user.fame}</Fame>
+          <Score><FontAwesomeIcon style={{marginRight: '8px'}} icon={faMapMarkerAlt}/>{user.city} <FontAwesomeIcon style={{margin: '0 8px 0 15px'}} icon={faFireAlt}/>{user.score}</Score>
           <Tags>
             {user.tags.map( (tag, index) =>
               <Tag>

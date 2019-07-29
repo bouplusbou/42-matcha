@@ -6,7 +6,8 @@ import Slider from 'rc-slider';
 import AlgoliaPlaces from 'algolia-places-react';
 import Select from 'react-select';
 
-export default function Filtering({filterAge, handleAgeChange, filterFame, handleFameChange, filterDistance, handleDistanceChange, handleLatlngChange, filterTags, handleTagsChange}) {
+export default function Filtering({filterAge, handleAgeChange, rangeAge, filterScore, handleScoreChange, filterDistance, handleDistanceChange, handleLatlngChange, filterTags, handleTagsChange}) {
+// export default function Filtering({filterAge, handleAgeChange, filterScore, handleScoreChange, filterDistance, handleDistanceChange, handleLatlngChange, filterTags, handleTagsChange}) {
 
     const Filtering = styled.aside`
         display: flex;
@@ -34,7 +35,7 @@ export default function Filtering({filterAge, handleAgeChange, filterFame, handl
 
     const createSliderWithTooltip = Slider.createSliderWithTooltip;
     const Range = createSliderWithTooltip(Slider.Range);
-
+    
     return (
         <Filtering>
             <section>
@@ -44,8 +45,10 @@ export default function Filtering({filterAge, handleAgeChange, filterFame, handl
                 </TextBox>
                 <Range 
                     onAfterChange={handleAgeChange}
-                    min={18}
-                    max={100}
+                    min={rangeAge[0]}
+                    max={rangeAge[1]}
+                    // min={0}
+                    // max={100}
                     allowCross={false}
                     defaultValue={filterAge}
                     tipFormatter={value => `${value}`} 
@@ -53,15 +56,15 @@ export default function Filtering({filterAge, handleAgeChange, filterFame, handl
             </section>
             <section>
                 <TextBox>
-                    <p>Fame</p>
-                    <p style={{fontSize: '0.9em'}}>{filterFame[0]} - {filterFame[1]}</p>
+                    <p>Score</p>
+                    <p style={{fontSize: '0.9em'}}>{filterScore[0]} - {filterScore[1]}</p>
                 </TextBox>
                 <Range 
-                    onAfterChange={handleFameChange}
+                    onAfterChange={handleScoreChange}
                     min={0}
                     max={1000}
                     allowCross={false}
-                    defaultValue={filterFame}
+                    defaultValue={filterScore}
                     tipFormatter={value => `${value}`} 
                 />
             </section>

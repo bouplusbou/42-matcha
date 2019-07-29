@@ -64,12 +64,7 @@ const allUsers = (req, res) => {
             .catch(err => { console.log(err) })
 }
 
-const searchUsers = (req, res) => {
-      const { age, fame, latlng, tags } = req.body
-      User.getUsers(age, fame, latlng, tags)
-            .then(users => { res.json({message : "Search through users", data: users}) })
-            .catch(err => { console.log(err) })
-}
+
 
 const oneUser = (req, res) => {
       User.getUser(req.params.id_user)
@@ -102,6 +97,29 @@ const uploadPhoto = async (req, res) => {
       }
 }
 
+
+
+
+const searchUsers = (req, res) => {
+      const token = req.body.authToken || req.query.authToken;
+      jwt.verify(token, config.jwtSecret, async (err, decoded) => {
+            const { sortingChoice, filterAge, filterScore, filterTags } = req.body;
+            // console.log(sortingChoice, filterAge, filterScore, filterTags);
+            User.searchUsers(decoded.uuid, sortingChoice, filterAge, filterScore, filterTags)
+                  .then(users => { res.json({usersArr: users}) })
+                  .catch(err => { console.log(err) })
+      });
+}
+
+const filtersMinMax = (req, res) => {
+      User.filtersMinMax()
+            .then(filtersMinMax => { res.json({ age: filtersMinMax.age, score: filtersMinMax.score }) })
+            .catch(err => { console.log(err) })
+}
+
+
+
+
 module.exports = {
       allUsers,
       createUser,
@@ -109,4 +127,5 @@ module.exports = {
       oneUser,
       profile,
       uploadPhoto,
+      filtersMinMax,
 }

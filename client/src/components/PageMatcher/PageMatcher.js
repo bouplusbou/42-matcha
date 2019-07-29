@@ -10,7 +10,7 @@ const usersArr = Array(30).fill({
   gender: 'woman',
   age: 23,
   city: 'Paris',
-  fame: 100,
+  Score: 100,
   orientation: 'homo',
   photo: 'https://i.ibb.co/Qp5gpX9/woman568.jpg',
   tags: ['lol', 'rainbow', 'burritos'],
@@ -26,7 +26,7 @@ export default function PageSearch() {
   const [users, setUsers] = useState(usersArr);
   const [sortingChoice, setSortingChoice] = useState('Most famous');
   const [filterAge, setFilterAge] = useState([18, 100]);
-  const [filterFame, setFilterFame] = useState([0, 1000]);
+  const [filterScore, setFilterScore] = useState([0, 1000]);
   const [filterLatLng, setFilterLatLng] = useState([48.856697, 2.351462]);
   const [filterDistance, setFilterDistance] = useState(0);
   const [filterTags, setFilterTags] = useState(tags);
@@ -68,7 +68,7 @@ export default function PageSearch() {
 
   const selectSorting = e => { setSortingChoice(e.target.innerText); };
   const handleAgeChange = values => { setFilterAge(values); };
-  const handleFameChange = values => { setFilterFame(values); };
+  const handleScoreChange = values => { setFilterScore(values); };
   const handleLatlngChange = () => {};
   const handleDistanceChange = value => { setFilterDistance(value); };
   const handleTagsChange = () => {};
@@ -79,8 +79,8 @@ export default function PageSearch() {
         <Filtering 
           filterAge={filterAge}
           handleAgeChange={handleAgeChange}
-          filterFame={filterFame}
-          handleFameChange={handleFameChange}
+          filterScore={filterScore}
+          handleScoreChange={handleScoreChange}
           handleLatlngChange={handleLatlngChange}
           filterDistance={filterDistance}
           handleDistanceChange={handleDistanceChange}
