@@ -50,15 +50,6 @@ for (tag of tags) {
     seedTags(tag);
 }
 
-
-function gaussianRand() {
-  let rand = 0;
-  for (let i = 0; i < 6; i++) {
-    rand += Math.random();
-  }
-  return rand / 6;
-}
-
 const orientationArr = ['heterosexual', 'homosexual', 'bisexual'];
 const genderArr = ['men', 'women', 'non-binary'];
 
@@ -106,6 +97,17 @@ const coord = {
   'Toulon': [43.15, 5.93]
 };
 
+function randomDate(type) {
+  const year_start = type === 'birth' ? 1989 : 2018;
+  const year_end = type === 'birth' ? 2000 : 2018;
+  const YYYY = Math.floor(Math.random() * (year_start - year_end + 1) + year_end);
+  let MM = Math.floor(Math.random() * (12 - 1 + 1) + 1);
+  MM = MM < 10 ? `0${MM}` : `${MM}`;
+  let DD = Math.floor(Math.random() * (20 - 1 + 1) + 1);
+  DD = DD < 10 ? `0${DD}` : `${DD}`;
+  return `${YYYY}-${MM}-${DD}`;
+}
+
 async function seedUser(firstName, gender, photos, i) { 
   await bcrypt.hash('password', 10, (error, hashedPassword) => {
     const tagArr = tags.sort(() => Math.random() - 0.5).slice(0, 3);
@@ -115,10 +117,8 @@ async function seedUser(firstName, gender, photos, i) {
     const username = `${firstName}${lastName.slice(0,1)}`;
     const confirmed = 1;
     const hash = crypto.randomBytes(20).toString('hex');
-    // const birthDate = new Date(new Date(1969, 0, 1).getTime() + Math.random() * (new Date(2001, 0, 1).getTime() - new Date(1969, 0, 1).getTime()));
-    const birthDate = '2015-07-21';
-    // const lastConnection = new Date(new Date(2019, 0, 1).getTime() + Math.random() * (new Date().getTime() - new Date(2019, 0, 1).getTime()));
-    const lastConnection = '2015-07-21';
+    const birthDate = randomDate('birth');
+    const lastConnection = randomDate('lastConnection');
     const orientation = orientationArr[Math.floor(Math.random() * orientationArr.length)];
     const lookingFor = genderArr[Math.floor(Math.random() * orientationArr.length)];
     const bio = faker.lorem.paragraph();
@@ -199,3 +199,24 @@ for (i = 800; i < 1001; i++) {
     seedUser(names.randomWomanFirstName(), 'non-binary', [unsplash.randomWomanPic()], i);
 }
 
+
+// async function seedRelationships() { 
+//   try {
+//     const resultPromise = session.run(`
+//     MATCH (t1:Tag {tag: $tag1})
+//     MATCH (t2:Tag {tag: $tag2})
+//     CREATE (u)-[:TAGGED]->(t1)
+//     CREATE (u)-[:TAGGED]->(t2)
+//     CREATE (u)-[:TAGGED]->(t3)
+//     `);
+//     resultPromise.then(result => {
+//         console.log(`${gender} user '${i}' created`);
+//     });
+//   } catch(err) {
+//     console.log(err.stack)
+//   }
+// }
+
+// for (i = 0; i < 400; i++) {
+//   seedRelationships();
+// }
