@@ -108,8 +108,8 @@ async function userFromUsername(username) {
 
 async function searchUsers(uuid, { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags }) { 
   // console.log(uuid);
-  // console.log(sortingChoice);
-  console.log(filterLatLng);
+  // console.log(filterTags);
+  // console.log(filterLatLng);
   const sorting = { 
     'Closest': 'ORDER BY dist_city',
     'Farthest': 'ORDER BY dist_city DESC',
@@ -119,81 +119,18 @@ async function searchUsers(uuid, { sortingChoice, filterAge, filterScore, filter
     'Least famous': 'ORDER BY score',
   };
 
-
-
-
-
-// `
-// MATCH (me:User {uuid: 'ab03f250-b293-11e9-acb6-bdc63f562fb9'}), (u:User)
-// MATCH (u)-[:TAGGED]->(t:Tag)
-// WHERE NOT (me = u) 
-// AND u.gender IN me.lookingFor
-// AND me.gender IN u.lookingFor
-// AND ( 0 <= u.score <= 100000 )
-// WITH me, u, t,
-//   point({latitude: me.latLng[0], longitude: me.latLng[1]}) AS p1, 
-//   point({latitude: u.latLng[0], longitude: u.latLng[1]}) AS p2,
-//   // point({latitude: 43.73, longitude: 7.27}) AS p3, 
-//   duration.between(date(u.birthDate),date()).years AS age
-// WITH me, u, t, age, p1, p2
-// // , distance(p2,p3) AS city_range
-// WHERE ( 19 <= age <= 29) 
-// // AND city_range <= 130000
-// RETURN u.username AS username, 
-//   age,
-//   u.gender AS gender,
-//   u.city AS city,
-//   u.score AS score,
-//   u.orientation AS orientation,
-//   u.photos AS photos,
-//   u.avatarIndex AS avatarIndex,
-//   collect(DISTINCT t.tag) AS tags, 
-//   distance(p1,p2) AS dist_city,
-//   // city_range
-// ORDER BY age
-// LIMIT 20
-// `
-
-// `
-// MATCH (me:User {uuid: 'ab03f250-b293-11e9-acb6-bdc63f562fb9'}), (u:User)
-// MATCH (u)-[:TAGGED]->(t:Tag)
-// WHERE NOT (me = u) 
-// AND u.gender IN me.lookingFor
-// AND me.gender IN u.lookingFor
-// AND ( $scoreMin <= u.score <= $scoreMax)
-// WITH me, u, t,
-//   point({latitude: me.latLng[0], longitude: me.latLng[1]}) AS p1, 
-//   point({latitude: u.latLng[0], longitude: u.latLng[1]}) AS p2,
-//   ${filterLatLng ? ' point({latitude: $lat, longitude: $lng}) AS p3, ' : ''}
-//   duration.between(date(u.birthDate),date()).years AS age
-// WITH me, u, t, age, p1, p2
-// ${filterLatLng ? ' , distance(p2,p3) AS city_range' : ''}
-// WHERE ( $ageMin <= age <= $ageMax)
-// ${filterLatLng ? ' AND city_range <= $cityRange' : ''}
-// RETURN u.username AS username, 
-//   age,
-//   u.gender AS gender,
-//   u.city AS city,
-//   u.score AS score,
-//   u.orientation AS orientation,
-//   u.photos AS photos,
-//   u.avatarIndex AS avatarIndex,
-//   collect(DISTINCT t.tag) AS tags, 
-//   distance(p1,p2) AS dist_city
-//   ${sorting[sortingChoice]}
-// LIMIT 20
-// `
-
-
+  const selectedTags = filterTags ? filterTags.map( tag => tag.label ) : [];
 
   try {
     const res = await session.run(`
     MATCH (me:User {uuid: $uuid}), (u:User)
     MATCH (u)-[:TAGGED]->(t:Tag)
+    MATCH (u)-[:TAGGED]->(t2:Tag)
     WHERE NOT (me = u) 
     AND u.gender IN me.lookingFor
     AND me.gender IN u.lookingFor
     AND ( $scoreMin <= u.score <= $scoreMax)
+    ${filterTags ? 'AND t2.tag in $selectedTags' : ''}
     WITH me, u, t,
       point({latitude: me.latLng[0], longitude: me.latLng[1]}) AS p1, 
       point({latitude: u.latLng[0], longitude: u.latLng[1]}) AS p2,
@@ -224,6 +161,7 @@ async function searchUsers(uuid, { sortingChoice, filterAge, filterScore, filter
       lat: filterLatLng ? filterLatLng[0] : 0,
       lng: filterLatLng ? filterLatLng[1] : 0,
       cityDistance: filterDistance * 1000,
+      selectedTags: selectedTags,
     });
     session.close();
     const users = res.records.map(record => {
@@ -259,8 +197,6 @@ async function filtersMinMax() {
   } catch(err) { console.log(err.stack) }
 }
 
-
-
 module.exports = {
   createUser,
   usernameExists,
@@ -273,84 +209,3 @@ module.exports = {
   // getUser,
   // getProfile,
 }
-
-
-
-// async function searchUsers(uuid, sortingChoice, filterAge, filterScore, filterTags) { 
-//   sortingChoice
-//   // console.log(uuid);
-//   try {
-//     const res = await session.run(`
-//     MATCH (me:User {uuid: $uuid}), (u:User)
-//     MATCH (u)-[:TAGGED]->(t:Tag)
-//     WHERE NOT (me = u) 
-//     AND u.gender IN me.lookingFor
-//     AND me.gender IN u.lookingFor
-//     WITH me, u, t, point({latitude: me.latLng[0], longitude: me.latLng[1]}) AS p1, point({latitude: u.latLng[0], longitude: u.latLng[1]}) AS p2
-//     RETURN u.username AS username, 
-//       u.birthDate AS birthDate,
-//       u.gender AS gender,
-//       u.city AS city,
-//       u.score AS score,
-//       u.orientation AS orientation,
-//       u.photos AS photos,
-//       u.avatarIndex AS avatarIndex,
-//       collect(DISTINCT t.tag) AS tags, 
-//       distance(p1,p2) AS dist_city
-//     ORDER BY dist_city
-//     `, { uuid: uuid });
-//     session.close();
-//     const users = res.records.map(record => {
-//       const username = record.get('username');
-//       const gender = record.get('gender');
-//       const birthDate = record.get('birthDate');
-//       var today = new Date();
-//       var birth = new Date(birthDate);
-//       let age = today.getFullYear() - birth.getFullYear();
-//       let m = today.getMonth() - birth.getMonth();
-//       if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
-//       const city = record.get('city');
-//       const score = record.get('score');
-//       const orientation = record.get('orientation');
-//       const avatarIndex = record.get('avatarIndex');
-//       const photos = record.get('photos');
-//       const photo = photos[avatarIndex];
-//       const tags = record.get('tags');
-//       return { username, gender, birthDate, age, city, score, orientation, photo, tags }
-//     });
-//     // console.log(users);
-//     return users;
-//   } catch(err) { console.log(err.stack) }
-// }
-
-
-
-
-
-
-
-// `
-//     MATCH (me:User {uuid: $uuid}), (u:User)
-//     MATCH (u)-[:TAGGED]->(t:Tag)
-//     WHERE NOT (me = u) 
-//     AND u.gender IN me.lookingFor
-//     AND me.gender IN u.lookingFor
-//     AND ( $scoreMin <= u.score <= $scoreMax)
-//     ${locationQuery}
-//     WITH me, u, t,
-//       point({latitude: me.latLng[0], longitude: me.latLng[1]}) AS p1, point({latitude: u.latLng[0], longitude: u.latLng[1]}) AS p2,
-//       duration.between(date(u.birthDate),date()).years AS age
-//     WHERE ( $ageMin <= age <= $ageMax)
-//     RETURN u.username AS username, 
-//       age,
-//       u.gender AS gender,
-//       u.city AS city,
-//       u.score AS score,
-//       u.orientation AS orientation,
-//       u.photos AS photos,
-//       u.avatarIndex AS avatarIndex,
-//       collect(DISTINCT t.tag) AS tags, 
-//       distance(p1,p2) AS dist_city
-//     ${sorting[sortingChoice]}
-//     LIMIT 20
-//     `

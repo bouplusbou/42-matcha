@@ -6,8 +6,7 @@ import Slider from 'rc-slider';
 import AlgoliaPlaces from 'algolia-places-react';
 import Select from 'react-select';
 
-export default function Filtering({filterAge, handleAgeChange, rangeAge, filterScore, rangeScore, handleScoreChange, filterDistance, handleDistanceChange, handleLatlngChange, filterTags, handleTagsChange}) {
-    // export default function Filtering({filterAge, handleAgeChange, filterScore, handleScoreChange, filterDistance, handleDistanceChange, handleLatlngChange, filterTags, handleTagsChange}) {
+export default function Filtering({filterAge, handleAgeChange, rangeAge, filterScore, rangeScore, handleScoreChange, filterDistance, handleDistanceChange, handleLatlngChange, allTags, filterTags, handleTagsChange}) {
     
         const Filtering = styled.aside`
             display: flex;
@@ -83,34 +82,24 @@ export default function Filtering({filterAge, handleAgeChange, rangeAge, filterS
                         <p>Distance</p>
                         <p style={{fontSize: '0.9em'}}>{filterDistance}km</p>
                     </TextBox>
-                    {/* <Range 
-                        onAfterChange={handleDistanceChange}
-                        min={0}
-                        max={1000}
-                        allowCross={false}
-                        defaultValue={filterDistance}
-                        tipFormatter={value => `${value}`} 
-                    /> */}
                     <Slider 
                         dots
                         step={200} 
-                        // defaultValue={50}
                         min={0}
                         max={1000}
                         defaultValue={filterDistance}
                         onAfterChange={handleDistanceChange}
-                        // onBeforeChange={log} 
                     />
                 </section>            
                 <section>
                     <p>Interests</p>
                     <Select
-                        // onChange={handleTagsChange}
+                        onChange={handleTagsChange}
                         defaultValue={[]}
+                        value={filterTags}
+                        options={allTags}
                         isMulti
                         name="colors"
-                        options={filterTags}
-                        // options={}
                         className="basic-multi-select"
                         classNamePrefix="select"
                     />
