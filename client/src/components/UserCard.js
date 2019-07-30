@@ -80,7 +80,9 @@ export default function UserCard({ user, width, height }) {
           <Score><FontAwesomeIcon style={{marginRight: '8px'}} icon={faMapMarkerAlt}/>{user.city} <FontAwesomeIcon style={{margin: '0 8px 0 15px'}} icon={faFireAlt}/>{user.score}</Score>
           <Tags>
             {user.tags.map( (tag, index) =>
-              <Tag>
+              <Tag
+                key={index}
+              >
                 #{tag}
               </Tag>
             )}

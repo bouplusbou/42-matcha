@@ -106,9 +106,9 @@ async function userFromUsername(username) {
   } catch(err) { console.log(err.stack) }
 }
 
-async function searchUsers(uuid, { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags }) { 
-  // console.log(uuid);
-  // console.log(filterTags);
+async function searchUsers(uuid, { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags, offset }) { 
+  console.log(uuid);
+  // console.log(offset);
   // console.log(filterLatLng);
   const sorting = { 
     'Closest': 'ORDER BY dist_city',
@@ -119,7 +119,7 @@ async function searchUsers(uuid, { sortingChoice, filterAge, filterScore, filter
     'Least famous': 'ORDER BY score',
   };
 
-  const selectedTags = filterTags ? filterTags.map( tag => tag.label ) : [];
+  const selectedTags = filterTags.length !== 0 ? filterTags.map( tag => tag.label ) : null;
 
   try {
     const res = await session.run(`
@@ -130,7 +130,7 @@ async function searchUsers(uuid, { sortingChoice, filterAge, filterScore, filter
     AND u.gender IN me.lookingFor
     AND me.gender IN u.lookingFor
     AND ( $scoreMin <= u.score <= $scoreMax)
-    ${filterTags ? 'AND t2.tag in $selectedTags' : ''}
+    ${selectedTags ? 'AND t2.tag in $selectedTags' : ''}
     WITH me, u, t,
       point({latitude: me.latLng[0], longitude: me.latLng[1]}) AS p1, 
       point({latitude: u.latLng[0], longitude: u.latLng[1]}) AS p2,
@@ -151,6 +151,7 @@ async function searchUsers(uuid, { sortingChoice, filterAge, filterScore, filter
       collect(DISTINCT t.tag) AS tags, 
       distance(p1,p2) AS dist_city
       ${sorting[sortingChoice]}
+    SKIP $offset
     LIMIT 20
     `, { 
       uuid: uuid,
@@ -162,6 +163,7 @@ async function searchUsers(uuid, { sortingChoice, filterAge, filterScore, filter
       lng: filterLatLng ? filterLatLng[1] : 0,
       cityDistance: filterDistance * 1000,
       selectedTags: selectedTags,
+      offset: offset,
     });
     session.close();
     const users = res.records.map(record => {

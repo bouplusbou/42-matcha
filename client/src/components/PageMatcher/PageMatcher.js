@@ -1,77 +1,100 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Sorting from '../Sorting';
 import Filtering from '../Filtering';
 import Results from '../Results';
+// import MoreButton from './MoreButton';
+import axios from 'axios';
 
 
-const usersArr = Array(30).fill({
-  username: 'mimyK',
-  gender: 'woman',
-  age: 23,
-  city: 'Paris',
-  Score: 100,
-  orientation: 'homo',
-  photo: 'https://i.ibb.co/Qp5gpX9/woman568.jpg',
-  tags: ['lol', 'rainbow', 'burritos'],
-});
+const SearchSection = styled.section`
+  margin: 3vw 10vw;
+  display: grid;
+  grid-template-columns: 330px 1fr;
+  grid-gap: 10px;
+  grid-template-areas:
+    "filtering sorting"
+    "filtering results";
+  @media (max-width: 1080px) {
+    margin: 0;
+    grid-gap: 50px;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "filtering"
+      "sorting"
+      "results";
+  }
+`;
+const FilteringSection = styled.aside`
+  grid-area: filtering;
+  justify-self: center;
+`;
+const SortingSection = styled.aside`
+  grid-area: sorting;
+  justify-self: end;
+  @media (max-width: 1080px) {
+    justify-self: center;
+  }
+`;
+const ResultsSection = styled.section`
+  grid-area: results;
+`;
 
-const tags = [
-  { value: 1, label: 'burritos'},
-  { value: 2, label: 'yolo'},
-  { value: 3, label: 'tofu'},
-];
 
 export default function PageSearch() {
-  const [users, setUsers] = useState(usersArr);
-  const [sortingChoice, setSortingChoice] = useState('Most famous');
-  const [filterAge, setFilterAge] = useState([18, 100]);
-  const [filterScore, setFilterScore] = useState([0, 1000]);
-  const [filterLatLng, setFilterLatLng] = useState([48.856697, 2.351462]);
-  const [filterDistance, setFilterDistance] = useState(0);
-  const [filterTags, setFilterTags] = useState(tags);
-  const authToken = localStorage.getItem('token');
+  const [sortingChoice, setSortingChoice] = useState('Closest');
+  const [filterLatLng, setFilterLatLng] = useState(null);
+  const [filterDistance, setFilterDistance] = useState(5);
+  const [filterTags, setFilterTags] = useState([]);
+  const [offset, setOffset] = useState(0);
 
-  const SearchSection = styled.section`
-    margin: 3vw 10vw;
-    display: grid;
-    grid-template-columns: 330px 1fr;
-    grid-gap: 10px;
-    grid-template-areas:
-      "filtering sorting"
-      "filtering results";
-    @media (max-width: 1080px) {
-      margin: 0;
-      grid-gap: 50px;
-      grid-template-columns: 1fr;
-      grid-template-areas:
-        "filtering"
-        "sorting"
-        "results";
+  const [filterAge, setFilterAge] = useState([18, 60]);
+  const [rangeAge, setRangeAge] = useState([0, 100]);
+  const [filterScore, setFilterScore] = useState([0, 100000]);
+  const [rangeScore, setRangeScore] = useState([0, 100000]);
+  useEffect(() => {
+    async function fetchData() {
+      const authToken = localStorage.getItem('token');
+      const res = await axios.get(`/users/filtersMinMax?authToken=${authToken}`);
+      setFilterAge(res.data.age);
+      setRangeAge(res.data.age);
+      setFilterScore(res.data.score);
+      setRangeScore(res.data.score);
     }
-  `;
-  const FilteringSection = styled.aside`
-    grid-area: filtering;
-    justify-self: center;
-  `;
-  const SortingSection = styled.aside`
-    grid-area: sorting;
-    justify-self: end;
-    @media (max-width: 1080px) {
-      justify-self: center;
+    fetchData();
+  }, []);
+
+
+  const [allTags, setAllTags] = useState(null);
+  useEffect(() => {
+    async function fetchData() {
+      const authToken = localStorage.getItem('token');
+      const res = await axios.get(`/tags?authToken=${authToken}`);
+      setAllTags(res.data.tags);
     }
-  `;
-  const ResultsSection = styled.section`
-    grid-area: results;
-  `;
+    fetchData();
+  }, []);
 
 
-  const selectSorting = e => { setSortingChoice(e.target.innerText); };
-  const handleAgeChange = values => { setFilterAge(values); };
-  const handleScoreChange = values => { setFilterScore(values); };
-  const handleLatlngChange = () => {};
-  const handleDistanceChange = value => { setFilterDistance(value); };
-  const handleTagsChange = () => {};
+  const [users, setUsers] = useState(['yolo']);
+  useEffect(() => {
+    async function fetchData() {
+      const authToken = localStorage.getItem('token');
+      const filters = { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags, offset }
+      console.log(filters);
+      const res = await axios.post(`/users/search?authToken=${authToken}`, filters);
+      offset !== 0 ? setUsers( prev => [...prev, ...res.data.usersArr]) : setUsers(res.data.usersArr);
+    }
+    fetchData();
+  }, [sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags, offset]);
+
+  const handleSelectSorting = e => { setSortingChoice(e.target.innerText); setOffset(0); };
+  const handleAgeChange = values => { setFilterAge(values); setOffset(0); };
+  const handleScoreChange = values => { setFilterScore(values); setOffset(0); };
+  const handleLatlngChange = ({ suggestion }) => { setFilterLatLng([suggestion.latlng.lat, suggestion.latlng.lng]); setOffset(0); };
+  const handleDistanceChange = value => { setFilterDistance(value); setOffset(0); };
+  const handleTagsChange = values => { setFilterTags(values); setOffset(0); };
+  // const handleOffsetChange = () => { setOffset(offset + 20); };
 
   return (
     <SearchSection>
@@ -79,11 +102,14 @@ export default function PageSearch() {
         <Filtering 
           filterAge={filterAge}
           handleAgeChange={handleAgeChange}
+          rangeAge={rangeAge}
           filterScore={filterScore}
+          rangeScore={rangeScore}
           handleScoreChange={handleScoreChange}
           handleLatlngChange={handleLatlngChange}
           filterDistance={filterDistance}
           handleDistanceChange={handleDistanceChange}
+          allTags={allTags}
           filterTags={filterTags}
           handleTagsChange={handleTagsChange}
         />
@@ -91,7 +117,7 @@ export default function PageSearch() {
       <SortingSection>
         <Sorting 
           sortingChoice={sortingChoice}
-          selectSorting={selectSorting}
+          handleSelectSorting={handleSelectSorting}
         />
       </SortingSection>
       <ResultsSection>
@@ -102,3 +128,82 @@ export default function PageSearch() {
     </SearchSection>
   );
 }
+
+
+
+
+
+
+// const SearchSection = styled.section`
+//   margin: 3vw 10vw;
+//   display: grid;
+//   grid-template-columns: 330px 1fr;
+//   grid-gap: 10px;
+//   grid-template-areas:
+//     "filtering sorting"
+//     "filtering results";
+//   @media (max-width: 750px) {
+//     grid-gap: 50px;
+//     grid-template-columns: 1fr;
+//     grid-template-areas:
+//       "filtering"
+//       "sorting"
+//       "results";
+//   }
+// `;
+// const FilteringSection = styled.aside`
+//   grid-area: filtering;
+//   justify-self: center;
+// `;
+// const SortingSection = styled.aside`
+//   grid-area: sorting;
+//   justify-self: end;
+//   @media (max-width: 750px) {
+//     justify-self: center;
+// }
+// `;
+// const ResultsSection = styled.section`
+//   grid-area: results;
+//   display: flex;
+//   flex-direction: column;
+// `;
+// const UserCards = styled.section`
+//   display: flex;
+//   flex-wrap: wrap;
+//   justify-content: space-around;
+// `;
+
+
+
+// export default function PageSearch() {
+//   return (
+//     <SearchSection>
+//       <FilteringSection>
+
+//       </FilteringSection>
+//       <SortingSection>
+//         <Sorting 
+//           sortingChoice={sortingChoice}
+//           handleSelectSorting={handleSelectSorting}
+//         />
+//       </SortingSection>
+//       <ResultsSection
+//         handleOffsetChange={handleOffsetChange}
+//       >
+//         <UserCards>
+//           {users.map( (user, index) => 
+//             <UserCard 
+//               key={index}
+//               user={user}
+//               width={250}
+//               height={375}
+//             />
+//           )}
+//         </UserCards>
+//         <MoreButton
+//           handleOffsetChange={handleOffsetChange}
+//         />
+//       </ResultsSection>
+//     </SearchSection>
+//   );
+// }

@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import UserCard from '../UserCard';
 import Sorting from '../Sorting';
 import Filtering from '../Filtering';
+import MoreButton from './MoreButton';
 import axios from 'axios';
 
 const SearchSection = styled.section`
@@ -36,15 +37,22 @@ const SortingSection = styled.aside`
 const ResultsSection = styled.section`
   grid-area: results;
   display: flex;
+  flex-direction: column;
+`;
+const UserCards = styled.section`
+  display: flex;
   flex-wrap: wrap;
   justify-content: space-around;
 `;
+
+
 
 export default function PageSearch() {
   const [sortingChoice, setSortingChoice] = useState('Closest');
   const [filterLatLng, setFilterLatLng] = useState(null);
   const [filterDistance, setFilterDistance] = useState(5);
-  const [filterTags, setFilterTags] = useState(null);
+  const [filterTags, setFilterTags] = useState([]);
+  const [offset, setOffset] = useState(0);
 
   const [filterAge, setFilterAge] = useState([18, 60]);
   const [rangeAge, setRangeAge] = useState([0, 100]);
@@ -76,24 +84,22 @@ export default function PageSearch() {
 
   const [users, setUsers] = useState([]);
   useEffect(() => {
-    console.log('HERE');
     async function fetchData() {
       const authToken = localStorage.getItem('token');
-      const filters = { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags }
+      const filters = { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags, offset }
       const res = await axios.post(`/users/search?authToken=${authToken}`, filters);
-      setUsers(res.data.usersArr);
+      offset !== 0 ? setUsers( prev => [...prev, ...res.data.usersArr]) : setUsers(res.data.usersArr);
     }
     fetchData();
-  }, [sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags]);
+  }, [sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags, offset]);
 
-
-  const handleSelectSorting = e => { setSortingChoice(e.target.innerText); };
-  const handleAgeChange = values => { setFilterAge(values); };
-  const handleScoreChange = values => { setFilterScore(values); };
-  const handleLatlngChange = ({ suggestion }) => { setFilterLatLng([suggestion.latlng.lat, suggestion.latlng.lng]); };
-  const handleDistanceChange = value => { setFilterDistance(value); };
-
-  const handleTagsChange = values => { setFilterTags(values); };
+  const handleSelectSorting = e => { setSortingChoice(e.target.innerText); setOffset(0); };
+  const handleAgeChange = values => { setFilterAge(values); setOffset(0); };
+  const handleScoreChange = values => { setFilterScore(values); setOffset(0); };
+  const handleLatlngChange = ({ suggestion }) => { setFilterLatLng([suggestion.latlng.lat, suggestion.latlng.lng]); setOffset(0); };
+  const handleDistanceChange = value => { setFilterDistance(value); setOffset(0); };
+  const handleTagsChange = values => { setFilterTags(values); setOffset(0); };
+  const handleOffsetChange = () => { setOffset(offset + 20); };
 
   return (
     <SearchSection>
@@ -119,14 +125,22 @@ export default function PageSearch() {
           handleSelectSorting={handleSelectSorting}
         />
       </SortingSection>
-      <ResultsSection>
-        {users.map( user => 
-          <UserCard 
-            user={user}
-            width={250}
-            height={375}
-          />
-        )}
+      <ResultsSection
+        handleOffsetChange={handleOffsetChange}
+      >
+        <UserCards>
+          {users.map( (user, index) => 
+            <UserCard 
+              key={index}
+              user={user}
+              width={250}
+              height={375}
+            />
+          )}
+        </UserCards>
+        <MoreButton
+          handleOffsetChange={handleOffsetChange}
+        />
       </ResultsSection>
     </SearchSection>
   );
