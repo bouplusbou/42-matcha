@@ -103,9 +103,7 @@ const uploadPhoto = async (req, res) => {
 const searchUsers = (req, res) => {
       const token = req.body.authToken || req.query.authToken;
       jwt.verify(token, config.jwtSecret, async (err, decoded) => {
-            const { sortingChoice, filterAge, filterScore, filterTags } = req.body;
-            // console.log(sortingChoice, filterAge, filterScore, filterTags);
-            User.searchUsers(decoded.uuid, sortingChoice, filterAge, filterScore, filterTags)
+            User.searchUsers(decoded.uuid, req.body)
                   .then(users => { res.json({usersArr: users}) })
                   .catch(err => { console.log(err) })
       });

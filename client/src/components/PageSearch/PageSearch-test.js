@@ -6,83 +6,90 @@ import Filtering from '../Filtering';
 import axios from 'axios';
 
 const SearchSection = styled.section`
-  margin: 3vw 10vw;
-  display: grid;
-  grid-template-columns: 330px 1fr;
-  grid-gap: 10px;
+margin: 3vw 10vw;
+display: grid;
+grid-template-columns: 330px 1fr;
+grid-gap: 10px;
+grid-template-areas:
+  "filtering sorting"
+  "filtering results";
+@media (max-width: 750px) {
+  grid-gap: 50px;
+  grid-template-columns: 1fr;
   grid-template-areas:
-    "filtering sorting"
-    "filtering results";
-  @media (max-width: 750px) {
-    grid-gap: 50px;
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "filtering"
-      "sorting"
-      "results";
-  }
+    "filtering"
+    "sorting"
+    "results";
+}
 `;
 const FilteringSection = styled.aside`
-  grid-area: filtering;
-  justify-self: center;
+grid-area: filtering;
+justify-self: center;
 `;
 const SortingSection = styled.aside`
-  grid-area: sorting;
-  justify-self: end;
-  @media (max-width: 750px) {
-    justify-self: center;
+grid-area: sorting;
+justify-self: end;
+@media (max-width: 750px) {
+  justify-self: center;
 }
 `;
 const ResultsSection = styled.section`
-  grid-area: results;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
+grid-area: results;
+display: flex;
+flex-wrap: wrap;
+justify-content: space-around;
 `;
 
 export default function PageSearch() {
+
   const [sortingChoice, setSortingChoice] = useState('Closest');
-  const [filterLatLng, setFilterLatLng] = useState(null);
-  const [filterDistance, setFilterDistance] = useState(5);
-  
-  
+
+  const [filterScore, setFilterScore] = useState([0, 100000]);
+  const [filterLatLng, setFilterLatLng] = useState([48.856697, 2.351462]);
+  const [filterDistance, setFilterDistance] = useState(null);
   const [filterTags, setFilterTags] = useState(null);
-  
+
+
+
+
+
   
   const [filterAge, setFilterAge] = useState([18, 60]);
   const [rangeAge, setRangeAge] = useState([0, 100]);
-  const [filterScore, setFilterScore] = useState([0, 100000]);
-  const [rangeScore, setRangeScore] = useState([0, 100000]);
   useEffect(() => {
     async function fetchData() {
       const authToken = localStorage.getItem('token');
       const filtersRange = await axios.get(`/users/filtersMinMax?authToken=${authToken}`);
       setFilterAge(filtersRange.data.age);
       setRangeAge(filtersRange.data.age);
-      setFilterScore(filtersRange.data.score);
-      setRangeScore(filtersRange.data.score);
     }
     fetchData();
   }, []);
+
+
+
 
   const [users, setUsers] = useState([]);
   useEffect(() => {
     async function fetchData() {
       const authToken = localStorage.getItem('token');
-      const filters = { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags }
+      const filters = { sortingChoice, filterAge, filterScore, filterTags }
       const users = await axios.post(`/users/search?authToken=${authToken}`, filters);
       setUsers(users.data.usersArr);
     }
     fetchData();
-  }, [sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags]);
+  }, [sortingChoice, filterAge, filterScore, filterTags]);
+
+
+
+
 
   const handleSelectSorting = e => { setSortingChoice(e.target.innerText); };
-  const handleAgeChange = values => { setFilterAge(values); };
-  const handleScoreChange = values => { setFilterScore(values); };
-  const handleLatlngChange = ({ suggestion }) => { setFilterLatLng([suggestion.latlng.lat, suggestion.latlng.lng]); };
-  const handleDistanceChange = value => { setFilterDistance(value); };
-  
-  const handleTagsChange = () => {};
+  const handleAgeChange = async values => { 
+    console.log(values);
+    setFilterAge(values);
+  };
+
 
   return (
     <SearchSection>
@@ -91,14 +98,6 @@ export default function PageSearch() {
           filterAge={filterAge}
           handleAgeChange={handleAgeChange}
           rangeAge={rangeAge}
-          filterScore={filterScore}
-          rangeScore={rangeScore}
-          handleScoreChange={handleScoreChange}
-          handleLatlngChange={handleLatlngChange}
-          filterDistance={filterDistance}
-          handleDistanceChange={handleDistanceChange}
-          filterTags={filterTags}
-          handleTagsChange={handleTagsChange}
         />
       </FilteringSection>
       <SortingSection>
