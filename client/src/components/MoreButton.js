@@ -1,12 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 
-export default function MoreButton({ handleOffsetChange }) {
+export default function MoreButton({ handleClickMoreButton }) {
 
     const MoreButton = styled.button`
         display: inline-block;
         max-width: 200px;
-        margin: 0 auto;
+        margin: 50px auto;
         padding: 8px 10px;
         border: solid 0.5px #AE86FF;
         border-radius: 10px;
@@ -38,7 +38,7 @@ export default function MoreButton({ handleOffsetChange }) {
 
     return (
         <MoreButton
-            onClick={handleOffsetChange}
+            onClick={handleClickMoreButton}
         >
             <p>Load More</p>
         </MoreButton>

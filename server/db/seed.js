@@ -212,13 +212,13 @@ async function seedUser(firstName, gender, photos, i) {
   })
 }
 
-for (i = 0; i < 400; i++) {
+for (i = 0; i < 200; i++) {
     seedUser(names.randomWomanFirstName(), 'female', [unsplash.randomWomanPic()], i);
 }
-for (i = 400; i < 800; i++) {
+for (i = 200; i < 400; i++) {
     seedUser(names.randomManFirstName(), 'male', [unsplash.randomManPic()], i);
 }
-for (i = 800; i < 1001; i++) {
+for (i = 400; i < 500; i++) {
     seedUser(names.randomWomanFirstName(), 'non-binary', [unsplash.randomWomanPic()], i);
 }
 

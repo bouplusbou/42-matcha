@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authenticate = require('../../middlewares/authenticate');
-const { allUsers, createUser, searchUsers, oneUser, profile, uploadPhoto, filtersMinMax } = require('../../controllers/userController');
+const { allUsers, createUser, searchUsers, suggestedUsers, likeDislike, filtersMinMax } = require('../../controllers/userController');
 const upload = require('../../middlewares/multer');
 
 router.route('/')
@@ -13,14 +13,20 @@ router.route('/')
 router.route('/search')
       .post(authenticate, (req, res) => { searchUsers(req, res); });
 
+router.route('/matcher')
+      .post(authenticate, (req, res) => { suggestedUsers(req, res); });
+
+router.route('/likeDislike')
+      .post(authenticate, (req, res) => { likeDislike(req, res); });
+
 router.route('/filtersMinMax')
       .get(authenticate, (req, res) => { filtersMinMax(req, res); });
       
-router.route('/profile')
-      .get(authenticate, (req, res) => { profile(req, res); });
+// router.route('/profile')
+//       .get(authenticate, (req, res) => { profile(req, res); });
 
-router.route('/uploadPhoto')
-      .post(authenticate, upload.single('userPhoto'), (req, res, next) => { uploadPhoto(req, res); });
+// router.route('/uploadPhoto')
+//       .post(authenticate, upload.single('userPhoto'), (req, res, next) => { uploadPhoto(req, res); });
 
 // routes order is important, first come first serve
 // with params, put it last

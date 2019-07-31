@@ -54,51 +54,11 @@ const createUser = (req, res) => {
       manageNewUser(email, firstName, lastName, username, password);
 };
 
-
-
-
-
 const allUsers = (req, res) => { 
       User.getUsers()
             .then(users => { res.json({message : "List all users", data: users}) })
             .catch(err => { console.log(err) })
 }
-
-
-
-const oneUser = (req, res) => {
-      User.getUser(req.params.id_user)
-            .then(user => { res.json({message : "Info for one user", data: user}) })
-            .catch(err => { console.log(err) })
-}
-
-const profile = async (req, res) => {
-      const token = req.body.authToken || req.query.authToken;
-      const uuid = await jwt.verify(token, config.jwtSecret, (err, decoded) => {
-            if (err) res.status(401).send('Unauthorized: Invalid token');
-            return decoded.uuid;
-      });
-      if (uuid) {
-            User.getProfile(uuid)
-                  .then(user => { res.json({message : "Profile", data: user}) })
-                  .catch(err => { console.log(err) })
-      }
-}
-
-const uploadPhoto = async (req, res) => {
-      const token = req.body.authToken || req.query.authToken;
-      const uuid = await jwt.verify(token, config.jwtSecret, (err, decoded) => {
-            if (err) res.status(401).send('Unauthorized: Invalid token');
-            return decoded.uuid;
-      });
-      if (uuid) {
-            console.log({uuid})
-            console.log(req.file);
-      }
-}
-
-
-
 
 const searchUsers = (req, res) => {
       const token = req.body.authToken || req.query.authToken;
@@ -115,15 +75,29 @@ const filtersMinMax = (req, res) => {
             .catch(err => { console.log(err) })
 }
 
+const likeDislike = (req, res) => {
+      const token = req.body.authToken || req.query.authToken;
+      jwt.verify(token, config.jwtSecret, async (err, decoded) => {
+            User.likeDislike(decoded.uuid, req.body)
+                  .then(users => { res.json({usersArr: users}) })
+                  .catch(err => { console.log(err) })
+      });
+}
 
-
+const suggestedUsers = (req, res) => {
+      const token = req.body.authToken || req.query.authToken;
+      jwt.verify(token, config.jwtSecret, async (err, decoded) => {
+            User.suggestedUsers(decoded.uuid, req.body)
+                  .then(users => { res.json({usersArr: users}) })
+                  .catch(err => { console.log(err) })
+      });
+}
 
 module.exports = {
       allUsers,
       createUser,
       searchUsers,
-      oneUser,
-      profile,
-      uploadPhoto,
+      suggestedUsers,
+      likeDislike,
       filtersMinMax,
 }

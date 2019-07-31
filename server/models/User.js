@@ -199,6 +199,103 @@ async function filtersMinMax() {
   } catch(err) { console.log(err.stack) }
 }
 
+
+
+async function suggestedUsers(uuid, { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags }) { 
+  // console.log(uuid, sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags);
+  // console.log(offset);
+  // console.log(filterLatLng);
+  const sorting = { 
+    'Closest': 'ORDER BY dist_city',
+    'Farthest': 'ORDER BY dist_city DESC',
+    'Youngest': 'ORDER BY age',
+    'Oldest': 'ORDER BY age',
+    'Most famous': 'ORDER BY score DESC',
+    'Least famous': 'ORDER BY score',
+  };
+
+  const selectedTags = filterTags.length !== 0 ? filterTags.map( tag => tag.label ) : null;
+
+  try {
+    const res = await session.run(`
+    MATCH (me:User {uuid: $uuid}), (u:User)
+    MATCH (u)-[:TAGGED]->(t:Tag)
+    MATCH (u)-[:TAGGED]->(t2:Tag)
+    WHERE NOT (me = u) 
+    AND NOT (me)-[:DISLIKED]->(u)
+    AND NOT (me)-[:LIKED]->(u)
+    AND u.gender IN me.lookingFor
+    AND me.gender IN u.lookingFor
+    AND ( $scoreMin <= u.score <= $scoreMax)
+    ${selectedTags ? 'AND t2.tag in $selectedTags' : ''}
+    WITH me, u, t,
+      point({latitude: me.latLng[0], longitude: me.latLng[1]}) AS p1, 
+      point({latitude: u.latLng[0], longitude: u.latLng[1]}) AS p2,
+      ${filterLatLng ? ' point({latitude: $lat, longitude: $lng}) AS p3, ' : ''}
+      duration.between(date(u.birthDate),date()).years AS age
+    WITH me, u, t, age, p1, p2
+    ${filterLatLng ? ' , distance(p2,p3) AS city_range' : ''}
+    WHERE ($ageMin <= age <= $ageMax)
+    ${filterLatLng ? ' AND city_range <= $cityDistance' : ''}
+    RETURN u.username AS username, 
+      age,
+      u.gender AS gender,
+      u.city AS city,
+      u.score AS score,
+      u.orientation AS orientation,
+      u.photos AS photos,
+      u.avatarIndex AS avatarIndex,
+      collect(DISTINCT t.tag) AS tags, 
+      distance(p1,p2) AS dist_city
+      ${sorting[sortingChoice]}
+    LIMIT 1
+    `, { 
+      uuid: uuid,
+      scoreMin: filterScore[0],
+      scoreMax: filterScore[1],
+      ageMin: filterAge[0],
+      ageMax: filterAge[1],
+      lat: filterLatLng ? filterLatLng[0] : 0,
+      lng: filterLatLng ? filterLatLng[1] : 0,
+      cityDistance: filterDistance * 1000,
+      selectedTags: selectedTags,
+    });
+    session.close();
+    const users = res.records.map(record => {
+      const username = record.get('username');
+      const gender = record.get('gender');
+      const age = record.get('age');
+      const city = record.get('city');
+      const score = record.get('score');
+      const orientation = record.get('orientation');
+      const avatarIndex = record.get('avatarIndex');
+      const photos = record.get('photos');
+      const photo = photos[avatarIndex];
+      const tags = record.get('tags');
+      return { username, gender, age, city, score, orientation, photo, tags }
+    });
+    return users;
+  } catch(err) { console.log(err.stack) }
+}
+
+async function likeDislike(uuid, { choice, username }) { 
+  const relation = {
+    'like': 'CREATE (me)-[r:LIKED]->(other)',
+    'dislike': 'CREATE (me)-[r:DISLIKED]->(other)'
+  }
+  try {
+    const res = await session.run(`
+      MATCH (me:User {uuid: $uuid}), (other:User {username: $username})
+      ${relation[choice]}
+      SET r.timestamp = timestamp()
+    `, { 
+      uuid: uuid,
+      username: username,
+    });
+    session.close();
+  } catch(err) { console.log(err.stack) }
+}
+
 module.exports = {
   createUser,
   usernameExists,
@@ -206,6 +303,8 @@ module.exports = {
   uuidExists,
   userFromUsername,
   searchUsers,
+  suggestedUsers,
+  likeDislike,
   filtersMinMax,
   // getUsers,
   // getUser,

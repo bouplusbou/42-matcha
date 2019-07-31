@@ -5,8 +5,10 @@ import 'rc-tooltip/assets/bootstrap.css';
 import Slider from 'rc-slider';
 import AlgoliaPlaces from 'algolia-places-react';
 import Select from 'react-select';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
-export default function Filtering({filterAge, handleAgeChange, rangeAge, filterScore, rangeScore, handleScoreChange, filterDistance, handleDistanceChange, handleLatlngChange, allTags, filterTags, handleTagsChange}) {
+export default function Filtering({filterAge, handleAgeChange, rangeAge, filterScore, rangeScore, handleScoreChange, filterCity, handleClickDeleteCity, filterDistance, handleDistanceChange, handleLatlngChange, allTags, filterTags, handleTagsChange}) {
     
         const Filtering = styled.aside`
             display: flex;
@@ -66,7 +68,18 @@ export default function Filtering({filterAge, handleAgeChange, rangeAge, filterS
                     />
                 </section>
                 <section>
-                    <p>City</p>
+                    <TextBox>
+                        <p>City</p>
+                        {filterCity &&
+                            <p style={{fontSize: '0.9em'}}>
+                            {filterCity} <FontAwesomeIcon 
+                                style={{marginLeft: '8px', color: 'lightgray', cursor: 'pointer'}}
+                                icon={faTimes}
+                                onClick={handleClickDeleteCity}
+                            />
+                            </p>
+                        }
+                    </TextBox>
                     <AlgoliaPlaces
                         placeholder='Search a city here'
                         options={{

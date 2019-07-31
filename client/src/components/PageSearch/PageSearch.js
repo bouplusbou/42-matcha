@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import UserCard from '../UserCard';
 import Sorting from '../Sorting';
 import Filtering from '../Filtering';
-import MoreButton from './MoreButton';
+import MoreButton from '../MoreButton';
 import axios from 'axios';
 
 const SearchSection = styled.section`
@@ -44,11 +44,17 @@ const UserCards = styled.section`
   flex-wrap: wrap;
   justify-content: space-around;
 `;
-
-
+const NoMore = styled.section`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
 
 export default function PageSearch() {
+  const [hasNoMore, setHasNoMore] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [sortingChoice, setSortingChoice] = useState('Closest');
+  const [filterCity, setFilterCity] = useState(null);
   const [filterLatLng, setFilterLatLng] = useState(null);
   const [filterDistance, setFilterDistance] = useState(5);
   const [filterTags, setFilterTags] = useState([]);
@@ -84,11 +90,18 @@ export default function PageSearch() {
 
   const [users, setUsers] = useState([]);
   useEffect(() => {
+    setIsLoading(true);
+    setHasNoMore(false);
     async function fetchData() {
       const authToken = localStorage.getItem('token');
       const filters = { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags, offset }
       const res = await axios.post(`/users/search?authToken=${authToken}`, filters);
-      offset !== 0 ? setUsers( prev => [...prev, ...res.data.usersArr]) : setUsers(res.data.usersArr);
+      if (res.data.usersArr.length === 0) {
+        setHasNoMore(true)
+      } else {
+        offset !== 0 ? setUsers( prev => [...prev, ...res.data.usersArr]) : setUsers(res.data.usersArr);
+      }
+      setIsLoading(false);
     }
     fetchData();
   }, [sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags, offset]);
@@ -96,10 +109,18 @@ export default function PageSearch() {
   const handleSelectSorting = e => { setSortingChoice(e.target.innerText); setOffset(0); };
   const handleAgeChange = values => { setFilterAge(values); setOffset(0); };
   const handleScoreChange = values => { setFilterScore(values); setOffset(0); };
-  const handleLatlngChange = ({ suggestion }) => { setFilterLatLng([suggestion.latlng.lat, suggestion.latlng.lng]); setOffset(0); };
+  const handleLatlngChange = ({ suggestion }) => { 
+    setFilterLatLng([suggestion.latlng.lat, suggestion.latlng.lng]);
+    setFilterCity(suggestion.name); 
+    setOffset(0); 
+  };
+  const handleClickDeleteCity = () => { 
+    setFilterLatLng(null);
+    setFilterCity(null);
+  };
   const handleDistanceChange = value => { setFilterDistance(value); setOffset(0); };
   const handleTagsChange = values => { setFilterTags(values); setOffset(0); };
-  const handleOffsetChange = () => { setOffset(offset + 20); };
+  const handleClickMoreButton = () => { setOffset(offset + 20); };
 
   return (
     <SearchSection>
@@ -112,6 +133,8 @@ export default function PageSearch() {
           rangeScore={rangeScore}
           handleScoreChange={handleScoreChange}
           handleLatlngChange={handleLatlngChange}
+          filterCity={filterCity}
+          handleClickDeleteCity={handleClickDeleteCity}
           filterDistance={filterDistance}
           handleDistanceChange={handleDistanceChange}
           allTags={allTags}
@@ -126,8 +149,9 @@ export default function PageSearch() {
         />
       </SortingSection>
       <ResultsSection
-        handleOffsetChange={handleOffsetChange}
+        handleClickMoreButton={handleClickMoreButton}
       >
+      {!hasNoMore &&
         <UserCards>
           {users.map( (user, index) => 
             <UserCard 
@@ -138,9 +162,17 @@ export default function PageSearch() {
             />
           )}
         </UserCards>
+      }
+      {!hasNoMore && !isLoading && 
         <MoreButton
-          handleOffsetChange={handleOffsetChange}
+          handleClickMoreButton={handleClickMoreButton}
         />
+      }
+      {hasNoMore && 
+        <NoMore>
+          <p>No more suggestion...</p>
+        </NoMore>
+      }
       </ResultsSection>
     </SearchSection>
   );
