@@ -7,8 +7,6 @@ const login = (req, res) => {
     const { username, password } = req.body;
     User.userFromUsername(username)
         .then(user =>  {
-            // console.log(user);
-            // console.log(user.password, user.uuid);
             if (user) {
                     bcrypt.compare(password, user.password, (err, result) => {
                         if (result) {

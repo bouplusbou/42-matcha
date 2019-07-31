@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useState, useEffect } from "react";
 
 import FakeData from "../../fakeData.json";
 import ProfileContext, { ProfileProvider } from './ProfileContext';
@@ -8,6 +8,9 @@ import Container from "../Container";
 import ProfileCard from './ProfileCard/ProfileCard';
 import UserList from './UserList'
 import styled from 'styled-components';
+
+import axios from 'axios';
+const authToken = localStorage.getItem('token');
 
 const GridContainer = styled.div `
     display:grid;
@@ -27,48 +30,28 @@ export default function PageProfile(props) {
     const profilData = {...FakeData.woman};
 
     const [profileState, setProfileState] = useState({
-        ...profilData,
-        likeHistory: [
-            FakeData.woman,
-            FakeData.woman,
-            FakeData.woman,
-            FakeData.woman,
-            FakeData.woman,
-            FakeData.woman,
-            FakeData.woman,
-            FakeData.woman,
-            FakeData.woman,
-            FakeData.woman,
-            FakeData.woman,
-            FakeData.woman,
-            FakeData.woman,
-            FakeData.woman,
-            FakeData.woman
-        ],
-        visitHistory: [
-            FakeData.woman,
-            FakeData.woman,
-            FakeData.woman,
-            FakeData.woman,
-            FakeData.woman,
-            FakeData.woman,
-            FakeData.woman,
-            FakeData.woman,
-            FakeData.woman,
-            FakeData.woman,
-            FakeData.woman,
-            FakeData.woman,
-            FakeData.woman,
-            FakeData.woman,
-            FakeData.woman,
-            FakeData.woman,
-            FakeData.woman
-        ],
+        uuid:"",
+        username:"",
+        firstName:"",
+        lastName:"",
+        gender:"",
+        orientation:"",
+        lookingFor:"",
+        age:"",
+        bio:"",
+        email:"",
+        tags:[],
+        photos:[],
+        avatarIndex:0,
+        score:0,
+        latLng:[],
+        likeHistory:[],
+        visitHistory:[],
         handleLike: handleLike,
         handleCancelLike: handleCancelLike,
         openEdit: OpenEdit,
         closeAndSaveEdit: CloseAndSaveEdit,
-        account: true,
+        account: false,
         edit: false,
     });
     
@@ -100,11 +83,24 @@ export default function PageProfile(props) {
         })
     }
 
+    useEffect(() => {
+        async function fetchData() {
+            const profile = await axios.get(`/users/getProfile?authToken=${authToken}`)
+            console.log(profile.data.profile)
+            setProfileState({
+                ...profileState,
+                ...profile.data.profile
+            })
+        }
+        fetchData();
+    }, []);
+
     return (
         <ProfileProvider value={{...profileState}}>
             <Container>
                 <GridContainer>
                     <ProfileCard/>
+                    {profileState.username}
                     {profileState.account &&
                         <Fragment>
                             <UserList

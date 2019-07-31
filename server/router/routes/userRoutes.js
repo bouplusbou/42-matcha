@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authenticate = require('../../middlewares/authenticate');
-const { allUsers, createUser, searchUsers, oneUser, profile, uploadPhoto } = require('../../controllers/userController');
+const { allUsers, createUser, searchUsers, getProfile, profile, uploadPhoto } = require('../../controllers/userController');
 const upload = require('../../middlewares/multer');
 
 router.route('/')
@@ -21,7 +21,8 @@ router.route('/uploadPhoto')
 
 // routes order is important, first come first serve
 // with params, put it last
-router.route('/:id_user')
-      .get(authenticate, (req, res) => { oneUser(req, res); });
+router.route('/getProfile')
+      .get(authenticate, (req, res) => { getProfile(req, res) })
+
 
 module.exports = router;

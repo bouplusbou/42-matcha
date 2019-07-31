@@ -60,7 +60,7 @@ export default function AvatarSection(props) {
 
     return (
         <Fragment>
-            <StyledSection avatar={profile.photos[profile.avatar]} onClick={OpenModal}>
+            <StyledSection avatar={profile.photos[profile.avatarIndex]} onClick={OpenModal}>
                 <ScoreContainer>
                     <Score>
                         <ScoreIcon icon={faFireAlt}/>

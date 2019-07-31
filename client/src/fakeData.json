@@ -16,7 +16,7 @@
     		"https://i.ibb.co/88h2rM9/man4.jpg",
     		"https://i.ibb.co/hyY9yd9/man5.jpg"
 		],
-		"avatar": "https://i.ibb.co/hyY9yd9/man5.jpg",
+		"avatarIndex": "https://i.ibb.co/hyY9yd9/man5.jpg",
 		"connected": false,
 		"lastConnection": "12/07/2019",
 		"score": 32156,
@@ -49,7 +49,7 @@
     		"https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80",
    			"https://images.unsplash.com/photo-1543522081-edff3813830c?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80"
 		],
-		"avatar": 0,
+		"avatarIndex": 0,
 		"connected": true,
 		"lastConnection": "09/06/2019",
 		"score": 18154,

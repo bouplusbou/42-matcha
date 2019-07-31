@@ -55,7 +55,7 @@ export default function UsernameRow(props) {
             </Container>
             <Container>
                 {profile.account ?
-                <EditButton icon={faPencilAlt} size={"2x"} onClick={profile.openEdit}/> :
+                <EditButton icon={faPencilAlt} size={"2x"} onClick={profile.test}/> :
                 <LikeButton {...profile}/>
             }
             </Container>
