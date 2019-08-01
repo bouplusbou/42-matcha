@@ -114,7 +114,10 @@ export default function PageSearch() {
     setFilterCity(null);
   };
   const handleDistanceChange = value => { setFilterDistance(value); setOffset(0); };
-  const handleTagsChange = values => { setFilterTags(values); setOffset(0); };
+  const handleTagsChange = values => { 
+    values !== null ? setFilterTags(values) : setFilterTags([]);
+    setOffset(0);
+  };
   const handleClickMoreButton = () => { setOffset(offset + 20); };
 
   return (
