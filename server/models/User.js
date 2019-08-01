@@ -4,7 +4,7 @@ const uuidv1 = require('uuid/v1');
 const driver = require('../db/database.js');
 const session = driver.session();
 
-async function createUser(email, firstName, lastName, username, password) {
+async function createUser(email, firstName, lastName, username, password, city, latLng ) {
   await bcrypt.hash(password, 10, (error, hashedPassword) => {
     const uuid = uuidv1();
     const hash = crypto.randomBytes(20).toString('hex');
@@ -19,7 +19,9 @@ async function createUser(email, firstName, lastName, username, password) {
           password: $password,
           confirmed: $confirmed,
           hash: $hash,
-          fame: $fame })
+          fame: $fame,
+          city: $city,
+          latLng: $latLng })
       `, {
           uuid: uuid,
           email: email,
@@ -30,6 +32,8 @@ async function createUser(email, firstName, lastName, username, password) {
           confirmed: 1,
           hash: hash,
           fame: 100,
+          city: city,
+          latLng: latLng,
       });
       session.close();
     } catch(err) { console.log(err.stack) }
