@@ -51,7 +51,7 @@ for (tag of tags) {
 }
 
 const orientationArr = ['heterosexual', 'homosexual', 'bisexual'];
-const genderArr = ['men', 'women', 'non-binary'];
+
 
 const emailProvider = [
   'hotmail.fr',
@@ -108,6 +108,29 @@ function randomDate(type) {
   return `${YYYY}-${MM}-${DD}`;
 }
 
+function findLookingFor(orientationGenderArr) {
+  switch (orientationGenderArr.join(' ')) {
+    case 'heterosexual male':
+      return ['female'];
+    case 'heterosexual female':
+      return ['male'];
+    case 'heterosexual non-binary':
+      return ['non-binary'];
+    case 'homosexual male':
+      return ['male'];
+    case 'homosexual female':
+      return ['female'];
+    case 'homosexual non-binary':
+      return ['non-binary'];
+    case 'bisexual female':
+      return ['female', 'male'];
+    case 'bisexual male':
+      return ['female', 'male'];
+    case 'bisexual non-binary':
+      return ['female', 'male', 'non-binary'];
+  }
+}
+
 async function seedUser(firstName, gender, photos, i) { 
   await bcrypt.hash('password', 10, (error, hashedPassword) => {
     const tagArr = tags.sort(() => Math.random() - 0.5).slice(0, 3);
@@ -120,9 +143,9 @@ async function seedUser(firstName, gender, photos, i) {
     const birthDate = randomDate('birth');
     const lastConnection = randomDate('lastConnection');
     const orientation = orientationArr[Math.floor(Math.random() * orientationArr.length)];
-    const lookingFor = genderArr[Math.floor(Math.random() * orientationArr.length)];
+    const lookingFor = findLookingFor([orientation, gender]);
     const bio = faker.lorem.paragraph();
-    const avatarIndex = 1;
+    const avatarIndex = 0;
     const score = Math.floor(Math.random() * 50000);
     const city = cities[Math.floor(Math.random() * cities.length)];
     const lat = coord[city][0] + Math.random() * 0.03;
@@ -189,13 +212,13 @@ async function seedUser(firstName, gender, photos, i) {
   })
 }
 
-for (i = 0; i < 400; i++) {
+for (i = 0; i < 200; i++) {
     seedUser(names.randomWomanFirstName(), 'female', [unsplash.randomWomanPic()], i);
 }
-for (i = 400; i < 800; i++) {
+for (i = 200; i < 400; i++) {
     seedUser(names.randomManFirstName(), 'male', [unsplash.randomManPic()], i);
 }
-for (i = 800; i < 1001; i++) {
+for (i = 400; i < 500; i++) {
     seedUser(names.randomWomanFirstName(), 'non-binary', [unsplash.randomWomanPic()], i);
 }
 

@@ -161,7 +161,7 @@ export default function PageSignup(props) {
       axios.post(`/users`, newUser)
         .then(res => { if (res.status === 200) props.history.push('/login'); })
         .catch(error => {
-          console.log(error);
+          // console.log(error);
           const res = error.response.data;
           if (res.errors.length !== 0) valueError(res.errors);
           if (res.taken.length !== 0) valueIsTaken(res.taken);

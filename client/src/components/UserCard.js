@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
@@ -6,8 +6,6 @@ import { faFireAlt } from '@fortawesome/free-solid-svg-icons';
 
 
 export default function UserCard({ user, width, height }) {
-  const [ showInfos, setShowInfos] = useState(false);
-
   const UserCard = styled.div`
     background-image: url(${user.photo});
     background-size: cover;
@@ -27,7 +25,7 @@ export default function UserCard({ user, width, height }) {
       height: 300px;
     }
   `;
-  const Hover = styled.div`
+  const UserInfos = styled.div`
     background-color: white;
     margin: 0 auto;
     height: 100px;
@@ -37,11 +35,12 @@ export default function UserCard({ user, width, height }) {
     box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.15);
     position: relative;
     top: 20px;
+    overflow: hidden;
   `;
   const Tags = styled.div`
     display: flex;
     scrollbar-width: none;
-    overflowY: scroll;
+    overflow-y: scroll;
     ::-webkit-scrollbar: { display: none };
   `;
   const Tag = styled.p`
@@ -58,7 +57,7 @@ export default function UserCard({ user, width, height }) {
     font-family: Roboto;
     font-weight: 500px;
   `;
-  const Fame = styled.p`
+  const Score = styled.p`
     color: #4A4A4A;
     font-family: Roboto;
     font-weight: 500px;
@@ -66,26 +65,21 @@ export default function UserCard({ user, width, height }) {
     font-size: 0.8em;
   `;
 
-  const toggleHover = () => { setShowInfos(!showInfos) };
-
-
   return (
-    <UserCard
-      onMouseEnter={toggleHover}  
-      onMouseLeave={toggleHover}  
-    >
-      { showInfos && 
-        <Hover>
-          <Username>{user.username}</Username>
-          <Fame><FontAwesomeIcon style={{marginRight: '8px'}} icon={faMapMarkerAlt}/>{user.city} <FontAwesomeIcon style={{margin: '0 8px 0 15px'}} icon={faFireAlt}/>{user.fame}</Fame>
-          <Tags>
-            {user.tags.map( (tag, index) =>
-              <Tag>
-                #{tag}
-              </Tag>
-            )}
-          </Tags>
-        </Hover> }
+    <UserCard>
+      <UserInfos>
+        <Username>{user.username}</Username>
+        <Score><FontAwesomeIcon style={{marginRight: '8px'}} icon={faMapMarkerAlt}/>{user.city} <FontAwesomeIcon style={{margin: '0 8px 0 15px'}} icon={faFireAlt}/>{user.score}</Score>
+        <Tags>
+          {user.tags.map( (tag, index) =>
+            <Tag
+              key={index}
+            >
+              #{tag}
+            </Tag>
+          )}
+        </Tags>
+      </UserInfos> 
     </UserCard>
   );
 }

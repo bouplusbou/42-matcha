@@ -1,12 +1,12 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import UserCard from './UserCard';
 import CircleButton from './CircleButton';
 import styled from 'styled-components'
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { faHeart } from '@fortawesome/free-solid-svg-icons';
 
-export default function Results({ users }) {
-
+export default function Results({ usersIndex, handleLikeDislike, user, hasNoMore }) {
+    
     const Results = styled.section`
         display: flex;
         justify-content: center;
@@ -30,27 +30,38 @@ export default function Results({ users }) {
 
     return (
         <Results>
-            <NextButtonSection>
-                <CircleButton
-                    circle_color={'gray'}
-                    icon_color={'white'}
-                    fa_icon={faTimes}
-                />
-            </NextButtonSection>
-            <CardSection>
-                <UserCard 
-                    user={users[0]}
-                    width={350}
-                    height={525}
-                />
-            </CardSection>
-            <LikeButtonSection>
-                <CircleButton
-                    circle_color={'#FF6F62'}
-                    icon_color={'white'}
-                    fa_icon={faHeart}
-                />
-            </LikeButtonSection>
+        {!hasNoMore &&
+            <Fragment>
+                <NextButtonSection>
+                    <CircleButton
+                        choice={'dislike'}
+                        handleLikeDislike={handleLikeDislike}
+                        circle_color={'gray'}
+                        icon_color={'white'}
+                        fa_icon={faTimes}
+                    />
+                </NextButtonSection>
+                    <CardSection>
+                        <UserCard 
+                            user={user}
+                            width={350}
+                            height={525}
+                        />
+                    </CardSection>
+                <LikeButtonSection>
+                    <CircleButton
+                        choice={'like'}
+                        handleLikeDislike={handleLikeDislike}
+                        circle_color={'#FF6F62'}
+                        icon_color={'white'}
+                        fa_icon={faHeart}
+                    />
+                </LikeButtonSection>
+            </Fragment>
+        }
+        {hasNoMore && 
+            <p>No more suggestion...</p>
+        }
         </Results>
     );
 }
