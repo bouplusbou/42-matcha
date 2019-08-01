@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Separator from '../Separator';
 import { faPencilAlt, faTimes, faCheck } from '@fortawesome/free-solid-svg-icons';
@@ -6,6 +6,9 @@ import { TextField } from '@material-ui/core';
 import ProfileContext from '../ProfileContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import TagChip from './TagChip';
+import CreatableSelect from 'react-select/creatable';
+import axios from 'axios';
+const authToken = localStorage.getItem('token');
 
 const StyledSection = styled.section `
     display:flex;
@@ -13,6 +16,7 @@ const StyledSection = styled.section `
 
     align-items:center;
     flex-direction:column;
+    border-radius:0 ${props => props.theme.borderRadius} ${props => props.theme.borderRadius} 0;
 
     background-color:#2b2c2e;
 `
@@ -35,28 +39,6 @@ const StyledTextField = styled(TextField) `
     }
     svg { color:${props => props.theme.color.purple}; }
 `
-
-const UsernameTextField = styled(StyledTextField) `grid-area:username;`
-
-const FirstNameTextField = styled(StyledTextField) `grid-area:firstName;`
-
-const LastNameTextField = styled(StyledTextField) `grid-area:lastName;`
-
-const GenderTextField = styled(StyledTextField) `grid-area:gender;`
-
-const OrientationTextField = styled(StyledTextField) `grid-area:orientation;`
-
-const AgeTextField = styled(StyledTextField) `grid-area:age;`
-
-const AddTagTextField = styled(StyledTextField) `grid-area:addTag;`
-
-const BiographyTextField = styled(StyledTextField) `
-    grid-area:biography;
-    margin:0;
-    max-height:200px;
-`
-
-
 const GridForm = styled.form `
     width:100%;
     display:grid;
@@ -66,11 +48,23 @@ const GridForm = styled.form `
     "username gender firstName lastName"
     "age . . orientation"
     "biography biography biography biography"
-    "addTag addTag addTag addTagButton"
+    "tagSelect tagSelect tagSelect tagSelect"
     "tags tags tags tags"
     ". cancelButton submitButton .";
     grid-column-gap: 1rem;
     grid-row-gap: 1rem;
+`
+
+const UsernameTextField = styled(StyledTextField) `grid-area:username;`
+const FirstNameTextField = styled(StyledTextField) `grid-area:firstName;`
+const LastNameTextField = styled(StyledTextField) `grid-area:lastName;`
+const GenderTextField = styled(StyledTextField) `grid-area:gender;`
+const OrientationTextField = styled(StyledTextField) `grid-area:orientation;`
+const AgeTextField = styled(StyledTextField) `grid-area:age;`
+const BiographyTextField = styled(StyledTextField) `
+    grid-area:biography;
+    margin:0;
+    max-height:200px;
 `
 
 const TagsContainer = styled.div `
@@ -106,65 +100,78 @@ const SubmitButton = styled(StyledButton) `
     }
 `
 
-const AddTagButton = styled(StyledButton) `
-    grid-area:addTagButton;
-    border:2px solid ${props => props.theme.color.purple};
-    color:${props => props.theme.color.purple};
-    background-color:#2b2c2e;
-    :hover {
-        color:#2b2c2e;
-        background-color:${props => props.theme.color.purple};
-        cursor:pointer;
-    }
-`
-
-const CancelButton = styled(AddTagButton) `
+const CancelButton = styled(StyledButton) `
     grid-area:cancelButton;
     height:2rem;
 `
 
+const StyledCreatableSelect = styled(CreatableSelect) `
+    grid-area:tagSelect;
+    div {
+        color:white;
+        border-color:#212223;
+        background-color:#2b2c2e;
+        div {
+            background-color:#2b2c2e;
+        }
+    }
+`
+
 export default function InfosSection(props) {
     const profile = useContext(ProfileContext);
-    const [editState, setEditState] = useState({
+    const [valueState, setValueState] = useState({
         ...profile,
         newTag: ""
     })
-    const Tags = editState.tags.map((tag, index) => <TagChip deletable={true} tag={tag} index={index} onDelete={DeleteTag}/>)
-    
+    const Tags = valueState.tags.map((tag, index) => <TagChip deletable={true} tag={tag} index={index} onDelete={DeleteTag}/>)
+    const [editState, setEditState] = useState({});
+
+    const [tagsList, setTagsList] = useState([]);
+    useEffect(() => {
+        async function fetchAllTags() {
+            const tags = await axios.get(`/tags?authToken=${authToken}`);
+            setTagsList([...tags.data.data]);
+        }
+        fetchAllTags();
+    },[]);
 
     function handleChange(event) {
         const {name, value} = event.target;
         if (name == "bio") {
-            if (editState.bio.length < 300 && value.length < 300)
-            setEditState({
-                ...editState,
-                bio: value
-            })
+            if (valueState.bio.length < 300 && value.length < 300) {
+                setValueState({ ...valueState, bio: value })
+                setEditState({ ...editState, bio: value })
+            }
         } else {
-            setEditState({
-                ...editState,
-                [name]: value,
-            });
+            setValueState({ ...valueState, [name]: value });
+            setEditState({ ...editState, [name]: value });
         }
     };
 
-    function CreateTag() {
-        if (editState.tags.length < 10) {
-            const newTags = editState.tags;
-            newTags.push(editState.newTag);
-            setEditState({
-                ...editState,
-                tags: newTags,
-                newTag: ""
-            })
-        }
+    async function createTag(tag) {
+        const newTag = {label: tag};
+        await axios.post(`/tags/create?authToken=${authToken}`, newTag);
+        addTag(newTag);
+        // setTagsList( ...tagsList, tag.label );
+    }
+    
+    async function addTag(newValue) {
+            const newTag = {tag: newValue.label};
+            console.log(newTag);
+            // await axios.post(`/users/addTag?authToken=${authToken}`, newTag);
+            // newTags.push(valueState.newTag);
+            // setValueState({
+            //     ...valueState,
+            //     tags: newTags,
+            //     newTag: ""
+            // })
     }
     function DeleteTag(tagIndex) {
         console.log(tagIndex);
-        const tags = editState.tags;
+        const tags = valueState.tags;
         tags.splice(tagIndex, 1);
-         setEditState({
-             ...editState,
+         setValueState({
+             ...valueState,
              tags : tags
          })
     }
@@ -175,13 +182,12 @@ export default function InfosSection(props) {
 
     return (
         <StyledSection>
-            {/* <Title>Edit your profile</Title> */}
             <Separator icon={faPencilAlt} size={"lg"}/>
             <GridForm>
                 <UsernameTextField
                     label="Username"
                     name='username'
-                    value={editState.username}
+                    value={valueState.username}
                     onChange={handleChange}
                     variant="outlined"
                 />
@@ -192,23 +198,25 @@ export default function InfosSection(props) {
                     SelectProps={{
                         native: true,
                     }}
-                    value={editState.gender}
+                    value={valueState.gender}
                     onChange={handleChange}
                     variant="outlined"
                 >
-                    <option value="man">Man</option>
-                    <option value="woman">Woman</option>
+                    <option value="male">Man</option>
+                    <option value="female">Woman</option>
                     <option value="non-binary">Non-binary</option>
                 </GenderTextField>
                 <FirstNameTextField
                     label="First Name"
-                    value={profile.firstName}
+                    name="firstName"
+                    value={valueState.firstName}
                     onChange={handleChange}
                     variant="outlined"
                 />
                 <LastNameTextField
                     label="Last Name"
-                    value={profile.lastName}
+                    name="lastName"
+                    value={valueState.lastName}
                     onChange={handleChange}
                     variant="outlined"
                 />
@@ -219,7 +227,7 @@ export default function InfosSection(props) {
                     SelectProps={{
                         native: true,
                     }}
-                    value={editState.age}
+                    value={valueState.age}
                     onChange={handleChange}
                     variant="outlined"
                 >
@@ -238,7 +246,7 @@ export default function InfosSection(props) {
                     SelectProps={{
                         native: true,
                     }}
-                    value={editState.orientation}
+                    value={valueState.orientation}
                     onChange={handleChange}
                     variant="outlined"
                 >
@@ -250,20 +258,16 @@ export default function InfosSection(props) {
                     label="Biography"
                     name="bio"
                     multiline
-                    value={editState.bio}
+                    value={valueState.bio}
                     onChange={handleChange}
                     fullWidth
                     variant="outlined"
                 />
-                <AddTagTextField
-                    label="Add tag"
-                    name='newTag'
-                    value={editState.newTag}
-                    placeholder="Add tag"
-                    onChange={handleChange}
-                    variant="outlined"
+                <StyledCreatableSelect
+                    options={tagsList}
+                    onChange={addTag}
+                    onCreateOption={createTag}
                 />
-                <AddTagButton onClick={CreateTag}>Add Tag</AddTagButton>
                 <TagsContainer>
                     {Tags}
                 </TagsContainer>

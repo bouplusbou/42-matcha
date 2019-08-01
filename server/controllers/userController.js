@@ -54,23 +54,6 @@ const createUser = (req, res) => {
       manageNewUser(email, firstName, lastName, username, password);
 };
 
-
-
-
-
-// const allUsers = (req, res) => { 
-//       User.userFromUsername()
-//             .then(users => { res.json({message : "List all users", data: users}) })
-//             .catch(err => { console.log(err) })
-// }
-
-// const searchUsers = (req, res) => {
-//       const { age, fame, latlng, tags } = req.body
-//       User.userFromUsername(age, fame, latlng, tags)
-//             .then(users => { res.json({message : "Search through users", data: users}) })
-//             .catch(err => { console.log(err) })
-// }
-
 const oneUser = (req, res) => {
       console.log(req.params.username)
       User.userFromUsername(req.params.username)
@@ -78,38 +61,17 @@ const oneUser = (req, res) => {
             .catch(err => { console.log(err) })
 }
 
-// const profile = async (req, res) => {
-//       const token = req.body.authToken || req.query.authToken;
-//       const uuid = await jwt.verify(token, config.jwtSecret, (err, decoded) => {
-//             if (err) res.status(401).send('Unauthorized: Invalid token');
-//             return decoded.uuid;
-//       });
-//       if (uuid) {
-//             User.getProfile(uuid)
-//                   .then(user => { res.json({message : "Profile", data: user}) })
-//                   .catch(err => { console.log(err) })
-//       }
-// }
-
-// const uploadPhoto = async (req, res) => {
-//       const token = req.body.authToken || req.query.authToken;
-//       const uuid = await jwt.verify(token, config.jwtSecret, (err, decoded) => {
-//             if (err) res.status(401).send('Unauthorized: Invalid token');
-//             return decoded.uuid;
-//       });
-//       if (uuid) {
-//             console.log({uuid})
-//             console.log(req.file);
-//       }
-// }
-
-const getProfile = async (req, res) => {
+const getUuid = async (req, res) => {
       const token = req.body.authToken || req.query.authToken;
       const uuid = await jwt.verify(token, config.jwtSecret, (err, decoded) => {
             if (err) res.status(401).send('Unauthorized: Invalid token');
             return decoded.uuid;
       });
-      console.log(uuid);
+      return uuid;
+}
+
+const getProfile = async (req, res) => {
+      const uuid = await getUuid(req, res);
       if (uuid) {
             User.getProfile(uuid)
                   .then(profile => { res.json({profile: profile})})
@@ -117,10 +79,37 @@ const getProfile = async (req, res) => {
       }
 }
 
+const updateProfile = async (req, res) => {
+      const uuid = await getUuid(req, res);
+      if (uuid) {
+            User.updateProfile(uuid, req.body)
+            .catch(err => { console.log(err) })
+      }
+}
+
+const updateRelationship = (req, res) => {
+      const token = req.body.authToken || req.query.authToken;
+      jwt.verify(token, config.jwtSecret, async (err, decoded) => {
+            User.updateRelationship(decoded.uuid, req.body)
+                  .then(users => { res.json({usersArr: users}) })
+                  .catch(err => { console.log(err) })
+      });
+}
+
+const addTag = async (req, res) => {
+      const uuid = await getUuid(req, res);
+      if (uuid) {
+            User.addTag(uuid, req.body);
+      }
+}
+
+
 module.exports = {
       // allUsers,
       createUser,
-      getProfile
+      getProfile,
+      updateProfile,
+      addTag,
       // searchUsers,
       // oneUser,
       // profile,

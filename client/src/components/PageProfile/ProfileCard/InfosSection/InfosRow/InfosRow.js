@@ -52,7 +52,7 @@ const LocalisationCase = (props) => {
     return (
         <StyledCase>
             <StyledIcon icon={props.icon} size={"2x"}/>
-            <StyledSpan><strong>{props.localisation}</strong></StyledSpan>
+            <StyledSpan><strong>{props.city}</strong></StyledSpan>
         </StyledCase>
     )      
 }
@@ -81,7 +81,7 @@ const InfosRow = (props) => {
             {profile =>(
                 <StyledRow>
                     <AgeCase icon={faCalendarAlt} age={profile.age}/>
-                    <LocalisationCase icon={faMapMarkedAlt} localisation={profile.localisation}/>
+                    <LocalisationCase icon={faMapMarkedAlt} city={profile.city}/>
                     <LookingForCase icon={faSearch} gender={profile.gender} orientation={profile.orientation}/>
                 </StyledRow>
             )}

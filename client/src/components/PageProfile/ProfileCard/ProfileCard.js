@@ -8,7 +8,6 @@ import ProfileContext from '../ProfileContext.js';
 
 const StyledCard = styled.section `
     display:flex;
-    overflow:hidden;
 
     min-height:350px;
     width:100%;
@@ -28,11 +27,15 @@ export default function ProfileCard(props) {
     const profile = useContext(ProfileContext);
     return (
         <StyledCard>
-            <AvatarSection/>
-            {profile.edit ?
-                <EditSection/> :
-                <InfosSection/>
-            }
+            {profile.username &&
+            <React.Fragment>
+                <AvatarSection/>
+                {profile.edit ?
+                    <EditSection/> :
+                    <InfosSection/>
+                }
+            </React.Fragment>
+        }
         </StyledCard>
     )
 }

@@ -5,9 +5,9 @@ import { faMars, faVenus, faTransgender } from '@fortawesome/free-solid-svg-icon
 
 const GenderIcon = (props) => {
     const icons = {
-        "man": faMars,
-        "woman": faVenus,
-        "nonBinary": faTransgender
+        "male": faMars,
+        "female": faVenus,
+        "non-binary": faTransgender
     }
 
     const GenderIcon = styled(FontAwesomeIcon) `

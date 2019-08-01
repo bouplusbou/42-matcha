@@ -11,6 +11,7 @@ import BiographyRow from './BiographyRow';
 
 const StyledSection = styled.section `
     display:flex;
+    flex:1;
     padding:1rem;
 
     align-items:flex-start;

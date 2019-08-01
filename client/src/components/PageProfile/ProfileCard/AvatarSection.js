@@ -14,7 +14,8 @@ const StyledSection = styled.section `
 
     align-items:flex-end;
     
-    background-image: url(${props => props.avatar});
+    border-radius:${props => props.theme.borderRadius} 0 0 ${props => props.theme.borderRadius};
+    background-image: url(${props => props.avatar ? props => props.avatar : "https://icon-library.net/images/no-profile-picture-icon/no-profile-picture-icon-12.jpg"});
     background-position: center center;
     background-size: cover;
     @media (max-width: 1000px) { 
@@ -30,6 +31,7 @@ const ScoreContainer = styled.div `
     align-items:flex-end;
     justify-content:center;
     
+    border-radius:0 0 0 ${props => props.theme.borderRadius};
     background: linear-gradient(179.76deg, rgba(0, 0, 0, 0) 0.51%, #000000 83.4%);
 `
 

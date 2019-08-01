@@ -50,6 +50,31 @@ async function usernameExists(username) {
   } catch(err) { console.log(err.stack) }
 }
 
+async function updateProfile(uuid, req) {
+  try {
+    await session.run(`
+      MATCH (u:User {uuid: $uuid})
+      ${req.username ? `SET u.username = $username` : ""}
+      ${req.firstName ? `SET u.firstName = $firstName` : ""}
+      ${req.lastName ? `SET u.lastName = $lastName` : ""}
+      ${req.gender ? `SET u.gender = $gender` : ""}
+      ${req.age ? `SET u.age = $age` : ""}
+      ${req.orientation ? `SET u.orientation = $orientation` : ""}
+      ${req.bio ? `SET u.bio = $bio` : ""}
+    `, {
+      uuid: uuid,
+      username: req.username,
+      firstName: req.firstName,
+      lastName: req.lastName,
+      gender: req.gender,
+      age: req.age,
+      orientation: req.orientation,
+      bio: req.bio,
+    });
+    session.close();
+  } catch (err) { console.log(err.stack) }
+}
+
 async function emailExists(email) { 
   try {
     const res = await session.run(`
@@ -113,6 +138,7 @@ async function getProfile(uuid) {
       u.latLng AS latLng,
       u.likeHistory AS likeHistory,
       u.visitHistory AS visitHistory,
+      u.lastConnection AS lastConnection,
       collect(t.tag) AS tags
     `, {uuid: uuid});
     session.close();
@@ -132,6 +158,7 @@ async function getProfile(uuid) {
     const latLng = res.records[0].get('latLng');
     const likeHistory = res.records[0].get('likeHistory');
     const visitHistory = res.records[0].get('visitHistory');
+    const lastConnection = res.records[0].get('lastConnection')
     return {
       uuid,
       username,
@@ -150,8 +177,41 @@ async function getProfile(uuid) {
       latLng,
       likeHistory,
       visitHistory,
+      lastConnection
     }
   } catch(err) { console.log(err.stack)};
+}
+
+async function updateRelationship(uuid, { choice, username }) { 
+  const relation = {
+    'like': 'CREATE (me)-[r:LIKED]->(other)',
+    'dislike': 'CREATE (me)-[r:DISLIKED]->(other)'
+  }
+  try {
+    const res = await session.run(`
+      MATCH (me:User {uuid: $uuid}), (other:User {username: $username})
+      ${relation[choice]}
+      SET r.timestamp = timestamp()
+    `, { 
+      uuid: uuid,
+      username: username,
+    });
+    session.close();
+  } catch(err) { console.log(err.stack) }
+}
+
+async function addTag(uuid, req) {
+  console.log(req);
+  try {
+    await session.run(`
+    MATCH (u:User {uuid: $uuid}), (t:Tag {tag: $tag})
+    CREATE (u)-[r:TAGGED]->(t)
+    `, {
+      uuid: uuid,
+      tag: req.tag
+    });
+    session.close();
+  } catch(err) { console.log(err.stack) }
 }
 
 module.exports = {
@@ -160,7 +220,9 @@ module.exports = {
   emailExists,
   uuidExists,
   userFromUsername,
-  getProfile
+  getProfile,
+  updateProfile,
+  addTag,
   // getUsers,
   // getUser,
   // getProfile,
