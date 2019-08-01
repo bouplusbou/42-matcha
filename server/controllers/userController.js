@@ -92,6 +92,19 @@ const suggestedUsers = (req, res) => {
       });
 }
 
+const confirmation = async (req, res) => {
+      const uuid = await User.uuidFromHash(req.body);
+      if (uuid !== null) {
+            User.confirmation(uuid)
+                  .then( () => { res.status(200).json({ message: 'Confirmation is set in db' }) })
+                  .catch(err => { 
+                        res.status(400).json({ message: 'The db did not update the confirmation' });
+                   })
+      } else {
+            res.status(400).json({ message: 'Hash is not OK' });
+      }
+}
+
 module.exports = {
       allUsers,
       createUser,
@@ -99,4 +112,5 @@ module.exports = {
       suggestedUsers,
       updateRelationship,
       filtersMinMax,
+      confirmation,
 }

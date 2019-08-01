@@ -92,6 +92,7 @@ export default function PageLogin(props) {
     password: '',
     showPassword: false,
     error: false,
+    errorMsg: '',
   });
 
   const handleChange = name => event => {
@@ -115,7 +116,11 @@ export default function PageLogin(props) {
         userState.toggleConnected();
         props.history.push('/search');
       })
-      .catch(err => setValues({ ...values, error: true }));
+      .catch(err => {
+        // console.log(err.response.data.errorMsg);
+        setValues({ ...values, error: true, errorMsg: err.response.data.errorMsg});
+        // wrong Username or Password 
+      });
   };
 
   return (
@@ -154,7 +159,7 @@ export default function PageLogin(props) {
 
             { values.error && 
               <ErrorBox>
-                <p> <span aria-label="Attention" role="img" >⚠️</span> wrong Username or Password</p>
+                <p> <span aria-label="Attention" role="img" >⚠️</span> {values.errorMsg}</p>
               </ErrorBox>
             }
             <SubmitButton type="submit">
@@ -162,6 +167,7 @@ export default function PageLogin(props) {
             </SubmitButton>
           </Form>
           <Redirect>
+            <p>Forgot your password ? <Link to="/resetPassword">Reset via your email</Link></p>
             <p>Not a member yet ? <Link to="/signup">Signup now</Link></p>
           </Redirect>
         </FormContainer>

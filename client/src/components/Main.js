@@ -5,12 +5,14 @@ import PageSignup from './PageSignup/PageSignup';
 import PageLogin from './PageLogin/PageLogin';
 import PageSearch from './PageSearch/PageSearch';
 import PageMatcher from './PageMatcher/PageMatcher';
+import PageConfirmAccount from './PageConfirmAccount/PageConfirmAccount';
 // import Authenticate from './Authenticate';
 
 const Main = () => (
   <main>
     <Switch>
       <Route exact path='/' component={PageHome}/>
+      <Route exact path='/confirm/:hash' component={PageConfirmAccount}/>
       <Route exact path='/login' component={PageLogin}/>
       <Route exact path='/search' component={PageSearch}/>
       <Route exact path='/matcher' component={PageMatcher}/>
