@@ -76,7 +76,6 @@ export default function PageSearch() {
     fetchData();
   }, []);
 
-
   const [allTags, setAllTags] = useState(null);
   useEffect(() => {
     async function fetchData() {
@@ -87,7 +86,6 @@ export default function PageSearch() {
     fetchData();
   }, []);
 
-
   const [users, setUsers] = useState([]);
   useEffect(() => {
     setIsLoading(true);
@@ -96,11 +94,8 @@ export default function PageSearch() {
       const authToken = localStorage.getItem('token');
       const filters = { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags, offset }
       const res = await axios.post(`/users/search?authToken=${authToken}`, filters);
-      if (res.data.usersArr.length === 0) {
-        setHasNoMore(true)
-      } else {
-        offset !== 0 ? setUsers( prev => [...prev, ...res.data.usersArr]) : setUsers(res.data.usersArr);
-      }
+      if (res.data.usersArr.length !== 20) setHasNoMore(true);
+      offset !== 0 ? setUsers( prev => [...prev, ...res.data.usersArr]) : setUsers(res.data.usersArr);
       setIsLoading(false);
     }
     fetchData();
@@ -151,7 +146,7 @@ export default function PageSearch() {
       <ResultsSection
         handleClickMoreButton={handleClickMoreButton}
       >
-      {!hasNoMore &&
+      {users.length !== 0 &&
         <UserCards>
           {users.map( (user, index) => 
             <UserCard 
@@ -163,12 +158,12 @@ export default function PageSearch() {
           )}
         </UserCards>
       }
-      {!hasNoMore && !isLoading && 
+      {!isLoading && !hasNoMore &&
         <MoreButton
           handleClickMoreButton={handleClickMoreButton}
         />
       }
-      {hasNoMore && 
+      {!isLoading && users.length === 0 && 
         <NoMore>
           <p>No more suggestion...</p>
         </NoMore>

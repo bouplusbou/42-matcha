@@ -75,10 +75,10 @@ const filtersMinMax = (req, res) => {
             .catch(err => { console.log(err) })
 }
 
-const likeDislike = (req, res) => {
+const updateRelationship = (req, res) => {
       const token = req.body.authToken || req.query.authToken;
       jwt.verify(token, config.jwtSecret, async (err, decoded) => {
-            User.likeDislike(decoded.uuid, req.body)
+            User.updateRelationship(decoded.uuid, req.body)
                   .then(users => { res.json({usersArr: users}) })
                   .catch(err => { console.log(err) })
       });
@@ -98,6 +98,6 @@ module.exports = {
       createUser,
       searchUsers,
       suggestedUsers,
-      likeDislike,
+      updateRelationship,
       filtersMinMax,
 }

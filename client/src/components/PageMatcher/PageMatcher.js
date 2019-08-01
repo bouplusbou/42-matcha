@@ -82,7 +82,7 @@ export default function PageSearch() {
       choice: choice,
       username: user.username,
     };
-    axios.post(`/users/likeDislike?authToken=${authToken}`, payload);
+    axios.post(`/users/updateRelationship?authToken=${authToken}`, payload);
     const filters = { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags }
     const res = await axios.post(`/users/matcher?authToken=${authToken}`, filters);
     res.data.usersArr.length === 0 ? setHasNoMore(true) : setUser(res.data.usersArr[0]);

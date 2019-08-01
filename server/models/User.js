@@ -1,39 +1,37 @@
-const db = require('../db/database.js');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const uuidv1 = require('uuid/v1');
-
 const driver = require('../db/database.js');
 const session = driver.session();
 
 async function createUser(email, firstName, lastName, username, password) {
   await bcrypt.hash(password, 10, (error, hashedPassword) => {
-      const uuid = uuidv1();
-      const hash = crypto.randomBytes(20).toString('hex');
-      try {
-        const res = session.run(`
-        CREATE (u:User {
-            uuid: $uuid,
-            email: $email,
-            username: $username,
-            firstName: $firstName,
-            lastName: $lastName,
-            password: $password,
-            confirmed: $confirmed,
-            hash: $hash,
-            fame: $fame })
-        `, {
-            uuid: uuid,
-            email: email,
-            username: username,
-            firstName: firstName,
-            lastName: lastName,
-            password: hashedPassword,
-            confirmed: 1,
-            hash: hash,
-            fame: 100,
-        });
-        session.close();
+    const uuid = uuidv1();
+    const hash = crypto.randomBytes(20).toString('hex');
+    try {
+      const res = session.run(`
+      CREATE (u:User {
+          uuid: $uuid,
+          email: $email,
+          username: $username,
+          firstName: $firstName,
+          lastName: $lastName,
+          password: $password,
+          confirmed: $confirmed,
+          hash: $hash,
+          fame: $fame })
+      `, {
+          uuid: uuid,
+          email: email,
+          username: username,
+          firstName: firstName,
+          lastName: lastName,
+          password: hashedPassword,
+          confirmed: 1,
+          hash: hash,
+          fame: 100,
+      });
+      session.close();
     } catch(err) { console.log(err.stack) }
   })
 }
@@ -107,9 +105,7 @@ async function userFromUsername(username) {
 }
 
 async function searchUsers(uuid, { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags, offset }) { 
-  console.log(uuid);
-  // console.log(offset);
-  // console.log(filterLatLng);
+  // console.log(uuid);
   const sorting = { 
     'Closest': 'ORDER BY dist_city',
     'Farthest': 'ORDER BY dist_city DESC',
@@ -202,9 +198,7 @@ async function filtersMinMax() {
 
 
 async function suggestedUsers(uuid, { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags }) { 
-  // console.log(uuid, sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags);
-  // console.log(offset);
-  // console.log(filterLatLng);
+  // console.log(uuid);
   const sorting = { 
     'Closest': 'ORDER BY dist_city',
     'Farthest': 'ORDER BY dist_city DESC',
@@ -278,7 +272,7 @@ async function suggestedUsers(uuid, { sortingChoice, filterAge, filterScore, fil
   } catch(err) { console.log(err.stack) }
 }
 
-async function likeDislike(uuid, { choice, username }) { 
+async function updateRelationship(uuid, { choice, username }) { 
   const relation = {
     'like': 'CREATE (me)-[r:LIKED]->(other)',
     'dislike': 'CREATE (me)-[r:DISLIKED]->(other)'
@@ -304,9 +298,6 @@ module.exports = {
   userFromUsername,
   searchUsers,
   suggestedUsers,
-  likeDislike,
+  updateRelationship,
   filtersMinMax,
-  // getUsers,
-  // getUser,
-  // getProfile,
 }
