@@ -41,17 +41,16 @@ const createUser = (req, res) => {
             return helpers;
       };
 
-      const manageNewUser = async (email, firstName, lastName, username, password) => {
+      const manageNewUser = async ({ email, firstName, lastName, username, password, city, latLng }) => {
             const helpers = await newUserIsOK(email, firstName, lastName, username, password);
             if (helpers.errors.length !== 0 || helpers.taken.length !== 0) {
                   res.status(400).json(helpers);
                   return;
             }
-            await User.createUser(email, firstName, lastName, username, password);
+            await User.createUser(email, firstName, lastName, username, password, city, latLng);
             res.status(200).json({ message: 'User created' });
       };
-      const { email, firstName, lastName, username, password } = req.body;
-      manageNewUser(email, firstName, lastName, username, password);
+      manageNewUser(req.body);
 };
 
 const allUsers = (req, res) => { 

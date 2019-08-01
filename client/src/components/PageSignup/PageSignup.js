@@ -88,7 +88,9 @@ export default function PageSignup(props) {
     passwordHelper: null,
     usernameHelper: null,
   });
-  
+
+
+
   const valueIsOk = (name, value) => {
     const regex = {
       email: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
@@ -145,29 +147,34 @@ export default function PageSignup(props) {
     setValues({ ...values, showPassword: !values.showPassword });
   };
 
-  const handleSubmit = event => {
+  const handleSubmit = async event => {
     event.preventDefault();
-    const newUser = { 
-      email: values.email,
-      firstName: values.firstName,
-      lastName: values.lastName,
-      username: values.username,
-      password: values.password
-    };
-    const emptyFields = Object.keys(newUser).filter(key => !newUser[key]);
-
-    if (emptyFields.length === 0) {
-      // console.log(newUser);
-      axios.post(`/users`, newUser)
-        .then(res => { if (res.status === 200) props.history.push('/login'); })
-        .catch(error => {
-          // console.log(error);
-          const res = error.response.data;
-          if (res.errors.length !== 0) valueError(res.errors);
-          if (res.taken.length !== 0) valueIsTaken(res.taken);
-        });
-    } else {
-      valueError(emptyFields);
+    try {
+      const res = await axios.get(`http://ip-api.com/json`);
+      const newUser = { 
+        email: values.email,
+        firstName: values.firstName,
+        lastName: values.lastName,
+        username: values.username,
+        password: values.password,
+        city: res.data.city,
+        latLng: [res.data.lat, res.data.lon],
+      };
+      const emptyFields = Object.keys(newUser).filter(key => !newUser[key]);
+      console.log(newUser);
+      if (emptyFields.length === 0) {
+        axios.post(`/users`, newUser)
+          .then(res => { if (res.status === 200) props.history.push('/login'); })
+          .catch(error => {
+            const res = error.response.data;
+            if (res.errors.length !== 0) valueError(res.errors);
+            if (res.taken.length !== 0) valueIsTaken(res.taken);
+          });
+      } else {
+        valueError(emptyFields);
+      }
+    } catch(error) {
+      console.log(error);
     }
   }
 

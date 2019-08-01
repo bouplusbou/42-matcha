@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const authenticate = require('../../middlewares/authenticate');
-const { allUsers, createUser, searchUsers, suggestedUsers, updateRelationship, filtersMinMax } = require('../../controllers/userController');
+const { createUser, searchUsers, suggestedUsers, updateRelationship, filtersMinMax } = require('../../controllers/userController');
 
 router.route('/')
-      .get(authenticate, (req, res) => { allUsers(req, res); })
       .post((req, res) => { createUser(req, res); })
 
 router.route('/search')
