@@ -32,7 +32,7 @@ export default function PageProfile(props) {
         openEdit: OpenEdit,
         closeAndSaveEdit: CloseAndSaveEdit,
         account: true,
-        edit: true,
+        edit: false,
     });
     
     async function handleLike() {
@@ -57,7 +57,7 @@ export default function PageProfile(props) {
     }
     
     async function CloseAndSaveEdit(editState) {
-        if (editState.length > 0) {
+        if (Object.keys(editState).length > 0) {
             await axios.post(`/users/updateProfile?authToken=${authToken}`, editState)
             .then( setProfileState({ ...profileState, edit: false }) );
         } else {
@@ -69,7 +69,6 @@ export default function PageProfile(props) {
         async function fetchData() {
             const profile = await axios.get(`/users/getProfile?authToken=${authToken}`)
             setProfileState({
-                city: "Paris 5eme", // TO REMOVE
                 ...profileState,
                 ...profile.data.profile
             })

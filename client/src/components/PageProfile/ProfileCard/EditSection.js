@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import TagChip from './TagChip';
 import CreatableSelect from 'react-select/creatable';
 import axios from 'axios';
+import AlgoliaPlaces from 'algolia-places-react';
 const authToken = localStorage.getItem('token');
 
 const StyledSection = styled.section `
@@ -46,7 +47,7 @@ const GridForm = styled.form `
     grid-template-rows:auto;
     grid-template-areas:
     "username gender firstName lastName"
-    "age . . orientation"
+    "age location location orientation"
     "biography biography biography biography"
     "tagSelect tagSelect tagSelect tagSelect"
     "tags tags tags tags"
@@ -117,6 +118,13 @@ const StyledCreatableSelect = styled(CreatableSelect) `
     }
 `
 
+const StyledAlgoliaPlaces = styled(AlgoliaPlaces) `
+    grid-area:location;
+    background-color:#2b2c2e;
+    color:#ffffff;
+    border-color:#212223;
+`
+
 export default function InfosSection(props) {
     const profile = useContext(ProfileContext);
     const [valueState, setValueState] = useState({
@@ -130,10 +138,11 @@ export default function InfosSection(props) {
     useEffect(() => {
         async function fetchAllTags() {
             const tags = await axios.get(`/tags?authToken=${authToken}`);
-            setTagsList([...tags.data.data]);
+            const filteredTags = tags.data.data.filter(tag => !valueState.tags.includes(tag.label));
+            setTagsList([...filteredTags]);
         }
         fetchAllTags();
-    },[]);
+    },[valueState]);
 
     function handleChange(event) {
         const {name, value} = event.target;
@@ -149,36 +158,58 @@ export default function InfosSection(props) {
     };
 
     async function createTag(tag) {
-        const newTag = {label: tag};
-        await axios.post(`/tags/create?authToken=${authToken}`, newTag);
-        addTag(newTag);
-        // setTagsList( ...tagsList, tag.label );
+        if (!valueState.tags.includes(tag)) {
+            await axios.post(`/tags/create?authToken=${authToken}`, {tag})
+            addTag({label: tag});
+        }
     }
     
     async function addTag(newValue) {
-            const newTag = {tag: newValue.label};
-            console.log(newTag);
-            // await axios.post(`/users/addTag?authToken=${authToken}`, newTag);
-            // newTags.push(valueState.newTag);
-            // setValueState({
-            //     ...valueState,
-            //     tags: newTags,
-            //     newTag: ""
-            // })
+            const tag = newValue.label;
+            await axios.post(`/users/addTag?authToken=${authToken}`, {tag});
+            const newTagsList = valueState.tags
+            newTagsList.push(tag);
+            setValueState({
+                ...valueState,
+                tags: newTagsList,
+                newTag: ""
+            })
     }
-    function DeleteTag(tagIndex) {
-        console.log(tagIndex);
-        const tags = valueState.tags;
-        tags.splice(tagIndex, 1);
-         setValueState({
-             ...valueState,
-             tags : tags
-         })
+
+    async function DeleteTag(tagIndex) {
+        const params = {data: {tag: valueState.tags[tagIndex]}};
+        await axios.delete(`/users/removeTag?authToken=${authToken}`, params);
+        const newTagsList = valueState.tags;
+        newTagsList.splice(tagIndex, 1);
+        setValueState({
+            ...valueState,
+            tags: newTagsList
+        })
     }
 
     function SubmitChanges() {
         profile.closeAndSaveEdit(editState);
     }
+
+    function handleInputChange(value) {
+        setValueState({
+            ...valueState,
+            newTag: value,
+        })
+    }
+
+    const handleLatlngChange = ({ suggestion }) => { 
+        setValueState({
+            ...valueState,
+            latLng: [suggestion.latlng.lat, suggestion.latlng.lng],
+            city: suggestion.city,
+        });
+        setEditState({
+            ...editState,
+            latLng: [suggestion.latlng.lat, suggestion.latlng.lng],
+            city: suggestion.city,
+        })
+    };
 
     return (
         <StyledSection>
@@ -219,6 +250,17 @@ export default function InfosSection(props) {
                     value={valueState.lastName}
                     onChange={handleChange}
                     variant="outlined"
+                />
+                <StyledAlgoliaPlaces
+                    placeholder='Search a city here'
+                    options={{
+                        appId: 'plGGWNJECAIH',
+                        apiKey: 'ecb0baaa5b936ebb8dcc52e94b0b3b75',
+                        language: 'fr',
+                        countries: ['fr'],
+                        type: 'address',
+                    }}
+                    onChange={handleLatlngChange}
                 />
                 <AgeTextField
                     select
@@ -264,8 +306,10 @@ export default function InfosSection(props) {
                     variant="outlined"
                 />
                 <StyledCreatableSelect
+                    value={valueState.newTag}
                     options={tagsList}
                     onChange={addTag}
+                    onInputChange={handleInputChange}
                     onCreateOption={createTag}
                 />
                 <TagsContainer>

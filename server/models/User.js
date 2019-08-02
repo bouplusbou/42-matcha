@@ -51,7 +51,6 @@ async function usernameExists(username) {
 }
 
 async function updateProfile(uuid, req) {
-  console.log(req);
   try {
     await session.run(`
       MATCH (u:User {uuid: $uuid})
@@ -64,18 +63,7 @@ async function updateProfile(uuid, req) {
       ${req.bio ? `SET u.bio = $bio` : ""}
       ${req.city ? `SET u.city = $city` : ""}
       ${req.latLng ? `SET u.letLng = $latLng` : ""}
-    `, {
-      uuid: uuid,
-      username: req.username,
-      firstName: req.firstName,
-      lastName: req.lastName,
-      gender: req.gender,
-      age: req.age,
-      orientation: req.orientation,
-      bio: req.bio,
-      city: req.city,
-      latLng: req.latLng,
-    });
+    `, { req });
     session.close();
   } catch (err) { console.log(err.stack) }
 }
@@ -121,6 +109,7 @@ async function uuidExists(uuid) {
 }
 
 async function getProfile(uuid) {
+  
   try {
     const res = await session.run(`
       MATCH (u:User)
