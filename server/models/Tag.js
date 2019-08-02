@@ -12,6 +12,16 @@ async function allTags() {
   } catch(err) { console.log(err.stack) }
 }
 
+async function createTag(req) {
+  try {
+    await session.run(`
+      CREATE (t:Tag {tag: $tag})
+    `, {tag: req.label});
+    session.close();
+  } catch(err) { console.log(err.stack) }
+}
+
 module.exports = {
+  createTag,
   allTags,
 }

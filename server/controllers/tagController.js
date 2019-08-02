@@ -12,6 +12,13 @@ const allTags = (req, res) => {
           .catch( error => { console.log(error) })
 }
 
+const createTag = async (req, res) => {
+      Tag.createTag(req.body)
+            .then(() => { res.json({message: "ca marche"})})
+            .catch(err => { console.log(err)})
+}
+
 module.exports = {
-    allTags
+    allTags,
+    createTag
 }

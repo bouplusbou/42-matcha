@@ -54,12 +54,6 @@ const createUser = (req, res) => {
       manageNewUser(req.body);
 };
 
-const allUsers = (req, res) => { 
-      User.getUsers()
-            .then(users => { res.json({message : "List all users", data: users}) })
-            .catch(err => { console.log(err) })
-};
-
 const searchUsers = (req, res) => {
       const token = req.body.authToken || req.query.authToken;
       jwt.verify(token, config.jwtSecret, async (err, decoded) => {
@@ -75,6 +69,34 @@ const filtersMinMax = (req, res) => {
             .catch(err => { console.log(err) })
 };
 
+
+const getUuid = async (req, res) => {
+      const token = req.body.authToken || req.query.authToken;
+      const uuid = await jwt.verify(token, config.jwtSecret, (err, decoded) => {
+            if (err) res.status(401).send('Unauthorized: Invalid token');
+            return decoded.uuid;
+      });
+      return uuid;
+}
+
+const getProfile = async (req, res) => {
+      const uuid = await getUuid(req, res);
+      if (uuid) {
+            User.getProfile(uuid)
+                  .then(profile => { res.json({profile: profile})})
+                  .catch(err => { console.log(err)})
+      }
+}
+
+const updateProfile = async (req, res) => {
+      const uuid = await getUuid(req, res);
+      console.log(req.body);
+      if (uuid) {
+            User.updateProfile(uuid, req.body)
+            .catch(err => { console.log(err) })
+      }
+}
+
 const updateRelationship = (req, res) => {
       const token = req.body.authToken || req.query.authToken;
       jwt.verify(token, config.jwtSecret, async (err, decoded) => {
@@ -82,7 +104,14 @@ const updateRelationship = (req, res) => {
                   .then(users => { res.json({usersArr: users}) })
                   .catch(err => { console.log(err) })
       });
-};
+}
+
+const addTag = async (req, res) => {
+      const uuid = await getUuid(req, res);
+      if (uuid) {
+            User.addTag(uuid, req.body)
+                  .then(() => { res.json({message: "ca marche"})})
+                  .catch(err => { console.log(err)})
 
 const suggestedUsers = (req, res) => {
       const token = req.body.authToken || req.query.authToken;
@@ -113,9 +142,21 @@ const resetPasswordEmail = (req, res) => {
             .catch(err => res.status(200).json({ message: 'Reset request treated' }))
 };
 
+const removeTag = async (req, res) => {
+      const uuid = await getUuid(req, res);
+      if (uuid) {
+            User.removeTag(uuid, req.body)
+                  .then(() => { res.json({message: "ca marche"})})
+                  .catch(err => { console.log(err)})
+      }
+}
+
 module.exports = {
-      allUsers,
       createUser,
+      getProfile,
+      updateProfile,
+      addTag,
+      removeTag,
       searchUsers,
       suggestedUsers,
       updateRelationship,

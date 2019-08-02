@@ -5,6 +5,7 @@ import PageSignup from './PageSignup/PageSignup';
 import PageLogin from './PageLogin/PageLogin';
 import PageSearch from './PageSearch/PageSearch';
 import PageMatcher from './PageMatcher/PageMatcher';
+import Profile from './PageProfile/PageProfile';
 import PageConfirmAccount from './PageConfirmAccount/PageConfirmAccount';
 // import Authenticate from './Authenticate';
 
@@ -16,10 +17,12 @@ const Main = () => (
       <Route exact path='/login' component={PageLogin}/>
       <Route exact path='/search' component={PageSearch}/>
       <Route exact path='/matcher' component={PageMatcher}/>
+      <Route exact path='/signup' component={PageSignup}/>
+      <Route path='/profile' component={Profile}/>
+      <Route path='/users' component={UsersSwitch}/>
       {/* le middleware cause un rerender, pourquoi ?*/}
       {/* <Route exact path='/search' component={Authenticate(PageSearch)}/> */}
       {/* <Route exact path='/matcher' component={Authenticate(PageMatcher)}/> */}
-      <Route exact path='/signup' component={PageSignup}/>
     </Switch>
   </main>
 );
