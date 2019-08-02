@@ -81,6 +81,7 @@ const getProfile = async (req, res) => {
 
 const updateProfile = async (req, res) => {
       const uuid = await getUuid(req, res);
+      console.log(req.body);
       if (uuid) {
             User.updateProfile(uuid, req.body)
             .catch(err => { console.log(err) })
@@ -99,7 +100,18 @@ const updateRelationship = (req, res) => {
 const addTag = async (req, res) => {
       const uuid = await getUuid(req, res);
       if (uuid) {
-            User.addTag(uuid, req.body);
+            User.addTag(uuid, req.body)
+                  .then(() => { res.json({message: "ca marche"})})
+                  .catch(err => { console.log(err)})
+      }
+}
+
+const removeTag = async (req, res) => {
+      const uuid = await getUuid(req, res);
+      if (uuid) {
+            User.removeTag(uuid, req.body)
+                  .then(() => { res.json({message: "ca marche"})})
+                  .catch(err => { console.log(err)})
       }
 }
 
@@ -110,6 +122,7 @@ module.exports = {
       getProfile,
       updateProfile,
       addTag,
+      removeTag,
       // searchUsers,
       // oneUser,
       // profile,

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authenticate = require('../../middlewares/authenticate');
-const { allUsers, createUser, searchUsers, getProfile, profile, uploadPhoto, updateProfile, addTag } = require('../../controllers/userController');
+const { allUsers, createUser, searchUsers, getProfile, profile, uploadPhoto, updateProfile, addTag, removeTag } = require('../../controllers/userController');
 const upload = require('../../middlewares/multer');
 
 router.route('/')
@@ -32,4 +32,8 @@ router.route('/updateRelationship')
 
 router.route(`/addTag`)
       .post(authenticate, (req, res) => { addTag(req, res); })
+
+router.route(`/removeTag`)
+      .delete(authenticate, (req, res) => { removeTag(req, res); })
+
 module.exports = router;

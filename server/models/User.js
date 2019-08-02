@@ -51,6 +51,7 @@ async function usernameExists(username) {
 }
 
 async function updateProfile(uuid, req) {
+  console.log(req);
   try {
     await session.run(`
       MATCH (u:User {uuid: $uuid})
@@ -61,6 +62,8 @@ async function updateProfile(uuid, req) {
       ${req.age ? `SET u.age = $age` : ""}
       ${req.orientation ? `SET u.orientation = $orientation` : ""}
       ${req.bio ? `SET u.bio = $bio` : ""}
+      ${req.city ? `SET u.city = $city` : ""}
+      ${req.latLng ? `SET u.letLng = $latLng` : ""}
     `, {
       uuid: uuid,
       username: req.username,
@@ -70,6 +73,8 @@ async function updateProfile(uuid, req) {
       age: req.age,
       orientation: req.orientation,
       bio: req.bio,
+      city: req.city,
+      latLng: req.latLng,
     });
     session.close();
   } catch (err) { console.log(err.stack) }
@@ -139,6 +144,7 @@ async function getProfile(uuid) {
       u.likeHistory AS likeHistory,
       u.visitHistory AS visitHistory,
       u.lastConnection AS lastConnection,
+      u.city AS city,
       collect(t.tag) AS tags
     `, {uuid: uuid});
     session.close();
@@ -158,7 +164,8 @@ async function getProfile(uuid) {
     const latLng = res.records[0].get('latLng');
     const likeHistory = res.records[0].get('likeHistory');
     const visitHistory = res.records[0].get('visitHistory');
-    const lastConnection = res.records[0].get('lastConnection')
+    const lastConnection = res.records[0].get('lastConnection');
+    const city = res.records[0].get('city');
     return {
       uuid,
       username,
@@ -177,7 +184,8 @@ async function getProfile(uuid) {
       latLng,
       likeHistory,
       visitHistory,
-      lastConnection
+      lastConnection,
+      city
     }
   } catch(err) { console.log(err.stack)};
 }
@@ -201,7 +209,6 @@ async function updateRelationship(uuid, { choice, username }) {
 }
 
 async function addTag(uuid, req) {
-  console.log(req);
   try {
     await session.run(`
     MATCH (u:User {uuid: $uuid}), (t:Tag {tag: $tag})
@@ -209,6 +216,19 @@ async function addTag(uuid, req) {
     `, {
       uuid: uuid,
       tag: req.tag
+    });
+    session.close();
+  } catch(err) { console.log(err.stack) }
+}
+
+async function removeTag(uuid, req) {
+  try {
+    await session.run(`
+      MATCH (u:User {uuid: $uuid})-[r:TAGGED]->(t:Tag {tag: $tag})
+      DELETE r
+    `, {
+      uuid: uuid,
+      tag: req.tag,
     });
     session.close();
   } catch(err) { console.log(err.stack) }
@@ -223,6 +243,7 @@ module.exports = {
   getProfile,
   updateProfile,
   addTag,
+  removeTag,
   // getUsers,
   // getUser,
   // getProfile,
