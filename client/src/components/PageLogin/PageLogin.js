@@ -86,12 +86,13 @@ const Redirect = styled.section`
     text-decoration: underline;
   }
 `;
-const ResetButton = styled.button`
+const ResetButton = styled.span`
   color: #C6C6C6;
   font-family: Roboto;
   font-style: normal;
   font-weight: 500;
   text-decoration: underline;
+  cursor: pointer;
 `;
 const ModalSection = styled.section`
   display: flex;
@@ -275,12 +276,8 @@ export default function PageLogin(props) {
             </SubmitButton>
           </Form>
           <Redirect>
-            <p>Forgot your password ?</p>
-            <ResetButton
-              onClick={handleOpen}
-            >
-              <p>Reset via your email</p>
-            </ResetButton>
+            <p>Forgot your password ? <ResetButton onClick={handleOpen}>Reset via your email</ResetButton></p>
+
             <p>Not a member yet ? <Link to="/signup">Signup now</Link></p>
           </Redirect>
         </FormContainer>

@@ -161,7 +161,7 @@ export default function PageSignup(props) {
         latLng: [res.data.lat, res.data.lon],
       };
       const emptyFields = Object.keys(newUser).filter(key => !newUser[key]);
-      console.log(newUser);
+      // console.log(newUser);
       if (emptyFields.length === 0) {
         axios.post(`/users`, newUser)
           .then(res => { if (res.status === 200) props.history.push('/login'); })

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import axios from 'axios';
@@ -18,6 +18,7 @@ const Container = styled.section`
   background-color: white;
   border-radius: 20px;
   box-shadow: 0px 20px 20px rgba(0, 0, 0, 0.1);
+  color: #4A4A4A;
   h1 {
     font-size: 2rem;
     text-align: center;
@@ -73,17 +74,23 @@ export default function PageConfirmAccount(props) {
         <Hero>
             <Section>
                 <Container>
-                    <h1>Welcome to Matcha ! <span aria-label="Congratulations" role="img" >🎉</span></h1>
                 {!isLoading && isError && 
+                  <Fragment>
+                    <h1>Sorry but...</h1>
                     <ErrorBox>
-                        <p> <span aria-label="Attention" role="img" >⚠️</span> the link you provided is not working, please try again.</p>
+                      <p> <span aria-label="Attention" role="img" >⚠️</span> the link you provided is not working, please try again.</p>
                     </ErrorBox>
+                  </Fragment>
+
                 }
                 {!isLoading && !isError &&
+                  <Fragment>
+                    <h1>Welcome to Matcha ! <span aria-label="Congratulations" role="img" >🎉</span></h1>
                     <Redirect>
                         <p>Your account is now confirmed.</p>
-                        <p>Wanna <Link to="/login">login</Link> ?</p>
+                        <p><span aria-label="Check-this" role="img" >👉</span> wanna <Link to="/login">login</Link> ?</p>
                     </Redirect>
+                  </Fragment>
                 }
                 </Container>
             </Section>
