@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const config = require('../middlewares/config');
+const sendEmail = require('../actions/email.js');
 
 const createUser = (req, res) => {
       const emailIsOK = email => {
@@ -57,7 +58,7 @@ const allUsers = (req, res) => {
       User.getUsers()
             .then(users => { res.json({message : "List all users", data: users}) })
             .catch(err => { console.log(err) })
-}
+};
 
 const searchUsers = (req, res) => {
       const token = req.body.authToken || req.query.authToken;
@@ -66,13 +67,13 @@ const searchUsers = (req, res) => {
                   .then(users => { res.json({usersArr: users}) })
                   .catch(err => { console.log(err) })
       });
-}
+};
 
 const filtersMinMax = (req, res) => {
       User.filtersMinMax()
             .then(filtersMinMax => { res.json({ age: filtersMinMax.age, score: filtersMinMax.score }) })
             .catch(err => { console.log(err) })
-}
+};
 
 const updateRelationship = (req, res) => {
       const token = req.body.authToken || req.query.authToken;
@@ -81,7 +82,7 @@ const updateRelationship = (req, res) => {
                   .then(users => { res.json({usersArr: users}) })
                   .catch(err => { console.log(err) })
       });
-}
+};
 
 const suggestedUsers = (req, res) => {
       const token = req.body.authToken || req.query.authToken;
@@ -90,7 +91,7 @@ const suggestedUsers = (req, res) => {
                   .then(users => { res.json({usersArr: users}) })
                   .catch(err => { console.log(err) })
       });
-}
+};
 
 const confirmation = async (req, res) => {
       const uuid = await User.uuidFromHash(req.body);
@@ -103,7 +104,14 @@ const confirmation = async (req, res) => {
       } else {
             res.status(400).json({ message: 'Hash is not OK' });
       }
-}
+};
+
+const resetPasswordEmail = (req, res) => {
+      const { email } = req.body;
+      User.resetPasswordEmail(email)
+            .then(hash => {res.status(200).json({ message: 'Reset request treated' })})
+            .catch(err => res.status(200).json({ message: 'Reset request treated' }))
+};
 
 module.exports = {
       allUsers,
@@ -113,4 +121,5 @@ module.exports = {
       updateRelationship,
       filtersMinMax,
       confirmation,
+      resetPasswordEmail,
 }

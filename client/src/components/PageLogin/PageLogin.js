@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import TextField from '@material-ui/core/TextField';
@@ -13,6 +13,9 @@ import FormControl from '@material-ui/core/FormControl';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormHelperText from '@material-ui/core/FormHelperText';
+import Modal from '@material-ui/core/Modal';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
 
 const Hero = styled.section`
@@ -81,7 +84,35 @@ const Redirect = styled.section`
     font-style: normal;
     font-weight: 500;
     text-decoration: underline;
-}
+  }
+`;
+const ResetButton = styled.button`
+  color: #C6C6C6;
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: 500;
+  text-decoration: underline;
+`;
+const ModalSection = styled.section`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  outline: none;
+`;
+const ModalContainer = styled.section`
+  flex-basis: 550px;
+  padding: 50px;
+  background-color: white;
+  border-radius: 20px;
+  box-shadow: 0px 42px 60px rgba(0, 0, 0, 0.25);
+  outline: none;
+  h1 {
+    font-size: 1.5rem;
+    text-align: center;
+    font-family: Roboto;
+    color: #292929;
+  }
 `;
 
 export default function PageLogin(props) {
@@ -90,9 +121,13 @@ export default function PageLogin(props) {
   const [values, setValues] = useState({
     username: '',
     password: '',
+    email: '',
+    resetPasswordError: false,
+    resetPasswordHelper: null,
     showPassword: false,
     error: false,
     errorMsg: '',
+    resetPasswordSubmited: false,
   });
 
   const handleChange = name => event => {
@@ -100,7 +135,7 @@ export default function PageLogin(props) {
   };
 
   const handleFocus = () => {
-    setValues({ ...values, error: false });
+    setValues({ ...values, resetPasswordError: false, resetPasswordHelper: '', error: false });
   };
 
   const toggleShowPassword = () => {
@@ -119,12 +154,85 @@ export default function PageLogin(props) {
       .catch(err => {
         // console.log(err.response.data.errorMsg);
         setValues({ ...values, error: true, errorMsg: err.response.data.errorMsg});
-        // wrong Username or Password 
       });
+  };
+
+  const emailIsOk = email => {
+    const regex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return regex.test(String(email));
+  }
+
+  const handleResetPasswordSubmit = event => {
+    event.preventDefault();
+    if (!emailIsOk(values.email)) {
+      setValues({ ...values, resetPasswordError: true, resetPasswordHelper: 'Enter a proper email' });
+    } else {
+      axios.post(`/users/resetPasswordEmail`, {email: values.email})
+        .then(res => { setValues({ ...values, resetPasswordSubmited: true }); })
+        .catch(err => {});
+    }
+  };
+
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => { setOpen(true); };
+  const handleClose = () => { setOpen(false); };
+
+  const handleEmailBlur = event => {
+    if (!emailIsOk(event.target.value)) {
+      setValues({ ...values, resetPasswordError: true, resetPasswordHelper: 'Enter a proper email' });
+    }
   };
 
   return (
     <Hero>
+      <Modal
+        aria-labelledby="simple-modal-title"
+        aria-describedby="simple-modal-description"
+        open={open}
+        // onClose={handleClose}
+      >
+      <ModalSection>
+        <ModalContainer>
+          <p style={{textAlign: 'right'}}>
+            <FontAwesomeIcon 
+              style={{color: 'lightgray', cursor: 'pointer'}}
+              icon={faTimes}
+              onClick={handleClose}
+            />
+          </p>
+          {values.resetPasswordSubmited && 
+            <Fragment>
+              <h1>Check your inbox <span aria-label="Inbox" role="img" >📥</span></h1>
+              <p style={{textAlign: 'center', justify: 'center'}}>
+                If the address "{values.email}" is related to a Matcha account, an email has been sent to reset your password.
+              </p>
+            </Fragment>
+          }
+          {!values.resetPasswordSubmited && 
+          <Fragment>
+            <h1>Forgot Password</h1>
+            <p>We will send you an email with instructions on how to reset your password.</p>
+            <Form noValidate autoComplete="off" onSubmit={handleResetPasswordSubmit}>
+              <TextField
+                id="standard-email"
+                label="Email"
+                required={true}
+                onChange={handleChange('email')}
+                onFocus={handleFocus}
+                onBlur={handleEmailBlur}
+                error={values.resetPasswordError}
+                helperText={values.resetPasswordHelper}
+                margin="normal"
+              />
+              <SubmitButton type="submit">
+                <p>Email me</p>
+              </SubmitButton>
+            </Form>
+          </Fragment>
+          }
+        </ModalContainer>
+      </ModalSection>
+      </Modal>
       <LoginSection>
         <FormContainer>
           <h1>Login</h1>
@@ -167,7 +275,12 @@ export default function PageLogin(props) {
             </SubmitButton>
           </Form>
           <Redirect>
-            <p>Forgot your password ? <Link to="/resetPassword">Reset via your email</Link></p>
+            <p>Forgot your password ?</p>
+            <ResetButton
+              onClick={handleOpen}
+            >
+              <p>Reset via your email</p>
+            </ResetButton>
             <p>Not a member yet ? <Link to="/signup">Signup now</Link></p>
           </Redirect>
         </FormContainer>
@@ -175,3 +288,6 @@ export default function PageLogin(props) {
     </Hero>
   );
 }
+
+
+

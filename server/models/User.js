@@ -291,12 +291,9 @@ async function uuidFromHash({ hash }) {
       RETURN me.uuid AS uuid
     `, { hash: hash });
     session.close();
-    if (res.records[0] !== undefined) {
-      const uuid = res.records[0].get('uuid');
-      return uuid;
-    } else {
-      return null;
-    }
+    if (res.records[0] === undefined) return null;
+    const uuid = res.records[0].get('uuid');
+    return uuid;
   } catch(err) { console.log(err) }
 }
 
@@ -307,6 +304,22 @@ async function confirmation(uuid) {
       SET me.confirmed = true
     `, { uuid: uuid });
     session.close();
+  } catch(err) { console.log(err) }
+}
+
+async function resetPasswordEmail(email) { 
+  console.log(email);
+  try {
+    const res = await session.run(`
+      MATCH (u:User)
+      WHERE u.email = $email
+      RETURN u.hash AS hash
+    `, { email: email });
+    session.close();
+    if (res.records[0] === undefined) return null;
+    const hash = res.records[0].get('hash');
+    sendEmail('resetPassword', email, hash);
+    return;
   } catch(err) { console.log(err) }
 }
 
@@ -322,4 +335,5 @@ module.exports = {
   filtersMinMax,
   uuidFromHash,
   confirmation,
+  resetPasswordEmail,
 }

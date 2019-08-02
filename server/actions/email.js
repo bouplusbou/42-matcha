@@ -15,12 +15,18 @@ const sendEmail = async (type, email, hash) => {
 
   const message = {
     'confirmation': `Please click below to confirm your Matcha account: http://localhost:3000/confirm/${hash}`,
+    'resetPassword': `Please click below to reset your password: http://localhost:3000/resetPassword/${hash}`,
+  };
+
+  const subject = {
+    'confirmation': 'Matcha - Please confirm your account',
+    'resetPassword': 'Matcha - Password reset request',
   };
 
   let info = await transporter.sendMail({
     from: '"Matcha Team" <hello@matcha.com>',
     to: email, 
-    subject: "Please confirm your Matcha account",
+    subject: subject[type],
     text: message[type],
   });
   // console.log("Message sent: %s", info.messageId);
