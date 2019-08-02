@@ -9,7 +9,7 @@ export default function HeaderConnectedWide() {
 
     return (
         <Logo>
-            <img src={'./logo_color.svg'} width="45px" height="45px" alt=""/>
+            <img src={'./logo_color.svg'} width="35px" height="35px" alt=""/>
         </Logo>
     );
 }

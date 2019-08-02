@@ -3,79 +3,122 @@ import styled from 'styled-components';
 import UserCard from '../UserCard';
 import Sorting from '../Sorting';
 import Filtering from '../Filtering';
+import MoreButton from '../MoreButton';
 import axios from 'axios';
 
-const usersArr = Array(30).fill({
-  username: 'mimyK',
-  gender: 'woman',
-  age: 23,
-  city: 'Paris',
-  fame: 100,
-  orientation: 'homo',
-  photo: 'https://i.ibb.co/Qp5gpX9/woman568.jpg',
-  tags: ['lol', 'rainbow', 'burritos'],
-});
-
-
 const SearchSection = styled.section`
-margin: 3vw 10vw;
-display: grid;
-grid-template-columns: 330px 1fr;
-grid-gap: 10px;
-grid-template-areas:
-  "filtering sorting"
-  "filtering results";
-@media (max-width: 750px) {
-  grid-gap: 50px;
-  grid-template-columns: 1fr;
+  margin: 3vw 10vw;
+  display: grid;
+  grid-template-columns: 330px 1fr;
+  grid-gap: 10px;
   grid-template-areas:
-    "filtering"
-    "sorting"
-    "results";
-}
+    "filtering sorting"
+    "filtering results";
+  @media (max-width: 750px) {
+    grid-gap: 50px;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "filtering"
+      "sorting"
+      "results";
+  }
 `;
 const FilteringSection = styled.aside`
-grid-area: filtering;
-justify-self: center;
+  grid-area: filtering;
+  justify-self: center;
 `;
 const SortingSection = styled.aside`
-grid-area: sorting;
-justify-self: end;
-@media (max-width: 750px) {
-  justify-self: center;
+  grid-area: sorting;
+  justify-self: end;
+  @media (max-width: 750px) {
+    justify-self: center;
 }
 `;
 const ResultsSection = styled.section`
-grid-area: results;
-display: flex;
-flex-wrap: wrap;
-justify-content: space-around;
+  grid-area: results;
+  display: flex;
+  flex-direction: column;
+`;
+const UserCards = styled.section`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+`;
+const NoMore = styled.section`
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 export default function PageSearch() {
-  const [users, setUsers] = useState(usersArr);
-  const [sortingChoice, setSortingChoice] = useState('Most famous');
-  const [filterAge, setFilterAge] = useState([18, 100]);
-  const [filterFame, setFilterFame] = useState([0, 1000]);
-  const [filterLatLng, setFilterLatLng] = useState([48.856697, 2.351462]);
-  const [filterDistance, setFilterDistance] = useState(0);
+  const [hasNoMore, setHasNoMore] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [sortingChoice, setSortingChoice] = useState('Closest');
+  const [filterCity, setFilterCity] = useState(null);
+  const [filterLatLng, setFilterLatLng] = useState(null);
+  const [filterDistance, setFilterDistance] = useState(5);
   const [filterTags, setFilterTags] = useState([]);
-  const authToken = localStorage.getItem('token');
+  const [offset, setOffset] = useState(0);
 
+  const [filterAge, setFilterAge] = useState([18, 60]);
+  const [rangeAge, setRangeAge] = useState([0, 100]);
+  const [filterScore, setFilterScore] = useState([0, 100000]);
+  const [rangeScore, setRangeScore] = useState([0, 100000]);
   useEffect(() => {
     async function fetchData() {
-      const tags = await axios.get(`/tags?authToken=${authToken}`);
-      setFilterTags(tags.data.data);
+      const authToken = localStorage.getItem('token');
+      const res = await axios.get(`/users/filtersMinMax?authToken=${authToken}`);
+      setFilterAge(res.data.age);
+      setRangeAge(res.data.age);
+      setFilterScore(res.data.score);
+      setRangeScore(res.data.score);
     }
     fetchData();
   }, []);
 
-  const selectSorting = e => { setSortingChoice(e.target.innerText); };
-  const handleAgeChange = values => { setFilterAge(values); };
-  const handleFameChange = values => { setFilterFame(values); };
-  const handleLatlngChange = () => {};
-  const handleDistanceChange = value => { setFilterDistance(value); };
-  const handleTagsChange = () => {};
+  const [allTags, setAllTags] = useState(null);
+  useEffect(() => {
+    async function fetchData() {
+      const authToken = localStorage.getItem('token');
+      const res = await axios.get(`/tags?authToken=${authToken}`);
+      setAllTags(res.data.tags);
+    }
+    fetchData();
+  }, []);
+
+  const [users, setUsers] = useState([]);
+  useEffect(() => {
+    setIsLoading(true);
+    setHasNoMore(false);
+    async function fetchData() {
+      const authToken = localStorage.getItem('token');
+      const filters = { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags, offset }
+      const res = await axios.post(`/users/search?authToken=${authToken}`, filters);
+      if (res.data.usersArr.length !== 20) setHasNoMore(true);
+      offset !== 0 ? setUsers( prev => [...prev, ...res.data.usersArr]) : setUsers(res.data.usersArr);
+      setIsLoading(false);
+    }
+    fetchData();
+  }, [sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags, offset]);
+
+  const handleSelectSorting = e => { setSortingChoice(e.target.innerText); setOffset(0); };
+  const handleAgeChange = values => { setFilterAge(values); setOffset(0); };
+  const handleScoreChange = values => { setFilterScore(values); setOffset(0); };
+  const handleLatlngChange = ({ suggestion }) => { 
+    setFilterLatLng([suggestion.latlng.lat, suggestion.latlng.lng]);
+    setFilterCity(suggestion.name); 
+    setOffset(0); 
+  };
+  const handleClickDeleteCity = () => { 
+    setFilterLatLng(null);
+    setFilterCity(null);
+  };
+  const handleDistanceChange = value => { setFilterDistance(value); setOffset(0); };
+  const handleTagsChange = values => { 
+    values !== null ? setFilterTags(values) : setFilterTags([]);
+    setOffset(0);
+  };
+  const handleClickMoreButton = () => { setOffset(offset + 20); };
 
   return (
     <SearchSection>
@@ -83,11 +126,16 @@ export default function PageSearch() {
         <Filtering 
           filterAge={filterAge}
           handleAgeChange={handleAgeChange}
-          filterFame={filterFame}
-          handleFameChange={handleFameChange}
+          rangeAge={rangeAge}
+          filterScore={filterScore}
+          rangeScore={rangeScore}
+          handleScoreChange={handleScoreChange}
           handleLatlngChange={handleLatlngChange}
+          filterCity={filterCity}
+          handleClickDeleteCity={handleClickDeleteCity}
           filterDistance={filterDistance}
           handleDistanceChange={handleDistanceChange}
+          allTags={allTags}
           filterTags={filterTags}
           handleTagsChange={handleTagsChange}
         />
@@ -95,17 +143,34 @@ export default function PageSearch() {
       <SortingSection>
         <Sorting 
           sortingChoice={sortingChoice}
-          selectSorting={selectSorting}
+          handleSelectSorting={handleSelectSorting}
         />
       </SortingSection>
-      <ResultsSection>
-        {users.map( user => 
-          <UserCard 
-            user={user}
-            width={250}
-            height={375}
-          />
-        )}
+      <ResultsSection
+        handleClickMoreButton={handleClickMoreButton}
+      >
+      {users.length !== 0 &&
+        <UserCards>
+          {users.map( (user, index) => 
+            <UserCard 
+              key={index}
+              user={user}
+              width={250}
+              height={375}
+            />
+          )}
+        </UserCards>
+      }
+      {!isLoading && !hasNoMore &&
+        <MoreButton
+          handleClickMoreButton={handleClickMoreButton}
+        />
+      }
+      {!isLoading && users.length === 0 && 
+        <NoMore>
+          <p>No more suggestion...</p>
+        </NoMore>
+      }
       </ResultsSection>
     </SearchSection>
   );

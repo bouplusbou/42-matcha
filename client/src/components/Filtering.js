@@ -5,9 +5,11 @@ import 'rc-tooltip/assets/bootstrap.css';
 import Slider from 'rc-slider';
 import AlgoliaPlaces from 'algolia-places-react';
 import Select from 'react-select';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
-export default function Filtering({filterAge, handleAgeChange, filterFame, handleFameChange, filterDistance, handleDistanceChange, handleLatlngChange, filterTags, handleTagsChange}) {
-
+export default function Filtering({filterAge, handleAgeChange, rangeAge, filterScore, rangeScore, handleScoreChange, filterCity, handleClickDeleteCity, filterDistance, handleDistanceChange, handleLatlngChange, allTags, filterTags, handleTagsChange}) {
+    
     const Filtering = styled.aside`
         display: flex;
         flex-direction: column;
@@ -23,7 +25,6 @@ export default function Filtering({filterAge, handleAgeChange, filterFame, handl
         }
         @media (max-width: 630px) {
             width: 180px;
-
         }
     `
     const TextBox = styled.section`
@@ -31,10 +32,10 @@ export default function Filtering({filterAge, handleAgeChange, filterFame, handl
         justify-content: space-between;
         align-items: end;
     `
-
+    
     const createSliderWithTooltip = Slider.createSliderWithTooltip;
     const Range = createSliderWithTooltip(Slider.Range);
-
+        
     return (
         <Filtering>
             <section>
@@ -44,8 +45,8 @@ export default function Filtering({filterAge, handleAgeChange, filterFame, handl
                 </TextBox>
                 <Range 
                     onAfterChange={handleAgeChange}
-                    min={18}
-                    max={100}
+                    min={rangeAge[0]}
+                    max={rangeAge[1]}
                     allowCross={false}
                     defaultValue={filterAge}
                     tipFormatter={value => `${value}`} 
@@ -53,20 +54,31 @@ export default function Filtering({filterAge, handleAgeChange, filterFame, handl
             </section>
             <section>
                 <TextBox>
-                    <p>Fame</p>
-                    <p style={{fontSize: '0.9em'}}>{filterFame[0]} - {filterFame[1]}</p>
+                    <p>Score</p>
+                    <p style={{fontSize: '0.9em'}}>{filterScore[0]} - {filterScore[1]}</p>
                 </TextBox>
                 <Range 
-                    onAfterChange={handleFameChange}
-                    min={0}
-                    max={1000}
+                    onAfterChange={handleScoreChange}
+                    min={rangeScore[0]}
+                    max={rangeScore[1]}
                     allowCross={false}
-                    defaultValue={filterFame}
+                    defaultValue={filterScore}
                     tipFormatter={value => `${value}`} 
                 />
             </section>
             <section>
-                <p>City</p>
+                <TextBox>
+                    <p>City</p>
+                    {filterCity &&
+                        <p style={{fontSize: '0.9em'}}>
+                        {filterCity} <FontAwesomeIcon 
+                            style={{marginLeft: '8px', color: 'lightgray', cursor: 'pointer'}}
+                            icon={faTimes}
+                            onClick={handleClickDeleteCity}
+                        />
+                        </p>
+                    }
+                </TextBox>
                 <AlgoliaPlaces
                     placeholder='Search a city here'
                     options={{
@@ -82,34 +94,24 @@ export default function Filtering({filterAge, handleAgeChange, filterFame, handl
                     <p>Distance</p>
                     <p style={{fontSize: '0.9em'}}>{filterDistance}km</p>
                 </TextBox>
-                {/* <Range 
-                    onAfterChange={handleDistanceChange}
-                    min={0}
-                    max={1000}
-                    allowCross={false}
-                    defaultValue={filterDistance}
-                    tipFormatter={value => `${value}`} 
-                /> */}
                 <Slider 
                     dots
                     step={200} 
-                    // defaultValue={50}
                     min={0}
                     max={1000}
                     defaultValue={filterDistance}
                     onAfterChange={handleDistanceChange}
-                    // onBeforeChange={log} 
                 />
             </section>            
             <section>
                 <p>Interests</p>
                 <Select
-                    // onChange={handleTagsChange}
+                    onChange={handleTagsChange}
                     defaultValue={[]}
+                    value={filterTags}
+                    options={allTags}
                     isMulti
                     name="colors"
-                    options={filterTags}
-                    // options={}
                     className="basic-multi-select"
                     classNamePrefix="select"
                 />

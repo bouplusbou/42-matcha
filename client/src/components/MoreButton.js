@@ -1,15 +1,12 @@
-import React, { useContext } from 'react';
-import { Link } from 'react-router-dom';
+import React from 'react';
 import styled from 'styled-components';
-import { actionLogout } from '../../actions/authActions';
-import AppContext from '../../AppContext';
 
-export default function LogoutButton() {
+export default function MoreButton({ handleClickMoreButton }) {
 
-    const userState = useContext(AppContext);
-
-    const LogoutButton = styled.button`
+    const MoreButton = styled.button`
         display: inline-block;
+        max-width: 200px;
+        margin: 50px auto;
         padding: 8px 10px;
         border: solid 0.5px #AE86FF;
         border-radius: 10px;
@@ -39,19 +36,11 @@ export default function LogoutButton() {
         }
     `;
 
-    const handleLogout = () => {
-        userState.toggleConnected();
-        actionLogout();
-    };
-
     return (
-        <Link 
-            to="/"
-            onClick={handleLogout}
+        <MoreButton
+            onClick={handleClickMoreButton}
         >
-            <LogoutButton>
-                <p>Logout</p>
-            </LogoutButton>
-        </Link>
+            <p>Load More</p>
+        </MoreButton>
     );
 }

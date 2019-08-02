@@ -9,7 +9,7 @@ export default function HeaderConnectedWide() {
         position: absolute;
         display: flex;
         flex-direction: column;
-        top: 80px;
+        top: 56px;
         right: 0;
         width: 80px;
         height: 250px;

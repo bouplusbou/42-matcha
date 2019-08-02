@@ -7,17 +7,21 @@ const login = (req, res) => {
     const { username, password } = req.body;
     User.userFromUsername(username)
         .then(user =>  {
-            if (user) {
+            if (user !== null) {
+                if (user.confirmed) {
                     bcrypt.compare(password, user.password, (err, result) => {
                         if (result) {
                             const token = jwt.sign({ uuid: user.uuid }, config.jwtSecret, { expiresIn: '6h' });
                             res.json({ token: token });
                         } else {
-                            res.status(401).json({ errors: 'Invalid Credentials' });
+                            res.status(401).json({ errorMsg: 'wrong credentials' });
                         }
                     });
+                } else {
+                    res.status(401).json({ errorMsg: 'you need to confirm your email first' });
+                }
             } else {
-                    res.status(401).json({ errors: 'Invalid Credentials' });
+                    res.status(401).json({ errorMsg: 'wrong credentials' });
             }
         })
         .catch(err => { console.log(err); });

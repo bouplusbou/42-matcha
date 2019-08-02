@@ -34,7 +34,6 @@ export default function Navlist() {
         <NavList>
             <li><Link to="/search">Search</Link></li>
             <li><Link to="/matcher">Matcher</Link></li>
-            <li><Link to="/profile">Profile</Link></li>
         </NavList>
     );
 }

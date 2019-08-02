@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 
 
-export default function UserCard({sortingChoice, selectSorting}) {
+export default function UserCard({sortingChoice, handleSelectSorting}) {
     const [showChoices, setShowChoices] = useState(false);
 
     const Sorting = styled.div`
@@ -35,11 +35,14 @@ export default function UserCard({sortingChoice, selectSorting}) {
             <span style={{color: '#CBCBCB', marginRight: '5px'}}>Sort by:</span> {sortingChoice} <FontAwesomeIcon style={{color: '#FF0041', margin: '0 8px'}} icon={faChevronDown}/>
             { showChoices && 
             <Hover>
-                <p onClick={selectSorting}>Youngest</p>
-                <p onClick={selectSorting}>Oldest</p>
+                <p onClick={handleSelectSorting}>Closest</p>
+                <p onClick={handleSelectSorting}>Farthest</p>
                 <div style={{borderBottom: 'solid 0.5px ghostwhite'}}></div>
-                <p onClick={selectSorting}>Most famous</p>
-                <p onClick={selectSorting}>Least famous</p>
+                <p onClick={handleSelectSorting}>Youngest</p>
+                <p onClick={handleSelectSorting}>Oldest</p>
+                <div style={{borderBottom: 'solid 0.5px ghostwhite'}}></div>
+                <p onClick={handleSelectSorting}>Most famous</p>
+                <p onClick={handleSelectSorting}>Least famous</p>
             </Hover>
             }
         </Sorting>  

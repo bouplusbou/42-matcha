@@ -1,7 +1,7 @@
 const driver = require('../db/database.js');
 const session = driver.session();
 
-async function getTags() { 
+async function allTags() { 
   try {
     const res = await session.run(`
       MATCH (t:Tag) 
@@ -22,6 +22,6 @@ async function createTag(req) {
 }
 
 module.exports = {
-  getTags,
   createTag,
+  allTags,
 }

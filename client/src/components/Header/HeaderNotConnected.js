@@ -8,7 +8,7 @@ export default function HeaderNotConnected()  {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        height: 80px;
+        height: 56px;
         background-color: #6F48BD;
         color: white;
     `;
