@@ -138,7 +138,7 @@ async function seedUser(firstName, gender, photos, i) {
     const lastName = faker.name.lastName();
     const email = `${firstName}.${lastName}@`+ emailProvider[Math.floor(Math.random() * emailProvider.length)];
     const username = `${firstName}${lastName.slice(0,1)}`;
-    const confirmed = 1;
+    const confirmed = true;
     const hash = crypto.randomBytes(20).toString('hex');
     const birthDate = randomDate('birth');
     const lastConnection = randomDate('lastConnection');
