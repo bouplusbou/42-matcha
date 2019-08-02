@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const authenticate = require('../../middlewares/authenticate');
 const UserController = require('../../controllers/userController');
-const upload = require('../../middlewares/multer');
 
 router.route('/')
       .post((req, res) => { UserController.createUser(req, res); })

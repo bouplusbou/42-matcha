@@ -19,7 +19,6 @@ const Main = () => (
       <Route exact path='/matcher' component={PageMatcher}/>
       <Route exact path='/signup' component={PageSignup}/>
       <Route path='/profile' component={Profile}/>
-      <Route path='/users' component={UsersSwitch}/>
       {/* le middleware cause un rerender, pourquoi ?*/}
       {/* <Route exact path='/search' component={Authenticate(PageSearch)}/> */}
       {/* <Route exact path='/matcher' component={Authenticate(PageMatcher)}/> */}

@@ -112,6 +112,8 @@ const addTag = async (req, res) => {
             User.addTag(uuid, req.body)
                   .then(() => { res.json({message: "ca marche"})})
                   .catch(err => { console.log(err)})
+      }
+}
 
 const suggestedUsers = (req, res) => {
       const token = req.body.authToken || req.query.authToken;
@@ -162,5 +164,5 @@ module.exports = {
       updateRelationship,
       filtersMinMax,
       confirmation,
-      resetPasswordEmail,
+      resetPasswordEmail
 }

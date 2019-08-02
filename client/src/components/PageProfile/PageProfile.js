@@ -70,7 +70,19 @@ export default function PageProfile(props) {
             const profile = await axios.get(`/users/getProfile?authToken=${authToken}`)
             setProfileState({
                 ...profileState,
-                ...profile.data.profile
+                ...profile.data.profile,
+                visitHistory: [
+                    profile.data.profile,
+                    profile.data.profile,
+                    profile.data.profile,
+                    profile.data.profile
+                ],
+                likeHistory: [
+                    profile.data.profile,
+                    profile.data.profile,
+                    profile.data.profile,
+                    profile.data.profile
+                ]
             })
         }
         fetchData();
