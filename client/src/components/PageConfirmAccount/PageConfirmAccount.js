@@ -81,7 +81,6 @@ export default function PageConfirmAccount(props) {
                       <p> <span aria-label="Attention" role="img" >⚠️</span> the link you provided is not working, please try again.</p>
                     </ErrorBox>
                   </Fragment>
-
                 }
                 {!isLoading && !isError &&
                   <Fragment>
