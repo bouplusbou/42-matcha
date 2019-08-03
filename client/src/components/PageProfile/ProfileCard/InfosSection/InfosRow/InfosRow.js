@@ -2,9 +2,9 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCalendarAlt, faMapMarkerAlt, faSearch, faMapMarkedAlt } from '@fortawesome/free-solid-svg-icons';
+import { faCalendarAlt, faSearch, faMapMarkedAlt } from '@fortawesome/free-solid-svg-icons';
 
-import ProfileContext, { ProfileConsumer } from '../../../ProfileContext';
+import { ProfileConsumer } from '../../../ProfileContext';
 
 const StyledRow = styled.div `
     display:flex;
@@ -59,11 +59,11 @@ const LocalisationCase = (props) => {
 
 const LookingForCase = (props) => {
     let lookingFor = null;
-    if ((props.gender == "man" && props.orientation == "straight") || 
-        (props.gender == "woman" && props.orientation == "homosexual"))
+    if ((props.gender === "man" && props.orientation === "straight") || 
+        (props.gender === "woman" && props.orientation === "homosexual"))
         lookingFor = "Woman";
-    else if ((props.gender == "woman" && props.orientation == "straight") || 
-            (props.gender == "man" && props.orientation == "homosexual"))
+    else if ((props.gender === "woman" && props.orientation === "straight") || 
+            (props.gender === "man" && props.orientation === "homosexual"))
         lookingFor = "Man";
     else
         lookingFor = "Woman & Man" 

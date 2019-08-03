@@ -56,7 +56,7 @@ export default function AvatarSection(props) {
     }
 
     const CloseModal = (event) => {
-        if (event.target.tagName == "DIV")
+        if (event.target.tagName === "DIV")
             setOpen(false);
     }
 

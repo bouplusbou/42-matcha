@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import styled from 'styled-components';
 
-import ProfileContext, { ProfileConsumer } from "../../../ProfileContext";
+import ProfileContext from "../../../ProfileContext";
 import ConnectedIcon from './ConnectedIcon';
 import GenderIcon from './GenderIcon';
 import LikeButton from './LikeButton';

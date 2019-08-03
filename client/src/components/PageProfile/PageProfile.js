@@ -1,6 +1,6 @@
 import React, { Fragment, useState, useEffect } from "react";
 
-import ProfileContext, { ProfileProvider } from './ProfileContext';
+import { ProfileProvider } from './ProfileContext';
 import { faEye, faHeart } from '@fortawesome/free-solid-svg-icons';
 
 import Container from "../Container";

@@ -3,7 +3,7 @@ import Main from './Main';
 import Header from './Header/Header';
 import { AppProvider } from '../AppContext';
 import { actionIsAuthenticated } from '../actions/authActions';
-import styled, { ThemeProvider } from "styled-components";
+import { ThemeProvider } from "styled-components";
 import Theme from "./theme.json";
 
 function App() {

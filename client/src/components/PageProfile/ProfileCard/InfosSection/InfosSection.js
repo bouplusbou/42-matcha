@@ -1,10 +1,9 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
 
-import ProfileContext, { ProfileConsumer } from '../../ProfileContext';
+import ProfileContext from '../../ProfileContext';
 import UsernameRow from './UsernameRow';
 import InfosRow from './InfosRow';
-import PhotosRow from './PhotosRow';
 import TagsRow from './TagsRow';
 import BiographyRow from './BiographyRow';
 
@@ -19,19 +18,14 @@ const StyledSection = styled.section `
 `
 
 export default function InfosSection(props) {
+    const profile = useContext(ProfileContext);
     return (
-            <ProfileConsumer>
-                {profile => (
-
-                    <StyledSection>
-                        <UsernameRow/>
-                        <InfosRow/>
-                        <BiographyRow bio={profile.bio}/>
-                        <TagsRow tags={profile.tags}/>
-                        {/* <PhotosRow photos={profile.photos} avatar={profile.avatar}/> */}
-                    </StyledSection>
-
-                )}
-            </ProfileConsumer>
+        <StyledSection>
+            <UsernameRow/>
+            <InfosRow/>
+            <BiographyRow bio={profile.bio}/>
+            <TagsRow tags={profile.tags}/>
+            {/* <PhotosRow photos={profile.photos} avatar={profile.avatar}/> */}
+        </StyledSection>
     )
 }

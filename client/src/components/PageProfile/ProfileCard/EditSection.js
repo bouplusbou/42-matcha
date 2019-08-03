@@ -146,7 +146,7 @@ export default function InfosSection(props) {
 
     function handleChange(event) {
         const {name, value} = event.target;
-        if (name == "bio") {
+        if (name === "bio") {
             if (valueState.bio.length < 300 && value.length < 300) {
                 setValueState({ ...valueState, bio: value })
                 setEditState({ ...editState, bio: value })
