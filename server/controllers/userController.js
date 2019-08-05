@@ -1,4 +1,4 @@
-const User = require('../models/User');
+const UserModel = require('../models/UserModel');
 const jwt = require('jsonwebtoken');
 const config = require('../middlewares/config');
 const sendEmail = require('../actions/email.js');
@@ -35,9 +35,9 @@ const createUser = (req, res) => {
             if (!lastNameIsOK(lastName)) { helpers.errors.push('lastName') };
             if (!usernameIsOK(username)) { helpers.errors.push('username') };
             if (!passwordIsOK(password)) { helpers.errors.push('password') };
-            const emailExists = await User.emailExists(email);;
+            const emailExists = await UserModel.emailExists(email);;
             if (emailExists) { helpers.taken.push('email') };
-            const usernameExists = await User.usernameExists(username);
+            const usernameExists = await UserModel.usernameExists(username);
             if (usernameExists) { helpers.taken.push('username') };
             return helpers;
       };
@@ -48,7 +48,7 @@ const createUser = (req, res) => {
                   res.status(400).json(helpers);
                   return;
             }
-            await User.createUser(email, firstName, lastName, username, password, city, latLng);
+            await UserModel.createUser(email, firstName, lastName, username, password, city, latLng);
             res.status(200).json({ message: 'User created' });
       };
       manageNewUser(req.body);
@@ -57,14 +57,14 @@ const createUser = (req, res) => {
 const searchUsers = (req, res) => {
       const token = req.body.authToken || req.query.authToken;
       jwt.verify(token, config.jwtSecret, async (err, decoded) => {
-            User.searchUsers(decoded.uuid, req.body)
+            UserModel.searchUsers(decoded.uuid, req.body)
                   .then(users => { res.json({usersArr: users}) })
                   .catch(err => { console.log(err) })
       });
 };
 
 const filtersMinMax = (req, res) => {
-      User.filtersMinMax()
+      UserModel.filtersMinMax()
             .then(filtersMinMax => { res.json({ age: filtersMinMax.age, score: filtersMinMax.score }) })
             .catch(err => { console.log(err) })
 };
@@ -82,7 +82,7 @@ const getUuid = async (req, res) => {
 const getProfile = async (req, res) => {
       const uuid = await getUuid(req, res);
       if (uuid) {
-            User.getProfile(uuid)
+            UserModel.getProfile(uuid)
                   .then(profile => { res.json({profile: profile})})
                   .catch(err => { console.log(err)})
       }
@@ -92,7 +92,7 @@ const updateProfile = async (req, res) => {
       const uuid = await getUuid(req, res);
       console.log(req.body);
       if (uuid) {
-            User.updateProfile(uuid, req.body)
+            UserModel.updateProfile(uuid, req.body)
             .catch(err => { console.log(err) })
       }
 }
@@ -100,7 +100,7 @@ const updateProfile = async (req, res) => {
 const updateRelationship = (req, res) => {
       const token = req.body.authToken || req.query.authToken;
       jwt.verify(token, config.jwtSecret, async (err, decoded) => {
-            User.updateRelationship(decoded.uuid, req.body)
+            UserModel.updateRelationship(decoded.uuid, req.body)
                   .then(users => { res.json({usersArr: users}) })
                   .catch(err => { console.log(err) })
       });
@@ -109,7 +109,7 @@ const updateRelationship = (req, res) => {
 const addTag = async (req, res) => {
       const uuid = await getUuid(req, res);
       if (uuid) {
-            User.addTag(uuid, req.body)
+            UserModel.addTag(uuid, req.body)
                   .then(() => { res.json({message: "ca marche"})})
                   .catch(err => { console.log(err)})
       }
@@ -118,16 +118,16 @@ const addTag = async (req, res) => {
 const suggestedUsers = (req, res) => {
       const token = req.body.authToken || req.query.authToken;
       jwt.verify(token, config.jwtSecret, async (err, decoded) => {
-            User.suggestedUsers(decoded.uuid, req.body)
+            UserModel.suggestedUsers(decoded.uuid, req.body)
                   .then(users => { res.json({usersArr: users}) })
                   .catch(err => { console.log(err) })
       });
 };
 
 const confirmation = async (req, res) => {
-      const uuid = await User.uuidFromHash(req.body);
+      const uuid = await UserModel.uuidFromHash(req.body);
       if (uuid !== null) {
-            User.confirmation(uuid)
+            UserModel.confirmation(uuid)
                   .then( () => { res.status(200).json({ message: 'Confirmation is set in db' }) })
                   .catch(err => { 
                         res.status(400).json({ message: 'The db did not update the confirmation' });
@@ -139,7 +139,7 @@ const confirmation = async (req, res) => {
 
 const resetPasswordEmail = (req, res) => {
       const { email } = req.body;
-      User.resetPasswordEmail(email)
+      UserModel.resetPasswordEmail(email)
             .then(hash => {res.status(200).json({ message: 'Reset request treated' })})
             .catch(err => res.status(200).json({ message: 'Reset request treated' }))
 };
@@ -147,7 +147,7 @@ const resetPasswordEmail = (req, res) => {
 const removeTag = async (req, res) => {
       const uuid = await getUuid(req, res);
       if (uuid) {
-            User.removeTag(uuid, req.body)
+            UserModel.removeTag(uuid, req.body)
                   .then(() => { res.json({message: "ca marche"})})
                   .catch(err => { console.log(err)})
       }
@@ -156,7 +156,7 @@ const removeTag = async (req, res) => {
 const resetPassword = (req, res) => {
       const regex = /^(?:(?=.*?[A-Z])(?:(?=.*?[0-9])(?=.*?[-!@#$%^&*()_[\]{},.<>+=])|(?=.*?[a-z])(?:(?=.*?[0-9])|(?=.*?[-!@#$%^&*()_[\]{},.<>+=])))|(?=.*?[a-z])(?=.*?[0-9])(?=.*?[-!@#$%^&*()_[\]{},.<>+=]))[A-Za-z0-9!@#$%^&*()_[\]{},.<>+=-]{6,50}$/;
       if (regex.test(String(req.body.newPassword))) {
-            User.resetPassword(req.body)
+            UserModel.resetPassword(req.body)
                   .then(username => {
                         if (username !== null) {
                               res.status(200).json({ message: 'New Password Set', username: username });

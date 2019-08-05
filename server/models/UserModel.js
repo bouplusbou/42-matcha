@@ -444,7 +444,7 @@ async function resetPassword({ hash, newPassword }) {
         WHERE u.hash = $hash
         SET u.password = $hashedPassword
         RETURN u.username AS username
-      `, 
+      `,
       { 
         hash: hash,
         hashedPassword: hashedPassword,
