@@ -1,4 +1,5 @@
 import React, { Fragment, useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import axios from 'axios';
 import Visibility from '@material-ui/icons/Visibility';
@@ -67,11 +68,23 @@ const ErrorBox = styled.section`
     font-size: 0.8rem;
   }
 `;
+const Redirect = styled.section`
+  color: black;
+  font-weight: 500;
+  text-align: center;
+  a {
+    text-decoration: none;
+    color: black;
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: 500;
+    text-decoration: underline;
+}
+`;
 
 export default function PageResetPassword(props) {
-    // const [isLoading, setIsLoading] = useState(true);
-    // const [isError, setIsError] = useState(true);
     const [isError, setIsError] = useState(true);
+    const [isSuccess, setIsSuccess] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -80,26 +93,37 @@ export default function PageResetPassword(props) {
 
     const handleSubmit = async event => {
       event.preventDefault();
-      const params = { 
-        hash: props.match.params.hash,
-        password: password,
-      };
-      axios.post(`/users/resetPassword`, params)
-        .then(res => { if (res.status === 200) props.history.push('/login'); })
-        .catch(error => {
-          // error.response.data;
-        })
+      if (passwordIsOk(password)) {
+        console.log(password);
+        const params = { 
+          hash: props.match.params.hash,
+          newPassword: password,
+        };
+        axios.post(`/users/resetPassword`, params)
+          .then(res => { if (res.status === 200) setIsSuccess(true); })
+          .catch(error => {
+            if (error.response.status === 401) {
+              setIsError(true);
+            } else {
+              setPasswordError(true);
+              setPasswordHelper('Minimum 6 characters, at least three of those four categories: uppercase, lowercase, number and special character');
+            }
+          })
+      }
     };
 
     const passwordIsOk = password => {
-      const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/;
+      const regex = /^(?:(?=.*?[A-Z])(?:(?=.*?[0-9])(?=.*?[-!@#$%^&*()_[\]{},.<>+=])|(?=.*?[a-z])(?:(?=.*?[0-9])|(?=.*?[-!@#$%^&*()_[\]{},.<>+=])))|(?=.*?[a-z])(?=.*?[0-9])(?=.*?[-!@#$%^&*()_[\]{},.<>+=]))[A-Za-z0-9!@#$%^&*()_[\]{},.<>+=-]{6,50}$/;
       return regex.test(String(password));
     }
 
     const handleBlur = event => {
       if (!passwordIsOk(event.target.value)) {
         setPasswordError(true);
-        setPasswordHelper('Minimum 6 characters, at least one uppercase letter, one lowercase letter and one number');
+        setPasswordHelper('Minimum 6 characters, at least three of those four categories: uppercase, lowercase, number and special character');
+      } else {
+        setPasswordError(false);
+        setPasswordHelper('');
       }
     };
     const handleChange = event => setPassword(event.target.value);
@@ -128,12 +152,20 @@ export default function PageResetPassword(props) {
                     </ErrorBox>
                   </Fragment>
                 }
-                {!isLoading && !isError && 
+                {!isLoading && isSuccess &&
+                  <Fragment>
+                    <h1>Your new password has been set ! <span aria-label="Congratulations" role="img" >🎉</span></h1>
+                    <Redirect>
+                        <p><span aria-label="Check-this" role="img" >👉</span> wanna <Link to="/login">login</Link> ?</p>
+                    </Redirect>
+                  </Fragment>
+                }
+                {!isLoading && !isError && !isSuccess && 
                   <Fragment>
                     <h1>Reset your password</h1>
                     <Form noValidate autoComplete="off" onSubmit={handleSubmit}>
                       <FormControl required={true}>
-                        <InputLabel htmlFor="adornment-password">Password</InputLabel>
+                        <InputLabel htmlFor="adornment-password">New Password</InputLabel>
                         <Input
                           id="standard-password"
                           type={showPassword ? 'text' : 'password'}

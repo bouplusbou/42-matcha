@@ -21,7 +21,7 @@ const createUser = (req, res) => {
             return regex.test(String(username));
       };
       const passwordIsOK = password => {
-            const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/;
+            const regex = /^(?:(?=.*?[A-Z])(?:(?=.*?[0-9])(?=.*?[-!@#$%^&*()_[\]{},.<>+=])|(?=.*?[a-z])(?:(?=.*?[0-9])|(?=.*?[-!@#$%^&*()_[\]{},.<>+=])))|(?=.*?[a-z])(?=.*?[0-9])(?=.*?[-!@#$%^&*()_[\]{},.<>+=]))[A-Za-z0-9!@#$%^&*()_[\]{},.<>+=-]{6,50}$/;
             return regex.test(String(password));
       };
       
@@ -151,7 +151,24 @@ const removeTag = async (req, res) => {
                   .then(() => { res.json({message: "ca marche"})})
                   .catch(err => { console.log(err)})
       }
-}
+};
+
+const resetPassword = (req, res) => {
+      const regex = /^(?:(?=.*?[A-Z])(?:(?=.*?[0-9])(?=.*?[-!@#$%^&*()_[\]{},.<>+=])|(?=.*?[a-z])(?:(?=.*?[0-9])|(?=.*?[-!@#$%^&*()_[\]{},.<>+=])))|(?=.*?[a-z])(?=.*?[0-9])(?=.*?[-!@#$%^&*()_[\]{},.<>+=]))[A-Za-z0-9!@#$%^&*()_[\]{},.<>+=-]{6,50}$/;
+      if (regex.test(String(req.body.newPassword))) {
+            User.resetPassword(req.body)
+                  .then(username => {
+                        if (username !== null) {
+                              res.status(200).json({ message: 'New Password Set', username: username });
+                        } else {
+                              res.status(401).send('Wrong hash provided');
+                        }
+                  })
+                  .catch(err => res.status(400).send('Invalid email'));
+      } else {
+            res.status(400).send('Invalid email');
+      }
+};
 
 module.exports = {
       createUser,
@@ -164,5 +181,6 @@ module.exports = {
       updateRelationship,
       filtersMinMax,
       confirmation,
-      resetPasswordEmail
+      resetPasswordEmail,
+      resetPassword,
 }

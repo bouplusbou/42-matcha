@@ -116,7 +116,6 @@ async function uuidExists(uuid) {
   } catch(err) { console.log(err) }
 }
 
-
 async function getProfile(uuid) {
   
   try {
@@ -279,8 +278,6 @@ async function filtersMinMax() {
   } catch(err) { console.log(err) }
 }
 
-
-
 async function suggestedUsers(uuid, { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags }) { 
   // console.log(uuid);
   const sorting = { 
@@ -439,6 +436,27 @@ async function resetPasswordEmail(email) {
   } catch(err) { console.log(err) }
 }
 
+async function resetPassword({ hash, newPassword }) { 
+  await bcrypt.hash(newPassword, 10, async (error, hashedPassword) => {
+    try {
+      const res = await session.run(`
+        MATCH (u:User)
+        WHERE u.hash = $hash
+        SET u.password = $hashedPassword
+        RETURN u.username AS username
+      `, 
+      { 
+        hash: hash,
+        hashedPassword: hashedPassword,
+      });
+      session.close();
+      if (res.records[0] === undefined) return null;
+      const username = res.records[0].get('username');
+      return username;
+    } catch(err) { console.log(err) }
+  })
+}
+
 module.exports = {
   createUser,
   usernameExists,
@@ -456,4 +474,7 @@ module.exports = {
   uuidFromHash,
   confirmation,
   resetPasswordEmail,
+  resetPassword,
 }
+
+

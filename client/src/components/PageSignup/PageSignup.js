@@ -97,7 +97,7 @@ export default function PageSignup(props) {
       firstName: /^[A-Za-zÀ-ÖØ-öø-ÿ-]{3,15}$/,
       lastName: /^[A-Za-zÀ-ÖØ-öø-ÿ]{3,15}$/,
       username: /^[A-Za-zÀ-ÖØ-öø-ÿ]{5,10}$/,
-      password: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/,
+      password: /^(?:(?=.*?[A-Z])(?:(?=.*?[0-9])(?=.*?[-!@#$%^&*()_[\]{},.<>+=])|(?=.*?[a-z])(?:(?=.*?[0-9])|(?=.*?[-!@#$%^&*()_[\]{},.<>+=])))|(?=.*?[a-z])(?=.*?[0-9])(?=.*?[-!@#$%^&*()_[\]{},.<>+=]))[A-Za-z0-9!@#$%^&*()_[\]{},.<>+=-]{6,50}$/,
     };
     return regex[name].test(String(value));
   };
@@ -108,7 +108,7 @@ export default function PageSignup(props) {
       firstName: 'Between 3 and 15 characters, only letters and "-"',
       lastName: 'Between 3 and 15 characters, only letters',
       username: 'Between 6 and 10 characters, only letters',
-      password: 'Minimum 6 characters, at least one uppercase letter, one lowercase letter and one number',
+      password: 'Minimum 6 characters, at least three of those four categories: uppercase, lowercase, number and special character',
     };
     const stateArr = nameArr.map(name => {return { [name]: null, [`${name+'Error'}`]: true, [`${name+'Helper'}`]: errorMsg[name] }});
     const state = stateArr.reduce((acc, curr) => {
