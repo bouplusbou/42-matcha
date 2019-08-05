@@ -1,11 +1,11 @@
-const User = require('../models/User');
+const UserModel = require('../models/UserModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const config = require('../middlewares/config');
 
 const login = (req, res) => {
     const { username, password } = req.body;
-    User.userFromUsername(username)
+    UserModel.userFromUsername(username)
         .then(user =>  {
             if (user !== null) {
                 if (user.confirmed) {
@@ -28,7 +28,7 @@ const login = (req, res) => {
 }
 
 const uuidIsValid = (req, res) => {
-    User.getUserByUuid(req.params.uuid)
+    UserModel.getUserByUuid(req.params.uuid)
         .then( user => { res.json({message : "Info for one user", data: user}); })
         .catch( error => { console.log(error); });
 }

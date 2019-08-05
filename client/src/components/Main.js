@@ -7,6 +7,7 @@ import PageSearch from './PageSearch/PageSearch';
 import PageMatcher from './PageMatcher/PageMatcher';
 import Profile from './PageProfile/PageProfile';
 import PageConfirmAccount from './PageConfirmAccount/PageConfirmAccount';
+import PageResetPassword from './PageResetPassword/PageResetPassword';
 // import Authenticate from './Authenticate';
 
 const Main = () => (
@@ -14,6 +15,7 @@ const Main = () => (
     <Switch>
       <Route exact path='/' component={PageHome}/>
       <Route exact path='/confirm/:hash' component={PageConfirmAccount}/>
+      <Route exact path='/resetPassword/:hash' component={PageResetPassword}/>
       <Route exact path='/login' component={PageLogin}/>
       <Route exact path='/search' component={PageSearch}/>
       <Route exact path='/matcher' component={PageMatcher}/>

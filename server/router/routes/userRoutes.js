@@ -21,6 +21,9 @@ router.route('/updateRelationship')
 router.route('/resetPasswordEmail')
       .post((req, res) => { UserController.resetPasswordEmail(req, res); });
 
+router.route('/resetPassword')
+      .post((req, res) => { UserController.resetPassword(req, res); });
+
 router.route('/filtersMinMax')
       .get(authenticate, (req, res) => { UserController.filtersMinMax(req, res); });
 

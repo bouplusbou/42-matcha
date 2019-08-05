@@ -17,7 +17,6 @@ import Modal from '@material-ui/core/Modal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
-
 const Hero = styled.section`
   background-color: #6F48BD;
   height: 100vh;
@@ -86,12 +85,13 @@ const Redirect = styled.section`
     text-decoration: underline;
   }
 `;
-const ResetButton = styled.button`
+const ResetButton = styled.span`
   color: #C6C6C6;
   font-family: Roboto;
   font-style: normal;
   font-weight: 500;
   text-decoration: underline;
+  cursor: pointer;
 `;
 const ModalSection = styled.section`
   display: flex;
@@ -133,15 +133,12 @@ export default function PageLogin(props) {
   const handleChange = name => event => {
     setValues({ ...values, [name]: event.target.value });
   };
-
   const handleFocus = () => {
     setValues({ ...values, resetPasswordError: false, resetPasswordHelper: '', error: false });
   };
-
   const toggleShowPassword = () => {
     setValues({ ...values, showPassword: !values.showPassword });
   };
-
   const handleSubmit = event => {
     event.preventDefault();
     const credentials = {username: values.username, password: values.password};
@@ -176,7 +173,6 @@ export default function PageLogin(props) {
   const [open, setOpen] = useState(false);
   const handleOpen = () => { setOpen(true); };
   const handleClose = () => { setOpen(false); };
-
   const handleEmailBlur = event => {
     if (!emailIsOk(event.target.value)) {
       setValues({ ...values, resetPasswordError: true, resetPasswordHelper: 'Enter a proper email' });
@@ -189,7 +185,6 @@ export default function PageLogin(props) {
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
         open={open}
-        // onClose={handleClose}
       >
       <ModalSection>
         <ModalContainer>
@@ -245,7 +240,6 @@ export default function PageLogin(props) {
               onFocus={handleFocus}
               margin="normal"
             />
-
             <FormControl>
               <InputLabel htmlFor="adornment-password">Password</InputLabel>
               <Input
@@ -264,7 +258,6 @@ export default function PageLogin(props) {
               />
               <FormHelperText style={{color: 'red'}} id="password-helper-text">{values.passwordHelper}</FormHelperText>
             </FormControl>
-
             { values.error && 
               <ErrorBox>
                 <p> <span aria-label="Attention" role="img" >⚠️</span> {values.errorMsg}</p>
@@ -275,12 +268,7 @@ export default function PageLogin(props) {
             </SubmitButton>
           </Form>
           <Redirect>
-            <p>Forgot your password ?</p>
-            <ResetButton
-              onClick={handleOpen}
-            >
-              <p>Reset via your email</p>
-            </ResetButton>
+            <p>Forgot your password ? <ResetButton onClick={handleOpen}>Reset via your email</ResetButton></p>
             <p>Not a member yet ? <Link to="/signup">Signup now</Link></p>
           </Redirect>
         </FormContainer>
@@ -288,6 +276,3 @@ export default function PageLogin(props) {
     </Hero>
   );
 }
-
-
-
