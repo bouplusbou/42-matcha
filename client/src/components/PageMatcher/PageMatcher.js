@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import Sorting from '../Sorting';
 import Filtering from '../Filtering';
 import Results from '../Results';
+import IncompleteProfile from '../IncompleteProfile';
 import axios from 'axios';
 
 
@@ -39,10 +40,31 @@ const ResultsSection = styled.section`
   grid-area: results;
 `;
 
-
 export default function PageSearch() {
-  const [hasNoMore, setHasNoMore] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  const [hasFullProfile, setHasFullProfile] = useState(true);
+  const [missingProfileFields, setMissingProfileFields] = useState(false);
+  useEffect(() => {
+    setIsLoading(true);
+    async function fetchData() {
+      const authToken = localStorage.getItem('token');
+      const res = await axios.get(`/users/hasFullProfile?authToken=${authToken}`);
+      const missingFields = [];
+      if (res.data.fields.birthDate === null) missingFields.push('your birthdate');
+      if (res.data.fields.gender === null) missingFields.push('your gender');
+      if (res.data.fields.orientation === null) missingFields.push('your sexual orientation');
+      if (res.data.fields.lookingFor === null) missingFields.push('who you are looking for');
+      if (missingFields.length !== 0) {
+        setMissingProfileFields(missingFields);
+        setHasFullProfile(false);
+        setIsLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
+  const [hasNoMore, setHasNoMore] = useState(false);
   const [sortingChoice, setSortingChoice] = useState('Closest');
   const [filterCity, setFilterCity] = useState(null);
   const [filterLatLng, setFilterLatLng] = useState(null);
@@ -146,7 +168,12 @@ export default function PageSearch() {
         />
       </SortingSection>
       <ResultsSection>
-        {!isLoading && 
+        {!isLoading && !hasFullProfile &&
+          <IncompleteProfile 
+            missingProfileFields={missingProfileFields}
+          />
+        }
+        {!isLoading && hasFullProfile &&
           <Results 
             handleLikeDislike={handleLikeDislike}
             user={user}

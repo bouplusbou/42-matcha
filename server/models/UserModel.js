@@ -457,6 +457,27 @@ async function resetPassword({ hash, newPassword }) {
   })
 }
 
+async function hasFullProfile(uuid) { 
+  try {
+    const res = await session.run(`
+      MATCH (u:User)
+      WHERE u.uuid = $uuid
+      RETURN u.lookingFor AS lookingFor, 
+      u.gender AS gender,
+      u.birthDate AS birthDate,
+      u.orientation AS orientation
+    `,
+    { uuid: uuid });
+    session.close();
+    if (res.records[0] === undefined) return null;
+    const lookingFor = res.records[0].get('lookingFor');
+    const gender = res.records[0].get('gender');
+    const birthDate = res.records[0].get('birthDate');
+    const orientation = res.records[0].get('orientation');
+    return { lookingFor, gender, birthDate, orientation };
+  } catch(err) { console.log(err) }
+}
+
 module.exports = {
   createUser,
   usernameExists,
@@ -475,6 +496,6 @@ module.exports = {
   confirmation,
   resetPasswordEmail,
   resetPassword,
+  hasFullProfile,
 }
-
-
+ 

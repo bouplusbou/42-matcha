@@ -4,6 +4,7 @@ import UserCard from '../UserCard';
 import Sorting from '../Sorting';
 import Filtering from '../Filtering';
 import MoreButton from '../MoreButton';
+import IncompleteProfile from '../IncompleteProfile';
 import axios from 'axios';
 
 const SearchSection = styled.section`
@@ -51,8 +52,30 @@ const NoMore = styled.section`
 `;
 
 export default function PageSearch() {
-  const [hasNoMore, setHasNoMore] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  const [hasFullProfile, setHasFullProfile] = useState(true);
+  const [missingProfileFields, setMissingProfileFields] = useState(false);
+  useEffect(() => {
+    setIsLoading(true);
+    async function fetchData() {
+      const authToken = localStorage.getItem('token');
+      const res = await axios.get(`/users/hasFullProfile?authToken=${authToken}`);
+      const missingFields = [];
+      if (res.data.fields.birthDate === null) missingFields.push('your birthdate');
+      if (res.data.fields.gender === null) missingFields.push('your gender');
+      if (res.data.fields.orientation === null) missingFields.push('your sexual orientation');
+      if (res.data.fields.lookingFor === null) missingFields.push('who you are looking for');
+      if (missingFields.length !== 0) {
+        setMissingProfileFields(missingFields);
+        setHasFullProfile(false);
+        setIsLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
+  const [hasNoMore, setHasNoMore] = useState(false);
   const [sortingChoice, setSortingChoice] = useState('Closest');
   const [filterCity, setFilterCity] = useState(null);
   const [filterLatLng, setFilterLatLng] = useState(null);
@@ -146,10 +169,13 @@ export default function PageSearch() {
           handleSelectSorting={handleSelectSorting}
         />
       </SortingSection>
-      <ResultsSection
-        handleClickMoreButton={handleClickMoreButton}
-      >
-      {users.length !== 0 &&
+      <ResultsSection>
+      {!isLoading && !hasFullProfile &&
+          <IncompleteProfile 
+            missingProfileFields={missingProfileFields}
+          />
+      }
+      {hasFullProfile && users.length !== 0 &&
         <UserCards>
           {users.map( (user, index) => 
             <UserCard 
@@ -161,12 +187,12 @@ export default function PageSearch() {
           )}
         </UserCards>
       }
-      {!isLoading && !hasNoMore &&
+      {!isLoading && hasFullProfile && !hasNoMore && 
         <MoreButton
           handleClickMoreButton={handleClickMoreButton}
         />
       }
-      {!isLoading && users.length === 0 && 
+      {!isLoading && hasFullProfile && users.length === 0 && 
         <NoMore>
           <p>No more suggestion...</p>
         </NoMore>

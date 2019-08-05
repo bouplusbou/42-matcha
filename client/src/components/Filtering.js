@@ -8,30 +8,30 @@ import Select from 'react-select';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
-export default function Filtering({filterAge, handleAgeChange, rangeAge, filterScore, rangeScore, handleScoreChange, filterCity, handleClickDeleteCity, filterDistance, handleDistanceChange, handleLatlngChange, allTags, filterTags, handleTagsChange}) {
-    
-    const Filtering = styled.aside`
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        height: 500px;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-        font-family: Roboto;
-        border-radius: 30px;
-        padding: 3em;
-        p {
-            font-weight: 500;
-            color: #292929;
-        }
-        @media (max-width: 630px) {
-            width: 180px;
-        }
-    `
-    const TextBox = styled.section`
-        display: flex;
-        justify-content: space-between;
-        align-items: end;
-    `
+const Filtering = styled.aside`
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 500px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    font-family: Roboto;
+    border-radius: 30px;
+    padding: 3em;
+    p {
+        font-weight: 500;
+        color: #292929;
+    }
+    @media (max-width: 630px) {
+        width: 180px;
+    }
+`;
+const TextBox = styled.section`
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+`;
+
+export default function FilteringComponent({filterAge, handleAgeChange, rangeAge, filterScore, rangeScore, handleScoreChange, filterCity, handleClickDeleteCity, filterDistance, handleDistanceChange, handleLatlngChange, allTags, filterTags, handleTagsChange}) {
     
     const createSliderWithTooltip = Slider.createSliderWithTooltip;
     const Range = createSliderWithTooltip(Slider.Range);

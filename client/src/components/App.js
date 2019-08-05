@@ -7,14 +7,13 @@ import { ThemeProvider } from "styled-components";
 import Theme from "./theme.json";
 
 function App() {
-
   const [connected, setConnected] = useState(false);
   
   useEffect(() => {
     actionIsAuthenticated(localStorage.getItem('token'))
       .then(isAuthenticated => isAuthenticated ? setConnected(true) : setConnected(false))
       .catch(err => setConnected(false));
-  });
+  }, []);
 
   const appState = { 
       connected: connected,

@@ -18,6 +18,9 @@ router.route('/matcher')
 router.route('/updateRelationship')
       .post(authenticate, (req, res) => { UserController.updateRelationship(req, res); });
 
+router.route('/hasFullProfile')
+      .get(authenticate, (req, res) => { UserController.hasFullProfile(req, res); });
+
 router.route('/resetPasswordEmail')
       .post((req, res) => { UserController.resetPasswordEmail(req, res); });
 
@@ -35,12 +38,13 @@ router.route('/getProfile')
 router.route(`/updateProfile`)
       .post(authenticate, (req, res) => { UserController.updateProfile(req, res) })
 
-router.route('/updateRelationship')
-      .post(authenticate, (req, res) => { UserController.updateRelationship(req, res); });
-
 router.route(`/addTag`)
       .post(authenticate, (req, res) => { UserController.addTag(req, res); })
 
 router.route(`/removeTag`)
       .delete(authenticate, (req, res) => { UserController.removeTag(req, res); })
+
 module.exports = router;
+
+
+

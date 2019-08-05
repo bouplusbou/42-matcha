@@ -170,6 +170,15 @@ const resetPassword = (req, res) => {
       }
 };
 
+const hasFullProfile = (req, res) => {
+      const token = req.body.authToken || req.query.authToken;
+      jwt.verify(token, config.jwtSecret, async (err, decoded) => {
+            UserModel.hasFullProfile(decoded.uuid)
+                  .then(fields => res.status(200).json({ fields }))
+                  .catch(err => res.status(400).send('Error'));
+      });
+};
+
 module.exports = {
       createUser,
       getProfile,
@@ -183,4 +192,5 @@ module.exports = {
       confirmation,
       resetPasswordEmail,
       resetPassword,
-}
+      hasFullProfile,
+};
