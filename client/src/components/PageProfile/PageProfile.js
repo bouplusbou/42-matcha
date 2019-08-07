@@ -1,26 +1,27 @@
 import React, { Fragment, useState, useEffect } from "react";
+import axios from 'axios';
 
 import { ProfileProvider } from './ProfileContext';
 import { faEye, faHeart } from '@fortawesome/free-solid-svg-icons';
 
 import Container from "../Container";
 import ProfileCard from './ProfileCard/ProfileCard';
-import UserList from './UserList'
+import UserList from './UserList/UserList'
 import styled from 'styled-components';
 
-import axios from 'axios';
 const authToken = localStorage.getItem('token');
 
 const GridContainer = styled.div `
     display:grid;
     margin-top:2rem;
+    min-width:360px;
 
     grid-template-columns:1fr;
     grid-template-rows:auto;
     grid-row-gap:2rem;
     @media (max-width: 1000px) {
         grid-row-gap:0rem;
-        margin-top:0;    
+        margin-top:0;
     }
 `
 
@@ -32,7 +33,7 @@ export default function PageProfile(props) {
         openEdit: OpenEdit,
         closeAndSaveEdit: CloseAndSaveEdit,
         account: true,
-        edit: false,
+        edit:true,
     });
     
     async function handleLike() {
@@ -56,10 +57,12 @@ export default function PageProfile(props) {
         })
     }
     
-    async function CloseAndSaveEdit(editState) {
-        if (Object.keys(editState).length > 0) {
-            await axios.post(`/users/updateProfile?authToken=${authToken}`, editState)
-            .then( setProfileState({ ...profileState, edit: false }) );
+    async function CloseAndSaveEdit(editedValues) {
+        console.log(editedValues)
+        if (Object.keys(editedValues).length > 0) {
+            await axios.post(`/users/updateProfile?authToken=${authToken}`, editedValues)
+                .then( setProfileState({ ...profileState, edit: false }))
+                .catch(err => console.log(err))
         } else {
             setProfileState({ ...profileState, edit: false })
         }
@@ -68,10 +71,14 @@ export default function PageProfile(props) {
     useEffect(() => {
         async function fetchData() {
             const profile = await axios.get(`/users/getProfile?authToken=${authToken}`)
+            console.log(profile);
             setProfileState({
                 ...profileState,
                 ...profile.data.profile,
                 visitHistory: [
+                    profile.data.profile,
+                    profile.data.profile,
+                    profile.data.profile,
                     profile.data.profile,
                     profile.data.profile,
                     profile.data.profile,
@@ -81,8 +88,11 @@ export default function PageProfile(props) {
                     profile.data.profile,
                     profile.data.profile,
                     profile.data.profile,
+                    profile.data.profile,
+                    profile.data.profile,
+                    profile.data.profile,
                     profile.data.profile
-                ]
+                ],
             })
         }
         fetchData();
@@ -96,6 +106,7 @@ export default function PageProfile(props) {
                     {profileState.account &&
                         <Fragment>
                             {profileState.likeHistory &&
+                            !profileState.edit &&
                                 <UserList
                                 title={"Users who likes you"} 
                                 list={profileState.likeHistory}
@@ -104,6 +115,7 @@ export default function PageProfile(props) {
                                 />
                             }
                             {profileState.visitHistory &&
+                            !profileState.edit &&
                                 <UserList 
                                 title={"Users who visited your profile"}
                                 list={profileState.visitHistory}

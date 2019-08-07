@@ -28,9 +28,9 @@ const StyledIcon = styled(FontAwesomeIcon) `
 export default function Separator(props) {
     return (
         <StyledDiv>
-        <Line color={props.color}/>
-            <StyledIcon icon={props.icon} size={props.size} color={props.color}/>
-        <Line color={props.color}/>
+            <Line color={props.color}/>
+                <StyledIcon icon={props.icon} size={props.size} color={props.color}/>
+            <Line color={props.color}/>
         </StyledDiv>
     )
 }

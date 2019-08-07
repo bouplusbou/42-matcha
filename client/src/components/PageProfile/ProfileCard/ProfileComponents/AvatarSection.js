@@ -5,12 +5,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFireAlt } from '@fortawesome/free-solid-svg-icons';
 import { Modal } from '@material-ui/core';
 
-import ProfileContext from '../ProfileContext';
-import PhotosModal from './PhotosModal';
+import ProfileContext from '../../ProfileContext';
+import PhotosModal from '../Components/PhotosModal';
 
 const StyledSection = styled.section `
     display:flex;
     min-width:300px;
+    min-height:375px;
 
     align-items:flex-end;
     
@@ -19,6 +20,9 @@ const StyledSection = styled.section `
     background-position: center center;
     background-size: cover;
     @media (max-width: 1000px) { 
+        border-radius:0;
+    }
+    @media (max-width: 740px) {
         height:300px;
     }
 `
@@ -33,6 +37,9 @@ const ScoreContainer = styled.div `
     
     border-radius:0 0 0 ${props => props.theme.borderRadius};
     background: linear-gradient(179.76deg, rgba(0, 0, 0, 0) 0.51%, #000000 83.4%);
+    @media (max-width: 1000px) { 
+        border-radius:0;
+    }
 `
 
 const Score = styled.div `

@@ -54,20 +54,15 @@ async function usernameExists(username) {
   } catch(err) { console.log(err) }
 }
 
-async function updateProfile(uuid, req) {
+async function updateProfile(uuid, editedValues) {
+  console.log("Update", editedValues)
+  let cypher = "MATCH (u:User {uuid: $uuid})\n";
+  for (var key in editedValues) { cypher += `SET u.${key} = $${key}\n` }
   try {
-    await session.run(`
-      MATCH (u:User {uuid: $uuid})
-      ${req.username ? `SET u.username = $username` : ""}
-      ${req.firstName ? `SET u.firstName = $firstName` : ""}
-      ${req.lastName ? `SET u.lastName = $lastName` : ""}
-      ${req.gender ? `SET u.gender = $gender` : ""}
-      ${req.age ? `SET u.age = $age` : ""}
-      ${req.orientation ? `SET u.orientation = $orientation` : ""}
-      ${req.bio ? `SET u.bio = $bio` : ""}
-      ${req.city ? `SET u.city = $city` : ""}
-      ${req.latLng ? `SET u.letLng = $latLng` : ""}
-    `, { req });
+    await session.run(cypher, {
+      ...editedValues,
+      uuid: uuid
+    });
     session.close();
   } catch (err) { console.log(err.stack) }
 }
@@ -118,74 +113,28 @@ async function uuidExists(uuid) {
 
 
 async function getProfile(uuid) {
-  
   try {
     const res = await session.run(`
       MATCH (u:User)
-      MATCH (u)-[:TAGGED]->(t:Tag)
+      OPTIONAL MATCH (u)-[:TAGGED]->(t:Tag)
       WHERE u.uuid = $uuid
       RETURN 
-      u.uuid AS uuid,
-      u.username AS username,
-      u.firstName AS firstName,
-      u.lastName AS lastName,
-      u.gender AS gender,
-      u.orientation AS orientation,
-      u.lookingFor AS lookingFor,
+      u,
       duration.between(date(u.birthDate),date()).years AS age,
-      u.bio AS bio,
-      u.email AS email,
-      u.photos AS photos,
-      u.avatarIndex AS avatarIndex,
-      u.score AS score,
-      u.latLng AS latLng,
-      u.likeHistory AS likeHistory,
-      u.visitHistory AS visitHistory,
-      u.lastConnection AS lastConnection,
-      u.city AS city,
       collect(t.tag) AS tags
     `, {uuid: uuid});
     session.close();
-    const username = res.records[0].get('username');
-    const firstName = res.records[0].get('firstName');
-    const lastName = res.records[0].get('lastName');
-    const gender = res.records[0].get('gender');
-    const orientation = res.records[0].get('orientation');
-    const lookingFor = res.records[0].get('lookingFor');
-    const age = res.records[0].get('age').low;
-    const bio = res.records[0].get('bio');
-    const email = res.records[0].get('email');
-    const tags = res.records[0].get('tags');
-    const photos = res.records[0].get('photos');
-    const avatarIndex = res.records[0].get('avatarIndex');
-    const score = res.records[0].get('score');
-    const latLng = res.records[0].get('latLng');
-    const likeHistory = res.records[0].get('likeHistory');
-    const visitHistory = res.records[0].get('visitHistory');
-    const lastConnection = res.records[0].get('lastConnection');
-    const city = res.records[0].get('city');
-    return {
-      uuid,
-      username,
-      firstName,
-      lastName,
-      gender,
-      orientation,
-      lookingFor,
-      age,
-      bio,
-      email,
-      tags,
-      photos,
-      avatarIndex,
-      score,
-      latLng,
-      likeHistory,
-      visitHistory,
-      lastConnection,
-      city
+    const user = res.records[0].get(`u`).properties;
+    delete user['password'];
+    delete user['hash'];
+    delete user['uuid'];
+    const age = res.records[0].get(`age`).low;
+    console.log(res.records[0].get(`tags`));
+    const tags = res.records[0].get(`tags`);
+    return {
+      ...user, age, tags
     }
-  } catch(err) { console.log(err.stack)};
+  } catch(err) { console.log(err) };
 }
 
 async function searchUsers(uuid, { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags, offset }) { 
@@ -376,6 +325,7 @@ async function updateRelationship(uuid, { choice, username }) {
 
 async function addTag(uuid, req) {
   try {
+    console.log(req);
     await session.run(`
     MATCH (u:User {uuid: $uuid}), (t:Tag {tag: $tag})
     CREATE (u)-[r:TAGGED]->(t)
@@ -383,7 +333,6 @@ async function addTag(uuid, req) {
       uuid: uuid,
       tag: req.tag
     });
-    session.close();
   } catch(err) { console.log(err.stack) }
 }
 
