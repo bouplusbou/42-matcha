@@ -179,6 +179,15 @@ const hasFullProfile = (req, res) => {
       });
 };
 
+const usernameFromUuid = (req, res) => {
+      const token = req.body.authToken || req.query.authToken;
+      jwt.verify(token, config.jwtSecret, async (err, decoded) => {
+            UserModel.usernameFromUuid(decoded.uuid)
+                  .then(username => res.status(200).json({ username }))
+                  .catch(err => res.status(400).send('Error'));
+      });
+};
+
 module.exports = {
       createUser,
       getProfile,
@@ -193,4 +202,5 @@ module.exports = {
       resetPasswordEmail,
       resetPassword,
       hasFullProfile,
+      usernameFromUuid,
 };

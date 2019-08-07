@@ -12,7 +12,7 @@ const login = (req, res) => {
                     bcrypt.compare(password, user.password, (err, result) => {
                         if (result) {
                             const token = jwt.sign({ uuid: user.uuid }, config.jwtSecret, { expiresIn: '6h' });
-                            res.json({ token: token });
+                            res.json({ token: token, username: user.username });
                         } else {
                             res.status(401).json({ errorMsg: 'wrong credentials' });
                         }

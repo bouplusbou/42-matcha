@@ -1,13 +1,14 @@
 const axios = require('axios');
 
-const actionLogin = token => {
+const actionLogin = (token, username) => {
     localStorage.setItem('token', token);
+    return username;
 };
 
-const actionIsAuthenticated = async (authToken) => {
+const actionIsAuthenticated = async authToken => {
     if (authToken) {
-        const isAuthenticated = await axios.get(`/auth?authToken=${authToken}`);
-        return !!isAuthenticated;
+        const res = await axios.get(`/auth?authToken=${authToken}`);
+        return res.data.username;
     } else {
         return false;
     }

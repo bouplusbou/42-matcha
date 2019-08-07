@@ -89,14 +89,15 @@ async function userFromUsername(username) {
     const res = await session.run(`
       MATCH (u:User)
       WHERE u.username = $username
-      RETURN u.password AS password, u.uuid AS uuid, u.confirmed AS confirmed
+      RETURN u.password AS password, u.uuid AS uuid, u.username AS username, u.confirmed AS confirmed
     `, { username: username });
     session.close();
     if (res.records[0] !== undefined) {
       const password = res.records[0].get('password');
       const uuid = res.records[0].get('uuid');
+      const username = res.records[0].get('username');
       const confirmed = res.records[0].get('confirmed');
-      const user = { password, uuid, confirmed };
+      const user = { password, uuid, username, confirmed };
       return user;
     } else {
       return null;
@@ -478,6 +479,19 @@ async function hasFullProfile(uuid) {
   } catch(err) { console.log(err) }
 }
 
+async function usernameFromUuid(uuid) { 
+  try {
+    const res = await session.run(`
+      MATCH (me:User {uuid: $uuid})
+      RETURN me.username AS username
+    `, { uuid: uuid });
+    session.close();
+    if (res.records[0] === undefined) return null;
+    const username = res.records[0].get('username');
+    return username;
+  } catch(err) { console.log(err) }
+}
+
 module.exports = {
   createUser,
   usernameExists,
@@ -497,5 +511,6 @@ module.exports = {
   resetPasswordEmail,
   resetPassword,
   hasFullProfile,
+  usernameFromUuid,
 }
  

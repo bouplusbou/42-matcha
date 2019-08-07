@@ -6,6 +6,8 @@ import Filtering from '../Filtering';
 import MoreButton from '../MoreButton';
 import IncompleteProfile from '../IncompleteProfile';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
+
 
 const SearchSection = styled.section`
   margin: 3vw 10vw;
@@ -51,7 +53,7 @@ const NoMore = styled.section`
   justify-content: center;
 `;
 
-export default function PageSearch() {
+export default function PageSearch(props) {
   const [isLoading, setIsLoading] = useState(true);
 
   const [hasFullProfile, setHasFullProfile] = useState(true);
@@ -178,12 +180,18 @@ export default function PageSearch() {
       {hasFullProfile && users.length !== 0 &&
         <UserCards>
           {users.map( (user, index) => 
-            <UserCard 
+            <Link 
               key={index}
-              user={user}
-              width={250}
-              height={375}
-            />
+              to={`/users/${user.username}`}
+              style={{textDecoration: 'none'}}
+            >
+              <UserCard 
+                user={user}
+                width={250}
+                height={375}
+              />
+            </Link>
+
           )}
         </UserCards>
       }
