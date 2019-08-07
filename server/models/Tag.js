@@ -18,7 +18,7 @@ async function createTag(req) {
   try {
     await session.run(`
       CREATE (t:Tag {tag: $tag})
-    `, {tag: req.label});
+    `, {tag: req.tag});
     session.close();
   } catch(err) { console.log(err.stack) }
 }

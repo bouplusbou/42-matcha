@@ -25,7 +25,7 @@ const StyledCard = styled.section `
 export default function ProfileCard(props) {
     const profile = useContext(ProfileContext);
     const [editState, setEditState] = useState({
-        selectedTab: "profile"
+        selectedTab: "account "
     })
 
     const editSectionsList = {
@@ -38,7 +38,6 @@ export default function ProfileCard(props) {
         setEditState({ selectedTab: selectedTab })
     }
 
-    const EditSection = editSectionsList[editState.selectedTab];
     return (
         <StyledCard>
             {profile.username &&
@@ -48,7 +47,7 @@ export default function ProfileCard(props) {
                         <AvatarSection/>
                     }
                     {profile.edit ? 
-                        EditSection :
+                        editSectionsList[editState.selectedTab] :
                         <InfosSection/>
                     }
             </React.Fragment>

@@ -15,6 +15,7 @@ const StyledSection = styled.section `
     display:flex;
     padding:1rem;
     width:100%;
+    height:700px;
 
     align-items:center;
     flex-direction:column;
@@ -158,7 +159,7 @@ export default function InfosSection(props) {
     const Tags = valueState.tags && valueState.tags.map((tag, index) => <TagChip deletable={true} tag={tag} key={index} index={index} onDelete={deleteTag}/>)
     useEffect(() => {
         fetchTagsList();
-    },[valueState.tags]);
+    });
     
     async function fetchTagsList() {
         const tags = await axios.get(`/tags?authToken=${authToken}`);
@@ -269,10 +270,12 @@ export default function InfosSection(props) {
     }
 
     function handleInputChange(value) {
-        setValueState({
-            ...valueState,
-            newTag: value,
-        })
+        if (value.length < 15) {
+            setValueState({
+                ...valueState,
+                newTag: value,
+            })
+        }
     }
 
         
@@ -386,6 +389,7 @@ export default function InfosSection(props) {
                     <StyledCreatableSelect
                         label="Tags"
                         value={valueState.newTag}
+                        inputValue={valueState.newTag}
                         options={tagsList}
                         onChange={addTag}
                         onInputChange={handleInputChange}

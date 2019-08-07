@@ -55,7 +55,8 @@ async function usernameExists(username) {
 }
 
 async function updateProfile(uuid, editedValues) {
-  console.log("Update", editedValues)
+  if (editedValues.newPassword)
+    editedValues.password = await bcrypt.hash(editedValues.newPassword, 10);
   let cypher = "MATCH (u:User {uuid: $uuid})\n";
   for (var key in editedValues) { cypher += `SET u.${key} = $${key}\n` }
   try {
@@ -116,8 +117,8 @@ async function getProfile(uuid) {
   try {
     const res = await session.run(`
       MATCH (u:User)
-      OPTIONAL MATCH (u)-[:TAGGED]->(t:Tag)
       WHERE u.uuid = $uuid
+      OPTIONAL MATCH (u)-[:TAGGED]->(t:Tag)
       RETURN 
       u,
       duration.between(date(u.birthDate),date()).years AS age,
@@ -127,9 +128,8 @@ async function getProfile(uuid) {
     const user = res.records[0].get(`u`).properties;
     delete user['password'];
     delete user['hash'];
-    delete user['uuid'];
+    delete user[`uuid`];
     const age = res.records[0].get(`age`).low;
-    console.log(res.records[0].get(`tags`));
     const tags = res.records[0].get(`tags`);
     return {
       ...user, age, tags
@@ -333,6 +333,7 @@ async function addTag(uuid, req) {
       uuid: uuid,
       tag: req.tag
     });
+    session.close();
   } catch(err) { console.log(err.stack) }
 }
 

@@ -71,7 +71,6 @@ export default function PageProfile(props) {
     useEffect(() => {
         async function fetchData() {
             const profile = await axios.get(`/users/getProfile?authToken=${authToken}`)
-            console.log(profile);
             setProfileState({
                 ...profileState,
                 ...profile.data.profile,

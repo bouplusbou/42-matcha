@@ -11,6 +11,7 @@ const login = (req, res) => {
                 if (user.confirmed) {
                     bcrypt.compare(password, user.password, (err, result) => {
                         if (result) {
+                            console.log(`UUID. ${user.uuid}`);
                             const token = jwt.sign({ uuid: user.uuid }, config.jwtSecret, { expiresIn: '6h' });
                             res.json({ token: token });
                         } else {

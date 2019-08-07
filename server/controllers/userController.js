@@ -21,7 +21,7 @@ const createUser = (req, res) => {
             return regex.test(String(username));
       };
       const passwordIsOK = password => {
-            const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/;
+            const regex = /^(?:(?=.*?[A-Z])(?:(?=.*?[0-9])(?=.*?[-!@#$%^&*()_[\]{},.<>+=])|(?=.*?[a-z])(?:(?=.*?[0-9])|(?=.*?[-!@#$%^&*()_[\]{},.<>+=])))|(?=.*?[a-z])(?=.*?[0-9])(?=.*?[-!@#$%^&*()_[\]{},.<>+=]))[A-Za-z0-9!@#$%^&*()_[\]{},.<>+=-]{6,50}$/;
             return regex.test(String(password));
       };
       
@@ -76,6 +76,7 @@ const getUuid = async (req, res) => {
             if (err) res.status(401).send('Unauthorized: Invalid token');
             return decoded.uuid;
       });
+      console.log(uuid);
       return uuid;
 }
 
