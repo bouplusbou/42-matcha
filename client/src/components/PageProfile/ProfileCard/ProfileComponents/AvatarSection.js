@@ -54,8 +54,12 @@ const ScoreIcon = styled(FontAwesomeIcon) `
     
     color:${props => props.theme.color.red};
 `
+
+const ModalContentContainer = styled.div `
+    height:100%;
+`
 export default function AvatarSection(props) {
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(true);
     const profile = useContext(ProfileContext);
     
     const OpenModal = () => {
@@ -78,11 +82,14 @@ export default function AvatarSection(props) {
                 </ScoreContainer>
             </StyledSection>
             <Modal open={open} onClose={CloseModal}>
-                <PhotosModal 
-                    index={profile.avatar} 
-                    photos={profile.photos}
-                    CloseModal={CloseModal}
-                />
+                <ModalContentContainer> 
+                    <PhotosModal 
+                        index={profile.avatarIndex} 
+                        photos={profile.photos}
+                        handleClose={CloseModal}
+                        account={profile.account}
+                    />
+                </ModalContentContainer>
             </Modal>
         </Fragment>
     )

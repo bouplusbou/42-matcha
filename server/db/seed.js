@@ -40,10 +40,8 @@ const tags = [
 ];
 
 function seedTags(tag) {
-    const resultPromise = session.run(`CREATE (t:Tag { tag: $tag })`, { tag: tag });
-    resultPromise.then(result => {
-        console.log(`Tag '${tag}' created`);
-    });
+    session.run(`CREATE (t:Tag { tag: $tag })`, { tag: tag });
+    console.log(`Tag '${tag}' created`);
 }
 
 for (tag of tags) {
@@ -131,8 +129,8 @@ function findLookingFor(orientationGenderArr) {
   }
 }
 
-async function seedUser(firstName, gender, photos, i) { 
-  await bcrypt.hash('password', 10, (error, hashedPassword) => {
+async function seedUser(firstName, gender, i) { 
+  await bcrypt.hash('password', 10, async (error, hashedPassword) => {
     const tagArr = tags.sort(() => Math.random() - 0.5).slice(0, 3);
     const uuid = uuidv1();
     const lastName = faker.name.lastName();
@@ -145,14 +143,22 @@ async function seedUser(firstName, gender, photos, i) {
     const orientation = orientationArr[Math.floor(Math.random() * orientationArr.length)];
     const lookingFor = findLookingFor([orientation, gender]);
     const bio = faker.lorem.paragraph();
-    const avatarIndex = 0;
+    const avatarIndex = Math.floor(Math.random() * 5);
     const score = Math.floor(Math.random() * 50000);
     const city = cities[Math.floor(Math.random() * cities.length)];
     const lat = coord[city][0] + Math.random() * 0.03;
     const lng = coord[city][1] + Math.random() * 0.05;
     const latLng = [lat, lng];
+    const seedId = i;
+    const photos = [
+      gender === "male" ? unsplash.randomManPic() : unsplash.randomWomanPic(),
+      gender === "male" ? unsplash.randomManPic() : unsplash.randomWomanPic(),
+      gender === "male" ? unsplash.randomManPic() : unsplash.randomWomanPic(),
+      gender === "male" ? unsplash.randomManPic() : unsplash.randomWomanPic(),
+      gender === "male" ? unsplash.randomManPic() : unsplash.randomWomanPic()
+    ]
     try {
-      const resultPromise = session.run(`
+      await session.run(`
       MATCH (t1:Tag {tag: $tag1})
       MATCH (t2:Tag {tag: $tag2})
       MATCH (t3:Tag {tag: $tag3})
@@ -175,7 +181,8 @@ async function seedUser(firstName, gender, photos, i) {
           photos: $photos,
           avatarIndex: $avatarIndex,
           lastConnection: $lastConnection,
-          score: $score })
+          score: $score,
+          seedId: $seedId })
       CREATE (u)-[:TAGGED]->(t1)
       CREATE (u)-[:TAGGED]->(t2)
       CREATE (u)-[:TAGGED]->(t3)
@@ -202,44 +209,30 @@ async function seedUser(firstName, gender, photos, i) {
           avatarIndex: avatarIndex,
           lastConnection: lastConnection,
           score: score,
+          seedId: seedId,
       });
-      resultPromise.then(result => {
-          console.log(`${gender} user '${i}' created`);
-      });
+      console.log(`${gender} user '${i}' created`);
     } catch(err) {
       console.log(err.stack)
     }
   })
 }
 
-for (i = 0; i < 200; i++) {
-    seedUser(names.randomWomanFirstName(), 'female', [unsplash.randomWomanPic()], i);
+async function runUsersSeed() {
+  await session.run(`CREATE CONSTRAINT ON (u:User) ASSERT u.seedId IS UNIQUE`);
+    for (i = 0; i < 200; i++) {
+      seedUser(names.randomWomanFirstName(), 'female', i);
+    }
+    for (i = 200; i < 400; i++) {
+      seedUser(names.randomManFirstName(), 'male', i);
+    }
+    for (i = 400; i < 500; i++) {
+      seedUser(names.randomWomanFirstName(), 'non-binary', i);
+    }
+  }
+  
+try {
+  runUsersSeed();
+} catch(err) {
+  console.log(err);
 }
-for (i = 200; i < 400; i++) {
-    seedUser(names.randomManFirstName(), 'male', [unsplash.randomManPic()], i);
-}
-for (i = 400; i < 500; i++) {
-    seedUser(names.randomWomanFirstName(), 'non-binary', [unsplash.randomWomanPic()], i);
-}
-
-
-// async function seedRelationships() { 
-//   try {
-//     const resultPromise = session.run(`
-//     MATCH (t1:Tag {tag: $tag1})
-//     MATCH (t2:Tag {tag: $tag2})
-//     CREATE (u)-[:TAGGED]->(t1)
-//     CREATE (u)-[:TAGGED]->(t2)
-//     CREATE (u)-[:TAGGED]->(t3)
-//     `);
-//     resultPromise.then(result => {
-//         console.log(`${gender} user '${i}' created`);
-//     });
-//   } catch(err) {
-//     console.log(err.stack)
-//   }
-// }
-
-// for (i = 0; i < 400; i++) {
-//   seedRelationships();
-// }

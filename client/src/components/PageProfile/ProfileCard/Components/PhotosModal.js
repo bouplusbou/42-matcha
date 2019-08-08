@@ -1,46 +1,86 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
-import Container from '../../../Container';
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRight, faArrowLeft, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+
+const ModalContainer = styled.div `
+    display:flex;
+    height:100%;
+    width:100%;
+    flex-direction:column;
+    align-items:center;
+    background-color:rgb(66, 66, 66, 0.7);
+`
+
+const MainImgContainer = styled.div `
+    display:flex;
+    height:50vh;
+    margin: 5rem 0 2rem 0;
+    flex-direction:column-reverse;
+    align-items:center;       
+`
+
+const ImgButtonContainer = styled.div `
+    display:flex;
+    align-items:space-between;
+    height:2rem;
+`
+
+const StyledImgButton = styled(FontAwesomeIcon) `
+    color:white;
+`
+
+const MainImg = styled.img `
+    margin-bottom:0.5rem;
+    box-shadow: 0px 20px 20px rgba(0, 0, 0, 0.2);
+`
+
+const ArrowButtonsContainer = styled.div `
+    display:flex;
+    margin-bottom:2rem;
+    justify-content:center;
+    align-items:center;
+`
+
+const StyledArrowIcon = styled(FontAwesomeIcon) `
+    margin: 0 1rem;
+    color:white;
+`
+
+const ThumbnailContainer = styled.div `
+    display: flex;
+    max-height:6rem;
+    max-width:1000px;
+    justify-content:center;
+`
 
 
 export default function PhotosModal(props) {
-
+    
     const [index, setIndex] = useState(props.index);
     const maxIndex = props.photos.length - 1;
 
-    const StyledDiv = styled.div `
-        display:flex;
-        height:100%;
-        width:100%;
-
-        align-items:center;
-        justify-content:center;
-        
-        background-color:rgb(66, 66, 66, 0.5);
-    `
-    
-    const StyledImg = styled.img `
-        max-height:75vh;
-        
+    const handleKeyDown = (event) => {
+        if (event.key === "ArrowRight")
+            handlePrevious();
+        if (event.key === "ArrowRight")
+            handleNext();
+    }
+    useEffect(() => {
+        document.addEventListener("keydown", handleKeyDown, false);
+    })
+    const Thumbnail = styled.img `
+        object-fit:cover;
+        min-width:10.6rem;
         box-shadow: 0px 20px 20px rgba(0, 0, 0, 0.2);
-    `
-
-    const ButtonContainer = styled.div `
-        display:flex;
-        margin-top:1rem;
-        
-        justify-content:center;
-        align-items:center;
-    `
-
-    const StyledIcon = styled(FontAwesomeIcon) `
-        margin: 0 1rem;
-        
-        color:white;
+        ${props => props.index === index && 
+            `border:2px solid ${props.theme.color.lightRed};`
+        }
+        :not(:last-child) { margin-right:1rem; }
+        :hover {
+            cursor:pointer;
+        }
     `
 
     const handlePrevious = () => {
@@ -52,14 +92,25 @@ export default function PhotosModal(props) {
     }
 
     return (
-        <StyledDiv onClick={props.handleClose}>
-            <Container>
-                <StyledImg src={props.photos[index]}/>
-                <ButtonContainer>
-                    <StyledIcon icon={faArrowLeft} size={"lg"} onClick={handlePrevious}/>
-                    <StyledIcon icon={faArrowRight} size={"lg"} onClick={handleNext}/>
-                </ButtonContainer>
-            </Container>
-        </StyledDiv>
+        <ModalContainer onClick={props.handleClose}>
+            <MainImgContainer>
+                {props.account &&
+                    <ImgButtonContainer>
+                        <StyledImgButton icon={faTrashAlt}/>
+                        <p>Set as profile pic</p>
+                    </ImgButtonContainer>
+                }
+                <MainImg src={props.photos[index]}/>
+            </MainImgContainer>
+                <ArrowButtonsContainer>
+                    <StyledArrowIcon icon={faArrowLeft} size={"lg"} onClick={handlePrevious}/>
+                    <StyledArrowIcon icon={faArrowRight} size={"lg"} onClick={handleNext}/>
+                </ArrowButtonsContainer>
+                <ThumbnailContainer>
+                    {props.photos.map((photo, index) => 
+                        <Thumbnail src={photo} key={index} index={index} onClick={() => setIndex(index)}/>
+                    )}
+                </ThumbnailContainer>
+        </ModalContainer>
     )
 }

@@ -33,7 +33,7 @@ export default function PageProfile(props) {
         openEdit: OpenEdit,
         closeAndSaveEdit: CloseAndSaveEdit,
         account: true,
-        edit:true,
+        edit:false,
     });
     
     async function handleLike() {
