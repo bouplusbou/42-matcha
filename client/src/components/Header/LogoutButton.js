@@ -40,7 +40,7 @@ export default function LogoutButton() {
     `;
 
     const handleLogout = () => {
-        userState.socket.emit('logout');
+        userState.isConnectedSocket.emit('logout');
         userState.toggleConnected();
         actionLogout();
     };

@@ -16,7 +16,8 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import Modal from '@material-ui/core/Modal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import io from 'socket.io-client';
+// import { useToasts } from 'react-toast-notifications';
+import { setupIsConnectedSocket, setupNotificationsSocket } from '../../actions/socketActions';
 
 
 const Hero = styled.section`
@@ -148,56 +149,8 @@ export default function PageLogin(props) {
       .then(res => actionLogin(res.data.token, res.data.username))
       .then(username => {
         userState.toggleConnected();
-
-
-        const socket = io('http://localhost:5000', {
-          query: {
-            username: username
-          }
-        });
-
-        // Add a connect listener
-        // socket.on('connect', () => {
-        //   console.log('Client has connected to the server!');
-        // });
-
-
-        socket.on('isConnected', usernames => {
-          console.log(`The back sent new connectedUsers: ${usernames}`);
-          userState.setConnectedUsers(usernames);
-      });
-
-        // Add a message listener
-        socket.on('message', data => {
-          console.log('Received a message from the server! 3', data);
-        });
-        // Add a disconnect listener
-        socket.on('disconnect', () => {
-          console.log('The server has disconnected!');
-        });
-
-        // Sends a message to the server via sockets
-        function sendMessageToServer(message) {
-          socket.send(message);
-        }
-
-
-        userState.setSocket(socket);
-
-        const notificationsSocket = io('http://localhost:5000/notifications');
-
-        notificationsSocket.on('visited', username => {
-          console.log(`${username} visited your profile !`);
-        });
-
-        notificationsSocket.on('message', data => {
-          console.log('Received a message from the server! 4', data);
-        });
-
-        userState.setNotificationsSocket(notificationsSocket);
-
-
-
+        setupIsConnectedSocket(userState.setIsConnectedSocket, username, userState.setConnectedUsers);
+        setupNotificationsSocket(username, userState.setNotificationsSocket);
         props.history.push('/search');
       })
       .catch(err => {
