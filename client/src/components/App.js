@@ -3,15 +3,14 @@ import Main from './Main';
 import Header from './Header/Header';
 import { AppProvider } from '../AppContext';
 import { actionIsAuthenticated } from '../actions/authActions';
-import { setupIsConnectedSocket, setupNotificationsSocket } from '../actions/socketActions';
+import setupSocket from '../actions/socketActions';
 import { ThemeProvider } from "styled-components";
 import Theme from "./theme.json";
 import { ToastProvider, useToasts } from 'react-toast-notifications'
 
 function App() {
   const [connected, setConnected] = useState(false);
-  const [isConnectedSocket, setIsConnectedSocket] = useState(null);
-  const [notificationsSocket, setNotificationsSocket] = useState(null);
+  const [socket, setSocket] = useState(null);
   const [connectedUsers, setConnectedUsers] = useState([]);
   
   useEffect(() => {
@@ -19,8 +18,7 @@ function App() {
       .then(username => {
         if (username) {
           setConnected(true);
-          setupIsConnectedSocket(setIsConnectedSocket, username, setConnectedUsers);
-          setupNotificationsSocket(username, setNotificationsSocket);
+          setupSocket(username, setSocket, setConnectedUsers);
         } else {
           setConnected(false)
         };
@@ -32,12 +30,10 @@ function App() {
       connected: connected,
       setConnected: setConnected,
       toggleConnected: () => {setConnected(!connected)},
-      isConnectedSocket: isConnectedSocket,
-      setIsConnectedSocket: setIsConnectedSocket,
       connectedUsers: connectedUsers,
       setConnectedUsers: setConnectedUsers,
-      notificationsSocket: notificationsSocket,
-      setNotificationsSocket: setNotificationsSocket,
+      socket: socket,
+      setSocket: setSocket,
   };
 
   return (

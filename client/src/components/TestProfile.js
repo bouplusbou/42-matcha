@@ -18,7 +18,7 @@ export default function TestProfile(props) {
     // }, []);
 
     useEffect(() => {
-        userState.notificationsSocket.emit('visit', username);
+        userState.socket.emit('visit', username);
     }, []);
 
     return (

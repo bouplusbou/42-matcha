@@ -17,7 +17,7 @@ import Modal from '@material-ui/core/Modal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 // import { useToasts } from 'react-toast-notifications';
-import { setupIsConnectedSocket, setupNotificationsSocket } from '../../actions/socketActions';
+import setupSocket from '../../actions/socketActions';
 
 
 const Hero = styled.section`
@@ -149,8 +149,7 @@ export default function PageLogin(props) {
       .then(res => actionLogin(res.data.token, res.data.username))
       .then(username => {
         userState.toggleConnected();
-        setupIsConnectedSocket(userState.setIsConnectedSocket, username, userState.setConnectedUsers);
-        setupNotificationsSocket(username, userState.setNotificationsSocket);
+        setupSocket(username, userState.setSocket, userState.setConnectedUsers);
         props.history.push('/search');
       })
       .catch(err => {

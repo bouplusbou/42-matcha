@@ -3,40 +3,26 @@ import io from 'socket.io-client';
 // import { Link } from 'react-router-dom';
 // import { useToasts } from 'react-toast-notifications'
 
-export function setupIsConnectedSocket(setIsConnectedSocket, username, setConnectedUsers) {
+export default function setupSocket(username, setSocket, setConnectedUsers) {
 
-    const isConnectedSocket = io('http://localhost:5000/sockets/isConnected', {
+    const socket = io('http://localhost:5000', {
         query: {
             username: username
         }
     });
     
-    isConnectedSocket.on('isConnected', usernames => {
+    socket.on('isConnected', usernames => {
         console.log(`The back sent new connectedUsers: ${usernames}`);
         setConnectedUsers(usernames);
     });
     
-    isConnectedSocket.on('message', data => {
-        console.log('Received a message from the server! 3', data);
-    });
-
-    isConnectedSocket.on('disconnect', () => {
+    socket.on('disconnect', () => {
         console.log('The server has disconnected!');
     });
     
-    setIsConnectedSocket(isConnectedSocket);
-}
-
-export function setupNotificationsSocket(username, setNotificationsSocket) {
-
     // const { addToast } = useToasts();
-    const notificationsSocket = io('http://localhost:5000/sockets/notifications', {
-        query: {
-            username: username
-        }
-    });
 
-    notificationsSocket.on('visited', username => {
+    socket.on('visited', username => {
         console.log(`${username} visited your profile !`);
         // addToast(
         //     <Link 
@@ -56,16 +42,9 @@ export function setupNotificationsSocket(username, setNotificationsSocket) {
         // )
     });
     
-    notificationsSocket.on('message', data => {
+    socket.on('message', data => {
         console.log('Received a message from the server! 4', data);
     });
     
-    setNotificationsSocket(notificationsSocket);
+    setSocket(socket);
 }
-
-
-
-// module.exports = {
-//     setupIsConnectedSocket,
-//     setupNotificationsSocket,
-// };
