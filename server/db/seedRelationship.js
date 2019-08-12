@@ -2,20 +2,28 @@ const driver = require('./database.js');
 
 const session = driver.session();
 
-async function runLikesSeed() {
+const getUserCount = async () => {
     const userCountRes = await session.run(`
         MATCH (u:User)
         RETURN count(u) AS userCount 
     `)
-    const maxId = userCountRes.records[0].get(`userCount`);
-    const likesByUser = 10
+    return userCountRes.records[0].get(`userCount`);
+}
+
+const deleteAllRelationships = async (relationship) => {
     const relCountRes = await session.run(`
         MATCH (n)
-        OPTIONAL MATCH (n)-[r:LIKED]-()
+        OPTIONAL MATCH (n)-[r:${relationship}]-()
         DELETE r
         RETURN count(r) AS relCount
     `)
-    console.log(`${relCountRes.records[0].get(`relCount`)} likes relationships erased.`);
+    console.log(`${relCountRes.records[0].get(`relCount`)} [:${relationship}] relationship(s) erased.`);
+}
+
+async function runLikesSeed() {
+    const maxId = await getUserCount();
+    const likesByUser = 10
+    await deleteAllRelationships("LIKED");
     console.log('Seeding likes...')
     for (i = 0; i < maxId; i++) {
         const invalidIds = [i];
@@ -45,19 +53,9 @@ async function runLikesSeed() {
 }
 
 async function runVisitSeed() {
-    const userCountRes = await session.run(`
-        MATCH (u:User)
-        RETURN count(u) AS userCount 
-    `)
-    const maxId = userCountRes.records[0].get(`userCount`);
+    const maxId = await getUserCount();
     const visitByUser = 10
-    const relCountRes = await session.run(`
-        MATCH (n)
-        OPTIONAL MATCH (n)-[r:VISIT]-()
-        DELETE r
-        RETURN count(r) AS relCount
-    `)
-    console.log(`${relCountRes.records[0].get(`relCount`)} visit relationships erased.`);
+    await deleteAllRelationships("VISIT");
     console.log('Seeding visits...')
     for (i = 0; i < maxId; i++) {
         const invalidIds = [i];
@@ -86,9 +84,58 @@ async function runVisitSeed() {
     session.close();
 }
 
-try {
-    runLikesSeed();
-    runVisitSeed();
-} catch(err) {
-    console.log(err);
+async function isLiked(userSeedId, targetSeedId) {
+    const res = await session.run(`
+        MATCH (u:User { seedId: $userSeedId })-[r:LIKED]-(t:User { seedId: $targetSeedId })
+        RETURN count(r) AS liked
+    `, {
+        userSeedId: userSeedId,
+        targetSeedId: targetSeedId
+    })
+    const liked = res.records[0].get(`liked`);
+    return liked === 1;
 }
+
+async function seedBlock() {
+    const maxId = await getUserCount();
+    await deleteAllRelationships("BLOCK");
+    console.log('Seeding blocks...');
+    for (i = 0; i < maxId; i++) {
+        let randomId = Math.floor(Math.random() * maxId);
+        while (i === randomId || await isLiked(i, randomId) || await isLiked(randomId, i)) {
+            randomId = Math.floor(Math.random() * maxId);
+        }
+        await session.run(`
+            MATCH (randomUser:User {seedId: $randomSeedId}), (user:User {seedId: $userSeedId})
+            CREATE (randomUser)-[r:BLOCK]->(user)
+            SET r.timestamp = timestamp()
+        `, {
+            randomSeedId: randomId,
+            userSeedId: i,   
+        })
+        }
+    const blockCountRes = await session.run(`
+        MATCH (n)
+        OPTIONAL MATCH (n)-[r:BLOCK]-()
+        RETURN count(r) AS blockCount
+    `)
+    console.log(`${blockCountRes.records[0].get(`blockCount`)} block generated for ${maxId} users.`)
+    session.close();
+}
+
+
+const main = () => {
+    const argv = process.argv;
+    try {
+        if (!argv[2] || argv[2] === "likes")
+            runLikesSeed();
+        if (!argv[2] || argv[2] === "visits")
+        runVisitSeed();
+        if (!argv[2] || argv[2] === "blocks")
+            seedBlock();
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+main();
