@@ -8,7 +8,9 @@
     "server": "nodemon server.js",
     "client": "cd ../client && npm start",
     "db-start": "docker run --publish=7474:7474 --publish=7687:7687 --env NEO4J_AUTH=neo4j/whiterabbit -d neo4j:3.5",
-    "db-seed": "cd ./db && node seed.js",
+    "db-seed": "cd ./db && node seedNodes.js && node seedRelationships.js",
+    "db-seedNodes": "cd ./db && node seedNodes.js",
+    "db-seedRel": "cd ./db && node seedRelationships.js",
     "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "author": "",
