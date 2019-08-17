@@ -137,6 +137,38 @@ async function getProfile(uuid) {
   } catch(err) { console.log(err) };
 }
 
+const getHistoric = async (uuid, type) => {
+  try {
+    const res = await session.run(`
+      MATCH (u:User {uuid: $uuid})
+      MATCH (t:User)-[r:${type}]->(u)
+      RETURN 
+      t AS user,
+      duration.between(date(t.birthDate),date()).years AS age,
+      toString(r.timestamp) AS timestamp
+      ORDER BY r.timestamp 
+    `, {
+      uuid:uuid
+    })
+    const historic = []
+    for (i = 0; i < res.records.length; i++) {
+      const user = res.records[i].get(`user`).properties;
+      delete user['password'];
+      delete user['hash'];
+      delete user[`uuid`];
+      historic.push({
+          relTime : new Date(parseInt(res.records[i].get(`timestamp`))),
+          age : res.records[i].get(`age`).low,
+          ...user,
+      })
+    }
+    console.log(historic)
+    return historic
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 async function searchUsers(uuid, { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags, offset }) { 
   // console.log(uuid);
   const sorting = { 
@@ -406,4 +438,5 @@ module.exports = {
   uuidFromHash,
   confirmation,
   resetPasswordEmail,
+  getHistoric,
 }

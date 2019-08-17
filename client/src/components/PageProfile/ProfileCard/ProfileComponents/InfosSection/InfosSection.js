@@ -36,9 +36,7 @@ export default function InfosSection(props) {
             <BiographyRow bio={profile.bio}/>
             <StyledDiv>
                 <TagsRow tags={profile.tags}/>
-                <FontAwesomeIcon icon={faEllipsisH}/>
             </StyledDiv>
-            {/* <PhotosRow photos={profile.photos} avatar={profile.avatar}/> */}
         </StyledSection>
     )
 }

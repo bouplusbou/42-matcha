@@ -184,7 +184,7 @@ const createUserNode = async (gender, seedId) => {
   const user = {};
   user.firstName = gender === "male" ? names.randomManFirstName() : names.randomWomanFirstName();
   user.gender = gender;
-  user.hashedPassword = bcrypt.hashSync('password', 10);
+  user.password = await bcrypt.hashSync('password', 10);
   user.uuid = uuidv1();
   user.lastName = faker.name.lastName();
   user.email = `${user.firstName}.${user.lastName}@`+ emailProvider[Math.floor(Math.random() * emailProvider.length)];
@@ -233,15 +233,15 @@ const seedUserNodes = async (requestedNodes = 600) => {
   log(`Setting up constraints...`);
   await session.run(`CREATE CONSTRAINT ON (u:User) ASSERT u.seedId IS UNIQUE`);
   log(`Constraints configured.`)
-  createdNodes += await createUsersByGender(`female`, usersByGender, createdNodes);
   createdNodes += await createUsersByGender(`male`, usersByGender, createdNodes);
+  createdNodes += await createUsersByGender(`female`, usersByGender, createdNodes);
   createdNodes += await createUsersByGender(`non-binary`, usersByGender, createdNodes);
 }
 
 const seedNodes = async () => {
   try {
     await DeleteDatabase();
-    await seedUserNodes();
+    await seedUserNodes(process.argv[2]);
     await seedTagNodes();
     log(`NODES SEEDING COMPLETE !`, `blue`)
     process.exit(0);

@@ -55,10 +55,10 @@ export default function UserListItem(props) {
     
     return (
         <StyledDiv>
-            <ProfilePhoto src={props.photos[props.avatar]}/>
+            <ProfilePhoto src={props.photos[props.avatarIndex]}/>
             <InfosContainer>
                 <Username color={props.color}>{props.username}</Username>
-                <Age>{props.age}, {props.localisation}</Age>
+                <Age>{props.age}, {props.city}</Age>
             </InfosContainer>
             <StyledButton icon={faHeart} size={"lg"} color={props.color}/>
         </StyledDiv>

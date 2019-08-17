@@ -1,8 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
+import axios from 'axios';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight, faArrowLeft, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import ProfileContext from '../../ProfileContext';
+
+const authToken = localStorage.getItem('token');
 
 const ModalContainer = styled.div `
     display:flex;
@@ -58,8 +62,10 @@ const ThumbnailContainer = styled.div `
 
 export default function PhotosModal(props) {
     
-    const [index, setIndex] = useState(props.index);
-    const maxIndex = props.photos.length - 1;
+    const profile = useContext(ProfileContext);
+    const [currentIndexState, setCurrentIndexState] = useState(profile.avatarIndex);
+    const [photosState, setPhotosState] = useState([...profile.photos]);
+    const maxIndex = photosState.length - 1;
 
     const handleKeyDown = (event) => {
         if (event.key === "ArrowRight")
@@ -70,11 +76,12 @@ export default function PhotosModal(props) {
     useEffect(() => {
         document.addEventListener("keydown", handleKeyDown, false);
     })
+
     const Thumbnail = styled.img `
         object-fit:cover;
         min-width:10.6rem;
         box-shadow: 0px 20px 20px rgba(0, 0, 0, 0.2);
-        ${props => props.index === index && 
+        ${props => props.index === currentIndexState && 
             `border:2px solid ${props.theme.color.lightRed};`
         }
         :not(:last-child) { margin-right:1rem; }
@@ -83,32 +90,60 @@ export default function PhotosModal(props) {
         }
     `
 
+    const handleDelete = async () => {
+        const confirm = window.confirm(`Are you sure you want to delete this picture ?`);
+        if (confirm) {
+            const filteredPhotos = [...profile.photos];
+            filteredPhotos.splice(currentIndexState, 1);
+            const editedValues = {
+                avatarIndex: profile.avatarIndex === currentIndexState ?
+                    0 :
+                    (profile.avatarIndex > currentIndexState ? profile.avatarIndex -1 : profile.avatarIndex),
+                photos: filteredPhotos,
+            }
+            await axios.post(`/users/updateProfile?authToken=${authToken}`, editedValues)
+            profile.fetchData();
+            if (filteredPhotos.length === 0) {
+                props.handleClose();
+            }
+            setPhotosState([...filteredPhotos]);
+        }
+    }
+
+    const handleSetAsProfile = async () => {
+        const confirm = window.confirm(`Do you wish to set this picture to your profile pic ?`);
+        if (confirm) {
+            const editedValues = { avatarIndex: currentIndexState }
+            await axios.post(`/users/updateProfile?authToken=${authToken}`, editedValues)
+            profile.fetchData();
+        }
+    }
     const handlePrevious = () => {
-        setIndex(index - 1 < 0 ? maxIndex : index - 1);
+        setCurrentIndexState(currentIndexState - 1 < 0 ? maxIndex : currentIndexState - 1);
     }
 
     const handleNext = () => {
-        setIndex(index + 1 > maxIndex ? 0 : index + 1);
+        setCurrentIndexState(currentIndexState + 1 > maxIndex ? 0 : currentIndexState + 1);
     }
 
     return (
         <ModalContainer onClick={props.handleClose}>
             <MainImgContainer>
-                {props.account &&
+                {profile.account &&
                     <ImgButtonContainer>
-                        <StyledImgButton icon={faTrashAlt}/>
-                        <p>Set as profile pic</p>
+                        <StyledImgButton icon={faTrashAlt} onClick={handleDelete}/>
+                        <p onClick={handleSetAsProfile}>Set as profile pic</p>
                     </ImgButtonContainer>
                 }
-                <MainImg src={props.photos[index]}/>
+                <MainImg src={photosState[currentIndexState]}/>
             </MainImgContainer>
                 <ArrowButtonsContainer>
                     <StyledArrowIcon icon={faArrowLeft} size={"lg"} onClick={handlePrevious}/>
                     <StyledArrowIcon icon={faArrowRight} size={"lg"} onClick={handleNext}/>
                 </ArrowButtonsContainer>
                 <ThumbnailContainer>
-                    {props.photos.map((photo, index) => 
-                        <Thumbnail src={photo} key={index} index={index} onClick={() => setIndex(index)}/>
+                    {photosState.map((photo, index) => 
+                        <Thumbnail src={photo} key={index} index={index} onClick={() => setCurrentIndexState(index)}/>
                     )}
                 </ThumbnailContainer>
         </ModalContainer>

@@ -83,9 +83,13 @@ const getUuid = async (req, res) => {
 const getProfile = async (req, res) => {
       const uuid = await getUuid(req, res);
       if (uuid) {
+            await User.getHistoric(uuid, "VISITED");
             User.getProfile(uuid)
-                  .then(profile => { res.json({profile: profile})})
-                  .catch(err => { console.log(err)})
+                  .then(async profile => { 
+                        profile.visitedHistoric = await User.getHistoric(uuid, "VISITED");
+                        profile.likedHistoric = await User.getHistoric(uuid, "LIKED");
+                        res.json({profile: profile})
+                  }).catch(err => { console.log(err)})
       }
 }
 
@@ -93,6 +97,7 @@ const updateProfile = async (req, res) => {
       const uuid = await getUuid(req, res);
       if (uuid) {
             User.updateProfile(uuid, req.body)
+            .then(() => { res.status(200).json({ message: 'Profile updated.' }) })
             .catch(err => { console.log(err) })
       }
 }

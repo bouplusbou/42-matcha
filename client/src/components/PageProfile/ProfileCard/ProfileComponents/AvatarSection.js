@@ -59,16 +59,19 @@ const ModalContentContainer = styled.div `
     height:100%;
 `
 export default function AvatarSection(props) {
-    const [open, setOpen] = useState(true);
+    const [open, setOpen] = useState(false);
     const profile = useContext(ProfileContext);
     
     const OpenModal = () => {
-        setOpen(true);
+        if (profile.photos.length > 0)  {
+            setOpen(true);
+        }
     }
 
     const CloseModal = (event) => {
-        if (event.target.tagName === "DIV")
+        if (!event || event.target.tagName === "DIV") {
             setOpen(false);
+        }
     }
 
     return (
@@ -84,10 +87,7 @@ export default function AvatarSection(props) {
             <Modal open={open} onClose={CloseModal}>
                 <ModalContentContainer> 
                     <PhotosModal 
-                        index={profile.avatarIndex} 
-                        photos={profile.photos}
                         handleClose={CloseModal}
-                        account={profile.account}
                     />
                 </ModalContentContainer>
             </Modal>

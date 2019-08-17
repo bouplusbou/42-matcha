@@ -28,11 +28,12 @@ const GridContainer = styled.div `
 export default function PageProfile(props) {
 
     const [profileState, setProfileState] = useState({
+        fetchData: fetchData,
         handleLike: handleLike,
         handleCancelLike: handleCancelLike,
         openEdit: OpenEdit,
         closeAndSaveEdit: CloseAndSaveEdit,
-        account: true,
+        account: false,
         edit:false,
     });
     
@@ -69,33 +70,17 @@ export default function PageProfile(props) {
     }
     
     useEffect(() => {
-        async function fetchData() {
-            const profile = await axios.get(`/users/getProfile?authToken=${authToken}`)
-            setProfileState({
-                ...profileState,
-                ...profile.data.profile,
-                visitHistory: [
-                    profile.data.profile,
-                    profile.data.profile,
-                    profile.data.profile,
-                    profile.data.profile,
-                    profile.data.profile,
-                    profile.data.profile,
-                    profile.data.profile
-                ],
-                likeHistory: [
-                    profile.data.profile,
-                    profile.data.profile,
-                    profile.data.profile,
-                    profile.data.profile,
-                    profile.data.profile,
-                    profile.data.profile,
-                    profile.data.profile
-                ],
-            })
-        }
         fetchData();
-    }, [profileState.edit]);
+    }, [])
+    
+    async function fetchData() {
+        const profile = await axios.get(`/users/getProfile?authToken=${authToken}`)
+        console.log(profile.data.profile)
+        setProfileState({
+            ...profileState,
+            ...profile.data.profile,
+        })
+    }
 
     return (
         <ProfileProvider value={{...profileState}}>
@@ -104,20 +89,20 @@ export default function PageProfile(props) {
                     <ProfileCard/>
                     {profileState.account &&
                         <Fragment>
-                            {profileState.likeHistory &&
+                            {profileState.likedHistoric &&
                             !profileState.edit &&
                                 <UserList
                                 title={"Users who likes you"} 
-                                list={profileState.likeHistory}
+                                list={profileState.likedHistoric}
                                 icon={faHeart} 
                                 color={"#FF5B6C"} 
                                 />
                             }
-                            {profileState.visitHistory &&
+                            {profileState.visitedHistoric &&
                             !profileState.edit &&
                                 <UserList 
                                 title={"Users who visited your profile"}
-                                list={profileState.visitHistory}
+                                list={profileState.visitedHistoric}
                                 icon={faEye} 
                                 color={"#6f48bd"}
                                 />
