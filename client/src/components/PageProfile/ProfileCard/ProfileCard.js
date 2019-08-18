@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import styled from 'styled-components';
 
 import AvatarSection from './ProfileComponents/AvatarSection';
@@ -25,7 +25,7 @@ const StyledCard = styled.section `
 export default function ProfileCard(props) {
     const profile = useContext(ProfileContext);
     const [editState, setEditState] = useState({
-        selectedTab: "account "
+        selectedTab: "profile"
     })
 
     const editSectionsList = {

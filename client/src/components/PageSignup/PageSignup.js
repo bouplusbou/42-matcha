@@ -163,7 +163,7 @@ export default function PageSignup(props) {
       const emptyFields = Object.keys(newUser).filter(key => !newUser[key]);
       console.log(newUser);
       if (emptyFields.length === 0) {
-        axios.post(`/users`, newUser)
+        axios.post(`/users/create`, newUser)
           .then(res => { if (res.status === 200) props.history.push('/login'); })
           .catch(error => {
             const res = error.response.data;

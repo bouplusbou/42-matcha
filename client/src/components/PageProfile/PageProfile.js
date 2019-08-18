@@ -33,8 +33,6 @@ export default function PageProfile(props) {
         handleCancelLike: handleCancelLike,
         openEdit: OpenEdit,
         closeAndSaveEdit: CloseAndSaveEdit,
-        account: false,
-        edit:false,
     });
     
     async function handleLike() {
@@ -52,20 +50,16 @@ export default function PageProfile(props) {
     }
     
     async function OpenEdit() {
-        setProfileState({
-            ...profileState,
-            edit: true,
-        })
+        fetchData(true);
     }
     
     async function CloseAndSaveEdit(editedValues) {
-        console.log(editedValues)
         if (Object.keys(editedValues).length > 0) {
             await axios.post(`/users/updateProfile?authToken=${authToken}`, editedValues)
-                .then( setProfileState({ ...profileState, edit: false }))
+                .then( fetchData(false))
                 .catch(err => console.log(err))
         } else {
-            setProfileState({ ...profileState, edit: false })
+            fetchData(false);
         }
     }
     
@@ -73,17 +67,21 @@ export default function PageProfile(props) {
         fetchData();
     }, [])
     
-    async function fetchData() {
-        const profile = await axios.get(`/users/getProfile?authToken=${authToken}`)
-        console.log(profile.data.profile)
+    async function fetchData(edit) {
+        console.log("fetching data...")
+        const username = props.match.params.username ? `/${props.match.params.username}` : "";
+        const profile = await axios.get(`/users${username}?authToken=${authToken}`)
+        console.log(profileState);
         setProfileState({
             ...profileState,
             ...profile.data.profile,
+            edit: edit,
         })
     }
 
     return (
         <ProfileProvider value={{...profileState}}>
+            {profileState.edit && "bitebitebite"}
             <Container>
                 <GridContainer>
                     <ProfileCard/>

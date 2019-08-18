@@ -1,17 +1,16 @@
-const User = require('../models/User');
+const User = require('../models/UserModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const config = require('../middlewares/config');
 
 const login = (req, res) => {
     const { username, password } = req.body;
-    User.userFromUsername(username)
+    User.getUserByUsername(username)
         .then(user =>  {
             if (user !== null) {
                 if (user.confirmed) {
                     bcrypt.compare(password, user.password, (err, result) => {
                         if (result) {
-                            console.log(`UUID. ${user.uuid}`);
                             const token = jwt.sign({ uuid: user.uuid }, config.jwtSecret, { expiresIn: '6h' });
                             res.json({ token: token });
                         } else {

@@ -1,4 +1,4 @@
-const Tag = require('../models/Tag');
+const Tag = require('../models/TagModel');
 
 const allTags = (req, res) => {
     Tag.allTags()
