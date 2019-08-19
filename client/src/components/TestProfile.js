@@ -1,5 +1,7 @@
 import React, { Fragment, useContext, useEffect, useState } from 'react';
 import AppContext from '../AppContext';
+import axios from 'axios';
+
 
 export default function TestProfile(props) {
     const userState = useContext(AppContext);
@@ -19,6 +21,9 @@ export default function TestProfile(props) {
 
     useEffect(() => {
         userState.socket.emit('visit', username);
+        const authToken = localStorage.getItem('token');
+        const visitedUsername = username;
+        axios.post(`/notifications/visited?authToken=${authToken}`, { visitedUsername });
     }, []);
 
     return (
@@ -28,4 +33,3 @@ export default function TestProfile(props) {
         </Fragment>
     );
 };
-
