@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import Logo from './Logo';
+import Logo from '../Logo';
 import Burger from './Burger';
 import Dropdown from './Dropdown';
 
-export default function HeaderConnectedWide() {
+export default function HeaderWide() {
 
     const [menuOpen, setMenuOpen] = useState(false);
 
-    const HeaderConnectedNarrow = styled.section`
+    const HeaderNarrow = styled.section`
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -24,10 +24,10 @@ export default function HeaderConnectedWide() {
 
     return (
         <React.Fragment>
-            <HeaderConnectedNarrow>
+            <HeaderNarrow>
                 <Logo />
                 <Burger toggleMenu={toggleMenu}/>
-            </HeaderConnectedNarrow>
+            </HeaderNarrow>
             { menuOpen && <Dropdown /> }
         </React.Fragment>
     );

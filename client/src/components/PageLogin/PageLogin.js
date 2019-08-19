@@ -16,7 +16,6 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import Modal from '@material-ui/core/Modal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-// import { useToasts } from 'react-toast-notifications';
 import setupSocket from '../../actions/socketActions';
 
 
