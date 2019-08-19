@@ -27,4 +27,5 @@ const Color = {
 
   module.exports = {
       error,
+      log,
   }

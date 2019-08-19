@@ -24,7 +24,6 @@ router.route('/resetPasswordEmail')
 router.route('/:username')
       .get(authenticate, (req, res) => { UserController.getProfile(req, res) })
 
-
 router.route(`/updateProfile`)
       .post(authenticate, (req, res) => { UserController.updateProfile(req, res) })
 
@@ -34,4 +33,6 @@ router.route(`/addTag`)
 router.route(`/removeTag`)
       .delete(authenticate, (req, res) => { UserController.removeTag(req, res); })
 
+router.route(`/uploadPic`)
+      .post(authenticate, (req, res) => { UserController.uploadPic(req, res); });
 module.exports = router;

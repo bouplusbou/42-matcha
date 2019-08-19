@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, Fragment } from 'react';
 import styled from 'styled-components';
 
 import ProfileContext from '../../../../ProfileContext';
@@ -6,8 +6,9 @@ import ConnectedIcon from './ConnectedIcon';
 import GenderIcon from './GenderIcon';
 import LikeButton from './LikeButton';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCog } from '@fortawesome/free-solid-svg-icons';
+import { faCog, faPlus } from '@fortawesome/free-solid-svg-icons';
 
+const FileInput = React.createRef();
 
 const StyledRow = styled.div `
     display:flex;
@@ -69,7 +70,19 @@ export default function UsernameRow(props) {
             </NamesContainer>
             <UsernameContainer>
                 {profile.account ?
-                <EditButton icon={faCog} size={"2x"} onClick={profile.openEdit}/> :
+                <Fragment>
+                <input
+                   accept="image/*"
+                   style={{ display: 'none' }}
+                   id="uploadFileButton"
+                   type="file"
+                   onChange={profile.uploadPicture}
+                   />
+                <label htmlFor="uploadFileButton">
+                    <EditButton icon={faPlus} size={"2x"}/>
+                </label>
+                <EditButton icon={faCog} size={"2x"} onClick={profile.openEdit}/>
+                </Fragment> :
                 <LikeButton {...profile}/>
             }
             </UsernameContainer>

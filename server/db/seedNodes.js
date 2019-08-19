@@ -5,6 +5,7 @@ const uuidv1 = require('uuid/v1');
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const driver = require('./database.js');
+const cloudinary = require('../tools/Cloudinary')
 
 const session = driver.session();
 const Color = {
@@ -28,6 +29,9 @@ const Color = {
 const log = (text, color = "yellow") => console.log(`${Color[color]}${text}${Color.Reset}`);
 
 const DeleteDatabase = async nodeLabel => {
+  log(`Deleting all Cloudinary uploads...`)
+  const cloudRes = await cloudinary.api.delete_resources_by_prefix(`userPictures`)
+  log(`Cloudinary uploads deleted.`);
   log(`Deleting all previous nodes/relationships...`);
   const relRes = await session.run(`
     MATCH ()-[r]->() 
@@ -181,6 +185,18 @@ const defineLookingFor = orientationGenderArr => {
 }
 
 const createUserNode = async (gender, seedId) => {
+  const photos = [
+    gender === "male" ? unsplash.randomManPic() : unsplash.randomWomanPic(),
+    gender === "male" ? unsplash.randomManPic() : unsplash.randomWomanPic(),
+    gender === "male" ? unsplash.randomManPic() : unsplash.randomWomanPic(),
+    gender === "male" ? unsplash.randomManPic() : unsplash.randomWomanPic(),
+    gender === "male" ? unsplash.randomManPic() : unsplash.randomWomanPic()
+  ];
+  const photosTimestamps = [];
+  for (i = 0; i < photos.length; i++) {
+    const upload = await cloudinary.uploader.upload(photos[i], { public_id: `userPictures/${Date.now()}`});
+    photosTimestamps.push(upload.public_id);
+  }
   const user = {};
   user.firstName = gender === "male" ? names.randomManFirstName() : names.randomWomanFirstName();
   user.gender = gender;
@@ -202,15 +218,9 @@ const createUserNode = async (gender, seedId) => {
   const lat = coord[user.city][0] + Math.random() * 0.03;
   const lng = coord[user.city][1] + Math.random() * 0.05;
   user.latLng = [lat, lng];
-  user.photos = [
-    gender === "male" ? unsplash.randomManPic() : unsplash.randomWomanPic(),
-    gender === "male" ? unsplash.randomManPic() : unsplash.randomWomanPic(),
-    gender === "male" ? unsplash.randomManPic() : unsplash.randomWomanPic(),
-    gender === "male" ? unsplash.randomManPic() : unsplash.randomWomanPic(),
-    gender === "male" ? unsplash.randomManPic() : unsplash.randomWomanPic()
-  ]
+  user.photos = [...photosTimestamps];
   user.seedId = seedId;
-  await session.run(`CREATE (u:User $props)`, { props: user })
+  // await session.run(`CREATE (u:User $props)`, { props: user })
 }
 
 const createUsersByGender = async (gender, count, currentMaxId) => {

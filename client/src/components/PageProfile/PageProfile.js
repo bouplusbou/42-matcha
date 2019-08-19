@@ -9,6 +9,9 @@ import ProfileCard from './ProfileCard/ProfileCard';
 import UserList from './UserList/UserList'
 import styled from 'styled-components';
 
+import { Image } from 'cloudinary-react'
+import { Button } from "@material-ui/core";
+
 const authToken = localStorage.getItem('token');
 
 const GridContainer = styled.div `
@@ -33,6 +36,7 @@ export default function PageProfile(props) {
         handleCancelLike: handleCancelLike,
         openEdit: OpenEdit,
         closeAndSaveEdit: CloseAndSaveEdit,
+        uploadPicture: uploadPicture
     });
     
     async function handleLike() {
@@ -79,11 +83,24 @@ export default function PageProfile(props) {
         })
     }
 
+    function uploadPicture(event) {
+        event.preventDefault();
+        const file = event.target.files[0];
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+            const image  = reader.result;
+            axios.post(`/users/uploadPic?authToken=${authToken}`, { image })
+        }
+    }
+
     return (
         <ProfileProvider value={{...profileState}}>
-            {profileState.edit && "bitebitebite"}
             <Container>
                 <GridContainer>
+                    {/* <p onClick={testUpload}>rzoigjrojgoizrj</p>
+                    <input type='file' accept="image/png, image/jpeg"></input> */}
+                 
                     <ProfileCard/>
                     {profileState.account &&
                         <Fragment>

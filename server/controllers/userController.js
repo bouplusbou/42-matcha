@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const config = require('../middlewares/config');
 const sendEmail = require('../actions/email.js');
 const Log = require(`../tools/Log`);
+const cloudinary = require(`../tools/Cloudinary`);
 
 const emailIsOK = email => {
       const regex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -166,6 +167,13 @@ const deleteRelationship = async (req, res) => {
       } catch (error) { Log.error(error, `deleteRelationship`, __filename) }
 }
 
+const uploadPic = async (req, res) => {
+      try {
+            const test = await cloudinary.uploader.upload(req.body.image, { public_id: Date.now() })
+            console.log(test)
+      } catch (error) { Log.error(error, `uploadPic`, __filename) }
+}
+
 module.exports = {
       createUser,
       getProfile,
@@ -176,5 +184,6 @@ module.exports = {
       resetPasswordEmail,
       getCurrentProfile,
       createRelationship,
-      deleteRelationship
+      deleteRelationship,
+      uploadPic
 }
