@@ -87,11 +87,11 @@ const seedTagNodes = async () => {
     await session.run(`
       CREATE (t:Tag { 
         tag: $tag,
-        seedId: $seedId 
+        userId: $userId 
       })
     `, { 
       tag: tagsList[i],
-      seedId: i
+      userId: i
     });
   }
   const result = await session.run(`
@@ -184,18 +184,10 @@ const defineLookingFor = orientationGenderArr => {
   }
 }
 
-const createUserNode = async (gender, seedId) => {
-  const photos = [
-    gender === "male" ? unsplash.randomManPic() : unsplash.randomWomanPic(),
-    gender === "male" ? unsplash.randomManPic() : unsplash.randomWomanPic(),
-    gender === "male" ? unsplash.randomManPic() : unsplash.randomWomanPic(),
-    gender === "male" ? unsplash.randomManPic() : unsplash.randomWomanPic(),
-    gender === "male" ? unsplash.randomManPic() : unsplash.randomWomanPic()
-  ];
-  const photosTimestamps = [];
-  for (i = 0; i < photos.length; i++) {
-    const upload = await cloudinary.uploader.upload(photos[i], { public_id: `userPictures/${Date.now()}`});
-    photosTimestamps.push(upload.public_id);
+const createUserNode = async (gender, userId) => {
+  const maxPhotosId = {
+    "male": unsplash.arrMan.length,
+    "female": unsplash.arrWoman.length,
   }
   const user = {};
   user.firstName = gender === "male" ? names.randomManFirstName() : names.randomWomanFirstName();
@@ -218,9 +210,15 @@ const createUserNode = async (gender, seedId) => {
   const lat = coord[user.city][0] + Math.random() * 0.03;
   const lng = coord[user.city][1] + Math.random() * 0.05;
   user.latLng = [lat, lng];
-  user.photos = [...photosTimestamps];
-  user.seedId = seedId;
-  // await session.run(`CREATE (u:User $props)`, { props: user })
+  user.photos = [
+    `seed${gender === "male" ? "Man" : "Woman"}/${Math.floor(Math.random() * maxPhotosId[gender])}`,
+    `seed${gender === "male" ? "Man" : "Woman"}/${Math.floor(Math.random() * maxPhotosId[gender])}`,
+    `seed${gender === "male" ? "Man" : "Woman"}/${Math.floor(Math.random() * maxPhotosId[gender])}`,
+    `seed${gender === "male" ? "Man" : "Woman"}/${Math.floor(Math.random() * maxPhotosId[gender])}`,
+    `seed${gender === "male" ? "Man" : "Woman"}/${Math.floor(Math.random() * maxPhotosId[gender])}`
+  ];
+  user.userId = userId;
+  await session.run(`CREATE (u:User $props)`, { props: user })
 }
 
 const createUsersByGender = async (gender, count, currentMaxId) => {
@@ -241,7 +239,7 @@ const seedUserNodes = async (requestedNodes = 600) => {
   const usersByGender = Math.floor(requestedNodes / 3);
   let createdNodes = 0;
   log(`Setting up constraints...`);
-  await session.run(`CREATE CONSTRAINT ON (u:User) ASSERT u.seedId IS UNIQUE`);
+  await session.run(`CREATE CONSTRAINT ON (u:User) ASSERT u.userId IS UNIQUE`);
   log(`Constraints configured.`)
   createdNodes += await createUsersByGender(`male`, usersByGender, createdNodes);
   createdNodes += await createUsersByGender(`female`, usersByGender, createdNodes);
