@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye } from '@fortawesome/free-solid-svg-icons';
+import axios from 'axios';
+import AppContext from '../../AppContext';
+
 
 const Hero = styled.section`
   background-color: ${props => props.theme.color.purple};
@@ -33,66 +36,64 @@ const Notifications = styled.div`
   padding: 10px 50px;
 `;
 const Notification = styled.div`
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 3fr 1fr 1fr;
   align-items: center;
-  justify-content: space-between;
-  background-color: #F2ECFF;
+  background-color: ${props => props.theme.color.lightPurple};
   padding: 15px;
   border-radius: 20px;
   margin: 10px;
 `;
 const Dot = styled.div`
-    width: 10px;
-    height: 10px;
-    background-color: ${props => props.theme.color.lightRed};
-    border-radius: 100%;
+  width: 10px;
+  height: 10px;
+  background-color: ${props => props.theme.color.lightRed};
+  border-radius: 100%;
+  justify-self: end;
+`;
+const Days = styled.p`
+  font-size: 0.8em;
+  font-weight: 700;
+  color: ${props => props.theme.color.purple};
+  justify-self: end;
 `;
  
 
 export default function PageNotifications() {
 
-  const [values, setValues] = useState();
+  const [notifications, setNotifications] = useState([]);
+  const appState = useContext(AppContext);
+
+
+  useEffect(() => {
+    async function fetchData() {
+      const authToken = localStorage.getItem('token');
+      const res = await axios.get(`/notifications?authToken=${authToken}`);
+      setNotifications(res.data.notifications);
+      appState.setUnseenNotificationsNb(0);
+    };
+    fetchData();
+  }, []);
 
   return (
     <Hero>
       <NotificationsSection>
         <Container>
           <Notifications>
-            <Notification>
-              <FontAwesomeIcon  style={{fontSize: '25px', color: 'white'}} icon={faEye}/>
-              <p>MarionB visited your profile</p>
-              <Dot></Dot>
-            </Notification>
-            <Notification>
-              <FontAwesomeIcon  style={{fontSize: '25px', color: 'white'}} icon={faEye}/>
-              <p>MarionB visited your profile</p>
-              <Dot></Dot>
-            </Notification>
-            <Notification>
-              <FontAwesomeIcon  style={{fontSize: '25px', color: 'white'}} icon={faEye}/>
-              <p>MarionB visited your profile</p>
-              <Dot></Dot>
-            </Notification>
-            <Notification>
-              <FontAwesomeIcon  style={{fontSize: '25px', color: 'white'}} icon={faEye}/>
-              <p>MarionB visited your profile</p>
-              <Dot></Dot>
-            </Notification>
-            <Notification>
-              <FontAwesomeIcon  style={{fontSize: '25px', color: 'white'}} icon={faEye}/>
-              <p>MarionB visited your profile</p>
-              <Dot></Dot>
-            </Notification>
-            <Notification>
-              <FontAwesomeIcon  style={{fontSize: '25px', color: 'white'}} icon={faEye}/>
-              <p>MarionB visited your profile</p>
-              <Dot></Dot>
-            </Notification>
-            <Notification>
-              <FontAwesomeIcon  style={{fontSize: '25px', color: 'white'}} icon={faEye}/>
-              <p>MarionB visited your profile</p>
-              <Dot></Dot>
-            </Notification>
+            {notifications.map((notification, index) => 
+              <Notification
+                key={index}
+              >
+                <FontAwesomeIcon style={{fontSize: '25px', color: 'white'}} icon={faEye}/>
+                <p>{notification.username} {notification.type} your profile</p>
+                <Days>
+                  {notification.days} days ago
+                </Days>
+                {notification.status === 'unseen' && 
+                  <Dot></Dot>
+                }
+              </Notification>
+            )}
           </Notifications>
         </Container>
       </NotificationsSection>

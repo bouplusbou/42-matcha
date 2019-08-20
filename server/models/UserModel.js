@@ -121,8 +121,8 @@ async function getProfile(uuid) {
   
   try {
     const res = await session.run(`
+      OPTIONAL MATCH (u)-[:TAGGED]->(t:Tag)  
       MATCH (u:User)
-      MATCH (u)-[:TAGGED]->(t:Tag)
       WHERE u.uuid = $uuid
       RETURN 
       u.uuid AS uuid,
@@ -204,12 +204,12 @@ async function searchUsers(uuid, { sortingChoice, filterAge, filterScore, filter
   try {
     const res = await session.run(`
     MATCH (me:User {uuid: $uuid}), (u:User)
-    MATCH (u)-[:TAGGED]->(t:Tag)
-    MATCH (u)-[:TAGGED]->(t2:Tag)
     WHERE NOT (me = u) 
     AND u.gender IN me.lookingFor
     AND me.gender IN u.lookingFor
     AND ( $scoreMin <= u.score <= $scoreMax)
+    OPTIONAL MATCH (u)-[:TAGGED]->(t:Tag)
+    OPTIONAL MATCH (u)-[:TAGGED]->(t2:Tag)
     ${selectedTags ? 'AND t2.tag in $selectedTags' : ''}
     WITH me, u, t,
       point({latitude: me.latLng[0], longitude: me.latLng[1]}) AS p1, 
@@ -246,6 +246,7 @@ async function searchUsers(uuid, { sortingChoice, filterAge, filterScore, filter
       offset: offset,
     });
     session.close();
+    console.log(res.records);
     const users = res.records.map(record => {
       const username = record.get('username');
       const gender = record.get('gender');
@@ -295,14 +296,14 @@ async function suggestedUsers(uuid, { sortingChoice, filterAge, filterScore, fil
   try {
     const res = await session.run(`
     MATCH (me:User {uuid: $uuid}), (u:User)
-    MATCH (u)-[:TAGGED]->(t:Tag)
-    MATCH (u)-[:TAGGED]->(t2:Tag)
     WHERE NOT (me = u) 
     AND NOT (me)-[:DISLIKED]->(u)
     AND NOT (me)-[:LIKED]->(u)
     AND u.gender IN me.lookingFor
     AND me.gender IN u.lookingFor
     AND ( $scoreMin <= u.score <= $scoreMax)
+    OPTIONAL MATCH (u)-[:TAGGED]->(t:Tag)
+    OPTIONAL MATCH (u)-[:TAGGED]->(t2:Tag)
     ${selectedTags ? 'AND t2.tag in $selectedTags' : ''}
     WITH me, u, t,
       point({latitude: me.latLng[0], longitude: me.latLng[1]}) AS p1, 

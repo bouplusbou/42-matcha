@@ -5,8 +5,10 @@ import axios from 'axios';
 
 export default function TestProfile(props) {
     const userState = useContext(AppContext);
+
     // const [isConnected, setIsConnected] = useState(false);
     const username = props.match.params.username;
+    const userId = 212;
 
     // useEffect(() => {
     //     // userState.socket.send(`${username} says HELLO from the client`);
@@ -20,10 +22,13 @@ export default function TestProfile(props) {
     // }, []);
 
     useEffect(() => {
-        userState.socket.emit('visit', username);
+        userState.socket.emit('visit', userId);
         const authToken = localStorage.getItem('token');
-        const visitedUsername = username;
-        axios.post(`/notifications/visited?authToken=${authToken}`, { visitedUsername });
+        const data = {
+            type: 'visited',
+            userId,
+        }
+        axios.post(`/notifications?authToken=${authToken}`, data);
     }, []);
 
     return (

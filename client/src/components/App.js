@@ -5,36 +5,47 @@ import Header from './Header/Header';
 import { AppProvider } from '../AppContext';
 import { actionIsAuthenticated } from '../actions/authActions';
 import setupSocket from '../actions/socketActions';
-import { ThemeProvider } from "styled-components";
-import Theme from "./theme.json";
+import { ThemeProvider } from 'styled-components';
+import Theme from './theme.json';
+import axios from 'axios';
 
 
 function App() {
   const [connected, setConnected] = useState(false);
   const [socket, setSocket] = useState(null);
   const [connectedUsers, setConnectedUsers] = useState([]);
+  const [unseenNotificationsNb, setUnseenNotificationsNb] = useState(0);
   
   useEffect(() => {
-    actionIsAuthenticated(localStorage.getItem('token'))
-      .then(username => {
-        if (username) {
-          setConnected(true);
-          setupSocket(username, setSocket, setConnectedUsers);
-        } else {
+      async function fetchData() {
+        try {
+          const username = await actionIsAuthenticated(localStorage.getItem('token'));
+          if (username) {
+            const authToken = localStorage.getItem('token');
+            const resNotif = await axios.get(`/notifications/unseenNotificationsNb?authToken=${authToken}`);
+            appState.setUnseenNotificationsNb(resNotif.data.nb);
+            setConnected(true);
+            setupSocket(username, setSocket, setConnectedUsers);
+          } else {
+            setConnected(false)
+          }
+        } catch {
           setConnected(false)
-        };
-      })
-      .catch(err => setConnected(false));
+        }
+      };
+      fetchData();
   }, []);
 
-  const appState = { 
-      connected: connected,
-      setConnected: setConnected,
+  const appState = {
+      connected,
+      setConnected,
       toggleConnected: () => {setConnected(!connected)},
-      connectedUsers: connectedUsers,
-      setConnectedUsers: setConnectedUsers,
-      socket: socket,
-      setSocket: setSocket,
+      connectedUsers,
+      setConnectedUsers,
+      socket,
+      setSocket,
+      unseenNotificationsNb, 
+      setUnseenNotificationsNb,
   };
 
   return (

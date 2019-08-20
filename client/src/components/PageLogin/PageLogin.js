@@ -18,7 +18,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import setupSocket from '../../actions/socketActions';
 
-
 const Hero = styled.section`
   background-color: #6F48BD;
   height: 100vh;
@@ -119,7 +118,7 @@ const ModalContainer = styled.section`
 
 export default function PageLogin(props) {
 
-  const userState = useContext(AppContext);
+  const appState = useContext(AppContext);
   const [values, setValues] = useState({
     username: '',
     password: '',
@@ -141,21 +140,20 @@ export default function PageLogin(props) {
   const toggleShowPassword = () => {
     setValues({ ...values, showPassword: !values.showPassword });
   };
-  const handleSubmit = event => {
-    event.preventDefault();
-    const credentials = {username: values.username, password: values.password};
-    axios.post(`/auth`, credentials)
-      .then(res => actionLogin(res.data.token, res.data.username))
-      .then(username => {
-        userState.toggleConnected();
-        setupSocket(username, userState.setSocket, userState.setConnectedUsers);
-        props.history.push('/search');
-      })
-      .catch(err => {
-        console.log(err);
-        // console.log(err.response.data.errorMsg);
-        setValues({ ...values, error: true, errorMsg: err.response.data.errorMsg});
-      });
+  const handleSubmit = async event => {
+    try {
+      event.preventDefault();
+      const credentials = {username: values.username, password: values.password};
+      const res = await axios.post(`/auth`, credentials);
+      const username = await actionLogin(res.data.token, res.data.username);
+      const resNotif = await axios.get(`/notifications/unseenNotificationsNb?authToken=${res.data.token}`);
+      appState.setUnseenNotificationsNb(resNotif.data.nb);
+      appState.toggleConnected();
+      setupSocket(username, appState.setSocket, appState.setConnectedUsers);
+      props.history.push('/search');
+    } catch(err) {
+      setValues({ ...values, error: true, errorMsg: err.response.data.errorMsg});
+    }
   };
 
   const emailIsOk = email => {

@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import NavList from './NavList';
+import Notifications from './Notifications';
 import LogoutButton from './LogoutButton';
 
 const Dropdown = styled.section`
@@ -10,7 +11,7 @@ const Dropdown = styled.section`
     top: 56px;
     right: 0;
     width: 80px;
-    height: 250px;
+    height: 300px;
     border-radius: 0px 0px 30px 30px;
     box-shadow: 0px 20px 20px rgba(0, 0, 0, 0.1);
     background-color: #6F48BD;
@@ -21,10 +22,21 @@ const Dropdown = styled.section`
     }
 `;
 
+const NotificationsSection = styled.section`
+    position: relative;
+`;
+
 export default function HeaderWide() {
 
     return (
         <Dropdown>
+            <ul>
+                <li style={{listStyle: 'none'}}>
+                    <NotificationsSection>
+                        <Notifications />
+                    </NotificationsSection>
+                </li>
+            </ul>
             <NavList />
             <LogoutButton />
         </Dropdown>
