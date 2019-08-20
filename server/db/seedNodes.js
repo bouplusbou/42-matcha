@@ -234,7 +234,7 @@ const createUsersByGender = async (gender, count, currentMaxId) => {
   return userCount.records[0].get(0).low;
 }
 
-const seedUserNodes = async (requestedNodes = 600) => {
+const seedUserNodes = async (requestedNodes = 450) => {
   log(`***** USER NODES SEEDING *****`, `blue`);
   const usersByGender = Math.floor(requestedNodes / 3);
   let createdNodes = 0;

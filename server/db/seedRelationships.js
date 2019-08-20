@@ -47,7 +47,7 @@ const hasMatched = async(userId, targetuserId) => {
         userId: userId,
         targetuserId: targetuserId
     })
-    const matched = res.records[0].get(0);
+    const matched = res.records[0].get(0).low;
     return matched === 2;
 }
 
@@ -111,7 +111,7 @@ const createNotification = async (type, fromId, toUuid) => {
 
 const seedVisitedRel = async () => {
     log(`***** VISITED RELATIONSHIPS SEEDING *****`, `blue`)
-    const relByUser = 10;
+    const relByUser = 20;
     const maxId = await getUserCount();
     await deleteAllRel("VISITED");
     log(`Creating "VISITED" relationships...`);
@@ -208,7 +208,7 @@ const seedTaggedRel = async () => {
 
 const seedLikedRel = async () => {
     log(`***** LIKED RELATIONSHIPS SEEDING *****`, `blue`)
-    const relByUser = 10;
+    const relByUser = 20;
     const maxId = await getUserCount();
     await deleteAllRel("LIKED");
     log(`Creating "LIKED" relationships...`);
@@ -230,9 +230,8 @@ const seedLikedRel = async () => {
                 randomuserId: randomId,
             })
             await createNotification("liked", randomId, res.records[0].get(`uuid`));
-            if (hasMatched(userId, randomId)) {
-                createNotification("matched", randomId, userId)
-            }
+            if (await hasMatched(userId, randomId))
+                await createNotification("matched", randomId, res.records[0].get(`uuid`));
         }
     }
     const result = await session.run(`
@@ -244,9 +243,9 @@ const seedLikedRel = async () => {
 
 const seedRelationships = async () => {
     try {
-        // await seedTaggedRel();
-        // await seedBlockedRel();
-        // await seedVisitedRel();
+        await seedTaggedRel();
+        await seedBlockedRel();
+        await seedVisitedRel();
         await seedLikedRel();
         log(`RELATIONSHIPS SEEDING COMPLETE !`, `blue`)
         process.exit(0);
