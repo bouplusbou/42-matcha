@@ -1016,5 +1016,7 @@ const randomManPic = () => {
 
 module.exports = {
     randomWomanPic,
-    randomManPic
+    randomManPic,
+    arrMan,
+    arrWoman,
 }

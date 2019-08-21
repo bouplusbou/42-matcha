@@ -69,7 +69,7 @@ async function updateProfile(uuid, req) {
       ${req.latLng ? `SET u.letLng = $latLng` : ""}
     `, { req });
     session.close();
-  } catch (err) { console.log(err.stack) }
+  } catch (err) { console.log(err) }
 }
 
 async function emailExists(email) { 
@@ -89,14 +89,15 @@ async function userFromUsername(username) {
     const res = await session.run(`
       MATCH (u:User)
       WHERE u.username = $username
-      RETURN u.password AS password, u.uuid AS uuid, u.confirmed AS confirmed
+      RETURN u.password AS password, u.uuid AS uuid, u.userId AS userId, u.confirmed AS confirmed
     `, { username: username });
     session.close();
     if (res.records[0] !== undefined) {
       const password = res.records[0].get('password');
       const uuid = res.records[0].get('uuid');
+      const userId = res.records[0].get('userId');
       const confirmed = res.records[0].get('confirmed');
-      const user = { password, uuid, confirmed };
+      const user = { password, uuid, userId, confirmed };
       return user;
     } else {
       return null;
@@ -120,8 +121,8 @@ async function getProfile(uuid) {
   
   try {
     const res = await session.run(`
+      OPTIONAL MATCH (u)-[:TAGGED]->(t:Tag)  
       MATCH (u:User)
-      MATCH (u)-[:TAGGED]->(t:Tag)
       WHERE u.uuid = $uuid
       RETURN 
       u.uuid AS uuid,
@@ -184,11 +185,10 @@ async function getProfile(uuid) {
       lastConnection,
       city
     }
-  } catch(err) { console.log(err.stack)};
+  } catch(err) { console.log(err)};
 }
 
 async function searchUsers(uuid, { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags, offset }) { 
-  // console.log(uuid);
   const sorting = { 
     'Closest': 'ORDER BY dist_city',
     'Farthest': 'ORDER BY dist_city DESC',
@@ -203,12 +203,12 @@ async function searchUsers(uuid, { sortingChoice, filterAge, filterScore, filter
   try {
     const res = await session.run(`
     MATCH (me:User {uuid: $uuid}), (u:User)
-    MATCH (u)-[:TAGGED]->(t:Tag)
-    MATCH (u)-[:TAGGED]->(t2:Tag)
     WHERE NOT (me = u) 
     AND u.gender IN me.lookingFor
     AND me.gender IN u.lookingFor
     AND ( $scoreMin <= u.score <= $scoreMax)
+    OPTIONAL MATCH (u)-[:TAGGED]->(t:Tag)
+    OPTIONAL MATCH (u)-[:TAGGED]->(t2:Tag)
     ${selectedTags ? 'AND t2.tag in $selectedTags' : ''}
     WITH me, u, t,
       point({latitude: me.latLng[0], longitude: me.latLng[1]}) AS p1, 
@@ -279,7 +279,6 @@ async function filtersMinMax() {
 }
 
 async function suggestedUsers(uuid, { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags }) { 
-  // console.log(uuid);
   const sorting = { 
     'Closest': 'ORDER BY dist_city',
     'Farthest': 'ORDER BY dist_city DESC',
@@ -294,14 +293,14 @@ async function suggestedUsers(uuid, { sortingChoice, filterAge, filterScore, fil
   try {
     const res = await session.run(`
     MATCH (me:User {uuid: $uuid}), (u:User)
-    MATCH (u)-[:TAGGED]->(t:Tag)
-    MATCH (u)-[:TAGGED]->(t2:Tag)
     WHERE NOT (me = u) 
     AND NOT (me)-[:DISLIKED]->(u)
     AND NOT (me)-[:LIKED]->(u)
     AND u.gender IN me.lookingFor
     AND me.gender IN u.lookingFor
     AND ( $scoreMin <= u.score <= $scoreMax)
+    OPTIONAL MATCH (u)-[:TAGGED]->(t:Tag)
+    OPTIONAL MATCH (u)-[:TAGGED]->(t2:Tag)
     ${selectedTags ? 'AND t2.tag in $selectedTags' : ''}
     WITH me, u, t,
       point({latitude: me.latLng[0], longitude: me.latLng[1]}) AS p1, 
@@ -368,7 +367,7 @@ async function updateRelationship(uuid, { choice, username }) {
       username: username,
     });
     session.close();
-  } catch(err) { console.log(err.stack) }
+  } catch(err) { console.log(err) }
 }
 
 async function addTag(uuid, req) {
@@ -381,7 +380,7 @@ async function addTag(uuid, req) {
       tag: req.tag
     });
     session.close();
-  } catch(err) { console.log(err.stack) }
+  } catch(err) { console.log(err) }
 }
 
 async function removeTag(uuid, req) {
@@ -410,6 +409,19 @@ async function uuidFromHash({ hash }) {
   } catch(err) { console.log(err) }
 }
 
+async function userIdFromUsername(username) { 
+  try {
+    const res = await session.run(`
+      MATCH (u:User {username: $username})
+      RETURN u.userId AS userId
+    `, { username: username });
+    session.close();
+    if (res.records[0] === undefined) return null;
+    const userId = res.records[0].get('userId');
+    return userId;
+  } catch(err) { console.log(err) }
+}
+
 async function confirmation(uuid) { 
   try {
     const res = await session.run(`
@@ -421,7 +433,6 @@ async function confirmation(uuid) {
 }
 
 async function resetPasswordEmail(email) { 
-  console.log(email);
   try {
     const res = await session.run(`
       MATCH (u:User)
@@ -478,6 +489,45 @@ async function hasFullProfile(uuid) {
   } catch(err) { console.log(err) }
 }
 
+async function userIdFromUuid(uuid) { 
+  try {
+    const res = await session.run(`
+      MATCH (u:User {uuid: $uuid})
+      RETURN u.userId AS userId
+    `, { uuid: uuid });
+    session.close();
+    if (res.records[0] === undefined) return null;
+    const userId = res.records[0].get('userId');
+    return userId;
+  } catch(err) { console.log(err) }
+}
+
+async function usernameFromUserId(userId) { 
+  try {
+    const res = await session.run(`
+      MATCH (u:User {userId: $userId})
+      RETURN u.username AS username
+    `, { userId: userId });
+    session.close();
+    if (res.records[0] === undefined) return null;
+    const username = res.records[0].get('username');
+    return username;
+  } catch(err) { console.log(err) }
+}
+
+async function uuidFromUsername(username) { 
+  try {
+    const res = await session.run(`
+      MATCH (u:User {username: $username})
+      RETURN u.uuid AS uuid
+    `, { username: username });
+    session.close();
+    if (res.records[0] === undefined) return null;
+    const uuid = res.records[0].get('uuid');
+    return uuid;
+  } catch(err) { console.log(err) }
+}
+
 module.exports = {
   createUser,
   usernameExists,
@@ -497,5 +547,9 @@ module.exports = {
   resetPasswordEmail,
   resetPassword,
   hasFullProfile,
+  userIdFromUuid,
+  userIdFromUsername,
+  usernameFromUserId,
+  uuidFromUsername,
 }
  

@@ -94,7 +94,6 @@ export default function PageResetPassword(props) {
     const handleSubmit = async event => {
       event.preventDefault();
       if (passwordIsOk(password)) {
-        console.log(password);
         const params = { 
           hash: props.match.params.hash,
           newPassword: password,

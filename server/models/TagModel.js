@@ -9,7 +9,7 @@ async function allTags() {
     `);
     session.close();
     return res.records[0].get('tags');
-  } catch(err) { console.log(err.stack) }
+  } catch(err) { console.log(err) }
 }
 
 async function createTag(req) {
@@ -18,7 +18,7 @@ async function createTag(req) {
       CREATE (t:Tag {tag: $tag})
     `, {tag: req.label});
     session.close();
-  } catch(err) { console.log(err.stack) }
+  } catch(err) { console.log(err) }
 }
 
 module.exports = {

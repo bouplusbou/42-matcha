@@ -90,7 +90,6 @@ const getProfile = async (req, res) => {
 
 const updateProfile = async (req, res) => {
       const uuid = await getUuid(req, res);
-      console.log(req.body);
       if (uuid) {
             UserModel.updateProfile(uuid, req.body)
             .catch(err => { console.log(err) })
@@ -179,6 +178,18 @@ const hasFullProfile = (req, res) => {
       });
 };
 
+const userIdFromUuid = (req, res) => {
+      const token = req.body.authToken || req.query.authToken;
+      jwt.verify(token, config.jwtSecret, async (err, decoded) => {
+            try {
+                  const userId = await UserModel.userIdFromUuid(decoded.uuid);
+                  res.status(200).json({ userId });
+            } catch {
+                  res.status(400).send('Error');
+            }
+      });
+};
+
 module.exports = {
       createUser,
       getProfile,
@@ -193,4 +204,5 @@ module.exports = {
       resetPasswordEmail,
       resetPassword,
       hasFullProfile,
+      userIdFromUuid,
 };
