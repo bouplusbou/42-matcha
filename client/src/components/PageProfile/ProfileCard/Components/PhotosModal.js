@@ -5,6 +5,7 @@ import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight, faArrowLeft, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import ProfileContext from '../../ProfileContext';
+import { Image } from 'cloudinary-react';
 
 const authToken = localStorage.getItem('token');
 
@@ -35,7 +36,7 @@ const StyledImgButton = styled(FontAwesomeIcon) `
     color:white;
 `
 
-const MainImg = styled.img `
+const MainImg = styled(Image) `
     margin-bottom:0.5rem;
     box-shadow: 0px 20px 20px rgba(0, 0, 0, 0.2);
 `
@@ -77,7 +78,7 @@ export default function PhotosModal(props) {
         document.addEventListener("keydown", handleKeyDown, false);
     })
 
-    const Thumbnail = styled.img `
+    const Thumbnail = styled(Image) `
         object-fit:cover;
         min-width:10.6rem;
         box-shadow: 0px 20px 20px rgba(0, 0, 0, 0.2);
@@ -135,7 +136,7 @@ export default function PhotosModal(props) {
                         <p onClick={handleSetAsProfile}>Set as profile pic</p>
                     </ImgButtonContainer>
                 }
-                <MainImg src={photosState[currentIndexState]}/>
+                <MainImg cloudName="matchacn" publicId={photosState[currentIndexState]}/>
             </MainImgContainer>
                 <ArrowButtonsContainer>
                     <StyledArrowIcon icon={faArrowLeft} size={"lg"} onClick={handlePrevious}/>
@@ -143,7 +144,7 @@ export default function PhotosModal(props) {
                 </ArrowButtonsContainer>
                 <ThumbnailContainer>
                     {photosState.map((photo, index) => 
-                        <Thumbnail src={photo} key={index} index={index} onClick={() => setCurrentIndexState(index)}/>
+                        <Thumbnail cloudName="matchacn" publicId={photo} key={index} index={index} onClick={() => setCurrentIndexState(index)}/>
                     )}
                 </ThumbnailContainer>
         </ModalContainer>
