@@ -1,3 +1,4 @@
+
 const UserModel = require('../models/UserModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -6,7 +7,8 @@ const config = require('../middlewares/config');
 const login = async (req, res) => {
     const { username, password } = req.body;
     try {
-        const user = await UserModel.userFromUsername(username);
+        const user = await UserModel.getUserByUsername(username);
+        console.log(user);
         if (user !== null) {
             if (user.confirmed) {
                 bcrypt.compare(password, user.password, (err, result) => {
@@ -38,29 +40,3 @@ module.exports = {
     login,
     uuidIsValid,
 }
-
-
-// const login = async (req, res) => {
-//     const { username, password } = req.body;
-//     const user = await UserModel.userFromUsername(username);
-    
-//         .then(user =>  {
-//             if (user !== null) {
-//                 if (user.confirmed) {
-//                     bcrypt.compare(password, user.password, (err, result) => {
-//                         if (result) {
-//                             const token = jwt.sign({ uuid: user.uuid }, config.jwtSecret, { expiresIn: '6h' });
-//                             res.json({ token: token, username: user.username });
-//                         } else {
-//                             res.status(401).json({ errorMsg: 'wrong credentials' });
-//                         }
-//                     });
-//                 } else {
-//                     res.status(401).json({ errorMsg: 'you need to confirm your email first' });
-//                 }
-//             } else {
-//                     res.status(401).json({ errorMsg: 'wrong credentials' });
-//             }
-//         })
-//         .catch(err => { console.log(err); });
-// }

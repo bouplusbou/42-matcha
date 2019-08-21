@@ -4,19 +4,19 @@ const authenticate = require('../../middlewares/authenticate');
 const UserController = require('../../controllers/userController');
 
 router.route('/')
+      .get(authenticate, (req, res) => { UserController.getCurrentProfile(req, res) })
+
+router.route('/create')
       .post((req, res) => { UserController.createUser(req, res); })
 
 router.route('/confirmation')
-      .post((req, res) => { UserController.confirmation(req, res); });
+      .post((req, res) => { UserController.confirmUser(req, res); });
 
-router.route('/search')
-      .post(authenticate, (req, res) => { UserController.searchUsers(req, res); });
+router.route('/createRelationship')
+      .post(authenticate, (req, res) => { UserController.createRelationship(req, res); });
 
-router.route('/matcher')
-      .post(authenticate, (req, res) => { UserController.suggestedUsers(req, res); });
-
-router.route('/updateRelationship')
-      .post(authenticate, (req, res) => { UserController.updateRelationship(req, res); });
+router.route('/deleteRelationship')
+      .delete(authenticate, (req, res) => { UserController.deleteRelationship(req, res); });
 
 router.route('/hasFullProfile')
       .get(authenticate, (req, res) => { UserController.hasFullProfile(req, res); });
@@ -24,15 +24,7 @@ router.route('/hasFullProfile')
 router.route('/resetPasswordEmail')
       .post((req, res) => { UserController.resetPasswordEmail(req, res); });
 
-router.route('/resetPassword')
-      .post((req, res) => { UserController.resetPassword(req, res); });
-
-router.route('/filtersMinMax')
-      .get(authenticate, (req, res) => { UserController.filtersMinMax(req, res); });
-
-// routes order is important, first come first serve
-// with params, put it last
-router.route('/getProfile')
+router.route('/:username')
       .get(authenticate, (req, res) => { UserController.getProfile(req, res) })
 
 router.route(`/updateProfile`)
@@ -44,6 +36,9 @@ router.route(`/addTag`)
 router.route(`/removeTag`)
       .delete(authenticate, (req, res) => { UserController.removeTag(req, res); })
 
+router.route(`/uploadPic`)
+      .post(authenticate, (req, res) => { UserController.uploadPic(req, res); });
+      
 module.exports = router;
 
 

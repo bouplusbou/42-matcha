@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart } from '@fortawesome/free-solid-svg-icons';
+import { Image } from 'cloudinary-react';
 
 const StyledDiv = styled.div `
     display:flex;
@@ -15,7 +16,7 @@ const StyledDiv = styled.div `
     box-shadow: 0px 20px 20px rgba(0, 0, 0, 0.1);
 `
 
-const ProfilePhoto = styled.img `
+const ProfilePhoto = styled(Image) `
     height:100%;
     width:80px;
 
@@ -55,10 +56,10 @@ export default function UserListItem(props) {
     
     return (
         <StyledDiv>
-            <ProfilePhoto src={props.photos[props.avatar]}/>
+            <ProfilePhoto cloudName='matchacn' publicId={props.photos[props.avatarIndex]}/>
             <InfosContainer>
                 <Username color={props.color}>{props.username}</Username>
-                <Age>{props.age}, {props.localisation}</Age>
+                <Age>{props.age}, {props.city}</Age>
             </InfosContainer>
             <StyledButton icon={faHeart} size={"lg"} color={props.color}/>
         </StyledDiv>

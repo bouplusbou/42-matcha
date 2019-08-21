@@ -15,10 +15,8 @@ const AuthenticatedApp = () => (
       <Route exact path='/matcher' component={PageMatcher}/>
       <Route exact path='/profile' component={Profile}/>
       <Route exact path='/users/:username' component={TestProfile}/>
-      {/* <Route render={() => <Redirect to={{pathname: "/search"}} />} /> */}
-      {/* le middleware cause un rerender, pourquoi ?*/}
-      {/* <Route exact path='/search' component={Authenticate(PageSearch)}/> */}
-      {/* <Route exact path='/matcher' component={Authenticate(PageMatcher)}/> */}
+      <Route exact path='/profile/:username' component={Profile}/>
+      <Route exact path='/profile' component={Profile}/>
     </Switch>
   </main>
 );

@@ -9,7 +9,6 @@ import { ThemeProvider } from 'styled-components';
 import Theme from './theme.json';
 import axios from 'axios';
 
-
 function App() {
   const [connected, setConnected] = useState(false);
   const [socket, setSocket] = useState(null);

@@ -4,21 +4,29 @@ import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFireAlt } from '@fortawesome/free-solid-svg-icons';
 import { Modal } from '@material-ui/core';
+import cloudinary from 'cloudinary-core';
 
-import ProfileContext from '../ProfileContext';
-import PhotosModal from './PhotosModal';
+
+import ProfileContext from '../../ProfileContext';
+import PhotosModal from '../Components/PhotosModal';
+
+const cloudinaryCore = new cloudinary.Cloudinary({cloud_name: 'matchacn'});
 
 const StyledSection = styled.section `
     display:flex;
     min-width:300px;
+    min-height:375px;
 
     align-items:flex-end;
     
     border-radius:${props => props.theme.borderRadius} 0 0 ${props => props.theme.borderRadius};
-    background-image: url(${props => props.avatar ? props => props.avatar : "https://icon-library.net/images/no-profile-picture-icon/no-profile-picture-icon-12.jpg"});
+    background-image: url(${props => props.avatar});
     background-position: center center;
     background-size: cover;
     @media (max-width: 1000px) { 
+        border-radius:0;
+    }
+    @media (max-width: 740px) {
         height:300px;
     }
 `
@@ -33,6 +41,9 @@ const ScoreContainer = styled.div `
     
     border-radius:0 0 0 ${props => props.theme.borderRadius};
     background: linear-gradient(179.76deg, rgba(0, 0, 0, 0) 0.51%, #000000 83.4%);
+    @media (max-width: 1000px) { 
+        border-radius:0;
+    }
 `
 
 const Score = styled.div `
@@ -47,22 +58,29 @@ const ScoreIcon = styled(FontAwesomeIcon) `
     
     color:${props => props.theme.color.red};
 `
+
+const ModalContentContainer = styled.div `
+    height:100%;
+`
 export default function AvatarSection(props) {
     const [open, setOpen] = useState(false);
     const profile = useContext(ProfileContext);
     
     const OpenModal = () => {
-        setOpen(true);
+        if (profile.photos.length > 0)  {
+            setOpen(true);
+        }
     }
 
     const CloseModal = (event) => {
-        if (event.target.tagName == "DIV")
+        if (!event || event.target.tagName === "DIV") {
             setOpen(false);
+        }
     }
 
     return (
         <Fragment>
-            <StyledSection avatar={profile.photos[profile.avatarIndex]} onClick={OpenModal}>
+            <StyledSection avatar={cloudinaryCore.url(profile.photos[profile.avatarIndex])} onClick={OpenModal}>
                 <ScoreContainer>
                     <Score>
                         <ScoreIcon icon={faFireAlt}/>
@@ -71,11 +89,11 @@ export default function AvatarSection(props) {
                 </ScoreContainer>
             </StyledSection>
             <Modal open={open} onClose={CloseModal}>
-                <PhotosModal 
-                    index={profile.avatar} 
-                    photos={profile.photos}
-                    CloseModal={CloseModal}
-                />
+                <ModalContentContainer> 
+                    <PhotosModal 
+                        handleClose={CloseModal}
+                    />
+                </ModalContentContainer>
             </Modal>
         </Fragment>
     )

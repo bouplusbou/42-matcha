@@ -1,38 +1,41 @@
-import React, { Fragment, useState, useEffect } from "react";
+import React, { Fragment, useState, useEffect, useContext } from "react";
+import axios from 'axios';
+import AppContext from '../../AppContext';
 
-import ProfileContext, { ProfileProvider } from './ProfileContext';
+import { ProfileProvider } from './ProfileContext';
 import { faEye, faHeart } from '@fortawesome/free-solid-svg-icons';
 
 import Container from "../Container";
 import ProfileCard from './ProfileCard/ProfileCard';
-import UserList from './UserList'
+import UserList from './UserList/UserList'
 import styled from 'styled-components';
 
-import axios from 'axios';
 const authToken = localStorage.getItem('token');
 
 const GridContainer = styled.div `
     display:grid;
     margin-top:2rem;
+    min-width:360px;
 
     grid-template-columns:1fr;
     grid-template-rows:auto;
     grid-row-gap:2rem;
     @media (max-width: 1000px) {
         grid-row-gap:0rem;
-        margin-top:0;    
+        margin-top:0;
     }
 `
 
 export default function PageProfile(props) {
+    const appState = useContext(AppContext);
 
     const [profileState, setProfileState] = useState({
+        fetchData: fetchData,
         handleLike: handleLike,
         handleCancelLike: handleCancelLike,
         openEdit: OpenEdit,
         closeAndSaveEdit: CloseAndSaveEdit,
-        account: true,
-        edit: false,
+        uploadPicture: uploadPicture
     });
     
     async function handleLike() {
@@ -50,43 +53,56 @@ export default function PageProfile(props) {
     }
     
     async function OpenEdit() {
-        setProfileState({
-            ...profileState,
-            edit: true,
-        })
+        fetchData(true);
     }
     
-    async function CloseAndSaveEdit(editState) {
-        if (Object.keys(editState).length > 0) {
-            await axios.post(`/users/updateProfile?authToken=${authToken}`, editState)
-            .then( setProfileState({ ...profileState, edit: false }) );
+    async function CloseAndSaveEdit(editedValues) {
+        if (Object.keys(editedValues).length > 0) {
+            await axios.post(`/users/updateProfile?authToken=${authToken}`, editedValues)
+                .then( fetchData(false))
+                .catch(err => console.log(err))
         } else {
-            setProfileState({ ...profileState, edit: false })
+            fetchData(false);
         }
     }
     
     useEffect(() => {
-        async function fetchData() {
-            const profile = await axios.get(`/users/getProfile?authToken=${authToken}`)
-            setProfileState({
-                ...profileState,
-                ...profile.data.profile,
-                visitHistory: [
-                    profile.data.profile,
-                    profile.data.profile,
-                    profile.data.profile,
-                    profile.data.profile
-                ],
-                likeHistory: [
-                    profile.data.profile,
-                    profile.data.profile,
-                    profile.data.profile,
-                    profile.data.profile
-                ]
-            })
-        }
         fetchData();
-    }, [profileState.edit]);
+        appState.socket.emit('visit', props.match.params.username);
+        const data = {
+            type: 'visited',
+            usernameVisited: props.match.params.username,
+        }
+        axios.post(`/notifications?authToken=${authToken}`, data);
+    }, [])
+    
+    async function fetchData(edit) {
+        console.log("fetching data...")
+        const username = props.match.params.username ? `/${props.match.params.username}` : "";
+        const profile = await axios.get(`/users${username}?authToken=${authToken}`)
+        console.log(profileState);
+        setProfileState({
+            ...profileState,
+            ...profile.data.profile,
+            edit: edit,
+        })
+    }
+
+    function uploadPicture(event) {
+        event.preventDefault();
+        const file = event.target.files[0];
+        console.log(file.size);
+        if (file.size < 1000000) {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                const image  = reader.result;
+                axios.post(`/users/uploadPic?authToken=${authToken}`, { image })
+            }
+        } else {
+            console.log(`Picture is too big`);
+        }
+    }
 
     return (
         <ProfileProvider value={{...profileState}}>
@@ -95,18 +111,20 @@ export default function PageProfile(props) {
                     <ProfileCard/>
                     {profileState.account &&
                         <Fragment>
-                            {profileState.likeHistory &&
+                            {profileState.likedHistoric &&
+                            !profileState.edit &&
                                 <UserList
                                 title={"Users who likes you"} 
-                                list={profileState.likeHistory}
+                                list={profileState.likedHistoric}
                                 icon={faHeart} 
                                 color={"#FF5B6C"} 
                                 />
                             }
-                            {profileState.visitHistory &&
+                            {profileState.visitedHistoric &&
+                            !profileState.edit &&
                                 <UserList 
                                 title={"Users who visited your profile"}
-                                list={profileState.visitHistory}
+                                list={profileState.visitedHistoric}
                                 icon={faEye} 
                                 color={"#6f48bd"}
                                 />

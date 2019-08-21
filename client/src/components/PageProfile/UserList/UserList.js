@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
 import UserListItem from './UserListItem';
-import Separator from './Separator';
+import Separator from '../ProfileCard/Components/Separator';
 
 const StyledSection = styled.section `
     display:flex;
@@ -60,7 +60,7 @@ const StyledButton = styled(FontAwesomeIcon) `
 `
 export default function UserList(props) {
     const [displayedUser, setDisplayedUser] = useState(props.list.slice(0, 8));
-    const Users = displayedUser.map(user => <UserListItem color={props.color} {...user}/>);
+    const Users = displayedUser.map((user, index) => <UserListItem color={props.color} key={index} {...user}/>);
 
     const handleShowMoreClick = (e) => {
         if (displayedUser.length < props.list.length)

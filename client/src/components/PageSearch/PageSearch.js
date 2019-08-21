@@ -92,7 +92,7 @@ export default function PageSearch(props) {
   useEffect(() => {
     async function fetchData() {
       const authToken = localStorage.getItem('token');
-      const res = await axios.get(`/users/filtersMinMax?authToken=${authToken}`);
+      const res = await axios.get(`/search/filtersMinMax?authToken=${authToken}`);
       setFilterAge(res.data.age);
       setRangeAge(res.data.age);
       setFilterScore(res.data.score);
@@ -118,7 +118,7 @@ export default function PageSearch(props) {
     async function fetchData() {
       const authToken = localStorage.getItem('token');
       const filters = { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags, offset }
-      const res = await axios.post(`/users/search?authToken=${authToken}`, filters);
+      const res = await axios.post(`/search?authToken=${authToken}`, filters);
       if (res.data.usersArr.length !== 20) setHasNoMore(true);
       offset !== 0 ? setUsers( prev => [...prev, ...res.data.usersArr]) : setUsers(res.data.usersArr);
       setIsLoading(false);
@@ -182,7 +182,7 @@ export default function PageSearch(props) {
           {users.map( (user, index) => 
             <Link 
               key={index}
-              to={`/users/${user.username}`}
+              to={`/profile/${user.username}`}
               style={{textDecoration: 'none'}}
             >
               <UserCard 

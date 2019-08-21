@@ -5,6 +5,7 @@ async function allTags() {
   try {
     const res = await session.run(`
       MATCH (t:Tag) 
+      WITH t ORDER BY t.tag
       RETURN collect(DISTINCT t.tag) AS tags
     `);
     session.close();
@@ -13,10 +14,11 @@ async function allTags() {
 }
 
 async function createTag(req) {
+  console.log(req);
   try {
     await session.run(`
       CREATE (t:Tag {tag: $tag})
-    `, {tag: req.label});
+    `, {tag: req.tag});
     session.close();
   } catch(err) { console.log(err) }
 }

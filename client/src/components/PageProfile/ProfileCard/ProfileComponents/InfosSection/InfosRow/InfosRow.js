@@ -2,9 +2,9 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCalendarAlt, faMapMarkerAlt, faSearch, faMapMarkedAlt } from '@fortawesome/free-solid-svg-icons';
+import { faCalendarAlt, faSearch, faMapMarkedAlt } from '@fortawesome/free-solid-svg-icons';
 
-import ProfileContext, { ProfileConsumer } from '../../../ProfileContext';
+import { ProfileConsumer } from '../../../../ProfileContext';
 
 const StyledRow = styled.div `
     display:flex;
@@ -57,20 +57,11 @@ const LocalisationCase = (props) => {
     )      
 }
 
-const LookingForCase = (props) => {
-    let lookingFor = null;
-    if ((props.gender == "man" && props.orientation == "straight") || 
-        (props.gender == "woman" && props.orientation == "homosexual"))
-        lookingFor = "Woman";
-    else if ((props.gender == "woman" && props.orientation == "straight") || 
-            (props.gender == "man" && props.orientation == "homosexual"))
-        lookingFor = "Man";
-    else
-        lookingFor = "Woman & Man" 
+const LookingForCase = (props) => { 
     return (
         <StyledCase>
             <StyledIcon icon={props.icon} size={"2x"}/>
-            <StyledSpan><strong>{lookingFor}</strong></StyledSpan>
+            <StyledSpan><strong>{props.lookingFor}</strong></StyledSpan>
         </StyledCase>
     )      
 }
@@ -82,7 +73,7 @@ const InfosRow = (props) => {
                 <StyledRow>
                     <AgeCase icon={faCalendarAlt} age={profile.age}/>
                     <LocalisationCase icon={faMapMarkedAlt} city={profile.city}/>
-                    <LookingForCase icon={faSearch} gender={profile.gender} orientation={profile.orientation}/>
+                    <LookingForCase icon={faSearch} lookingFor={profile.lookingFor}/>
                 </StyledRow>
             )}
         </ProfileConsumer>

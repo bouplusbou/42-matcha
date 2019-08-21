@@ -52,7 +52,7 @@ const PhotosRow = (props) => {
     }
 
     const handleClose = (event) => {
-        if (event.target.tagName == "DIV")
+        if (event.target.tagName === "DIV")
             setModalState({
                 open:false,
                 index:null

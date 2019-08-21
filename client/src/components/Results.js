@@ -34,7 +34,7 @@ export default function Results({ usersIndex, handleLikeDislike, user, hasNoMore
             <Fragment>
                 <NextButtonSection>
                     <CircleButton
-                        choice={'dislike'}
+                        choice={'disliked'}
                         handleLikeDislike={handleLikeDislike}
                         circle_color={'gray'}
                         icon_color={'white'}
@@ -50,7 +50,7 @@ export default function Results({ usersIndex, handleLikeDislike, user, hasNoMore
                     </CardSection>
                 <LikeButtonSection>
                     <CircleButton
-                        choice={'like'}
+                        choice={'liked'}
                         handleLikeDislike={handleLikeDislike}
                         circle_color={'#FF6F62'}
                         icon_color={'white'}
