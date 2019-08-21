@@ -28,28 +28,6 @@ const Color = {
 }
 const log = (text, color = "yellow") => console.log(`${Color[color]}${text}${Color.Reset}`);
 
-const DeleteDatabase = async nodeLabel => {
-  log(`\n***** Database cleaning *****`, `blue`);
-  log(`Deleting all Cloudinary uploads...`)
-  const cloudRes = await cloudinary.api.delete_resources_by_prefix(`userPictures`)
-  log(`Cloudinary uploads deleted.`);
-  log(`Deleting previous relationships...`);
-  const relRes = await session.run(`
-    MATCH ()-[r]->() 
-    DELETE r
-    RETURN count(r)
-  `);
-  log(`${relRes.records[0].get(0)} relationships deleted.`)
-  log(`Deleting previous relationships...`);
-  const nodeRes = await session.run(`
-    MATCH (n) 
-    DELETE n
-    RETURN count(n)
-  `);
-  log(`${nodeRes.records[0].get(0)} nodes deleted.`)
-}
-
-/* TAGS SEEDING */
 
 const tagsList = [
   'burritos',
@@ -103,8 +81,6 @@ const seedTagNodes = async () => {
   log(`${result.records[0].get(0)} Tag nodes created.`, `green`);
 }
 
-/* USER SEEDING */
-
 const orientationArr = ['heterosexual', 'homosexual', 'bisexual'];
 
 const emailProvider = [
@@ -148,6 +124,27 @@ const coord = {
   'Saint-Etienne': [45.43, 4.39],
   'Toulon': [43.15, 5.93]
 };
+
+const DeleteDatabase = async nodeLabel => {
+  log(`\n***** Database cleaning *****`, `blue`);
+  log(`Deleting all Cloudinary uploads...`)
+  const cloudRes = await cloudinary.api.delete_resources_by_prefix(`userPictures`)
+  log(`Cloudinary uploads deleted.`);
+  log(`Deleting remaining relationships...`);
+  const relRes = await session.run(`
+    MATCH ()-[r]->() 
+    DELETE r
+    RETURN count(r)
+  `);
+  log(`${relRes.records[0].get(0)} relationships deleted.`)
+  log(`Deleting remaining nodes...`);
+  const nodeRes = await session.run(`
+    MATCH (n) 
+    DELETE n
+    RETURN count(n)
+  `);
+  log(`${nodeRes.records[0].get(0)} nodes deleted.`)
+}
 
 const getRandomDate = type => {
   const currentYear = new Date().getFullYear();
@@ -249,11 +246,11 @@ const seedUserNodes = async (requestedNodes = 450) => {
   log(`\n***** User nodes seeding *****`, `blue`);
   const usersByGender = Math.floor(requestedNodes / 3);
   let createdNodes = 0;
-  setConstraints();
+  await setConstraints();
   createdNodes += await createUsersByGender(`male`, usersByGender, createdNodes);
   createdNodes += await createUsersByGender(`female`, usersByGender, createdNodes);
   createdNodes += await createUsersByGender(`non-binary`, usersByGender, createdNodes);
-  log(`${createdNodes} users created in total.`)
+  log(`${createdNodes} user nodes created in total.`, `green`)
 }
 
 const seedNodes = async () => {
@@ -261,11 +258,11 @@ const seedNodes = async () => {
     await DeleteDatabase();
     await seedUserNodes(process.argv[2]);
     await seedTagNodes();
-    log(`\nNodes seeding complete !`, `blue`)
+    log(`\nNodes seeding complete !`, `cyan`)
     process.exit(0);
   } catch (error) {
     log(error, `red`);
-    log(`Terminating seeding process.`, `red`);
+    log(`\nTerminating seeding process.`, `red`);
     process.exit(1);
   }
 }

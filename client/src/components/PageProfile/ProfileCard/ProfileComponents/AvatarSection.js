@@ -66,10 +66,7 @@ export default function AvatarSection(props) {
     const [open, setOpen] = useState(false);
     const profile = useContext(ProfileContext);
     
-    const avatar = cloudinaryCore.url(profile.photos[profile.avatarIndex]);
-
     const OpenModal = () => {
-        console.log(avatar);
         if (profile.photos.length > 0)  {
             setOpen(true);
         }
@@ -83,7 +80,7 @@ export default function AvatarSection(props) {
 
     return (
         <Fragment>
-            <StyledSection avatar={avatar} onClick={OpenModal}>
+            <StyledSection avatar={cloudinaryCore.url(profile.photos[profile.avatarIndex])} onClick={OpenModal}>
                 <ScoreContainer>
                     <Score>
                         <ScoreIcon icon={faFireAlt}/>

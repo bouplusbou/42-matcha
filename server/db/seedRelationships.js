@@ -20,6 +20,7 @@ const Color = {
     white: "\x1b[37m",
 }
 const log = (text, color = "yellow") => console.log(`${Color[color]}${text}${Color.Reset}`);
+const capitalize = string => string.charAt(0).toUpperCase() + string.slice(1);
 
 const getUserCount = async () => {
     const result = await session.run(`
@@ -30,13 +31,21 @@ const getUserCount = async () => {
 }
 
 const deleteAllRel = async (relationship) => {
-    log(`Deleting all "${relationship}" relationships...`);
-    const result = await session.run(`
+    log(`Deleting all "${relationship}" relationships and notifications...`);
+    const relResult = await session.run(`
         MATCH ()-[r:${relationship}]->()
         DELETE r
         RETURN count(r)
-    `)
-    log(`${result.records[0].get(0)} "${relationship}" relationships deleted.`);
+        `)
+    log(`${relResult.records[0].get(0)} "${relationship}" relationships deleted.`);
+    if (relationship !== "TAGGED" && relationship !== "BLOCKED") {
+        const notifResult = await session.run(`
+        MATCH (n:Notification {type: "${relationship.toLowerCase()}"})
+        DELETE n
+        RETURN count(n)
+        `)
+        log(`${notifResult.records[0].get(0)} "${capitalize(relationship.toLowerCase())}" notifications deleted.`);
+    }
 }
 
 const hasMatched = async(userId, targetuserId) => {
@@ -110,11 +119,11 @@ const createNotification = async (type, fromId, toUuid) => {
 }
 
 const seedVisitedRel = async () => {
-    log(`***** VISITED RELATIONSHIPS SEEDING *****`, `blue`)
+    log(`\n***** VISITED relationships seeding *****`, `blue`)
     const relByUser = 20;
     const maxId = await getUserCount();
     await deleteAllRel("VISITED");
-    log(`Creating "VISITED" relationships...`);
+    log(`Creating ${relByUser * maxId} "VISITED" relationships...`);
     for (userId = 0; userId < maxId; userId++) {
         for (relCount = 0; relCount < relByUser; relCount++) {
             let randomId = Math.floor(Math.random() * maxId);
@@ -144,11 +153,11 @@ const seedVisitedRel = async () => {
 }
 
 const seedBlockedRel = async () => {
-    log(`***** BLOCKED RELATIONSHIPS SEEDING *****`, `blue`)
+    log(`\n***** BLOCKED relationships seeding *****`, `blue`)
     const relByUser = 2;
     const maxId = await getUserCount();
     await deleteAllRel("BLOCKED");
-    log(`Creating "BLOCKED" relationships...`);
+    log(`Creating ${relByUser * maxId} "BLOCKED" relationships...`);
     for (userId = 0; userId < maxId; userId++) {
         for (relCount = 0; relCount < relByUser; relCount++) {
             let randomId = Math.floor(Math.random() * maxId);
@@ -173,12 +182,12 @@ const seedBlockedRel = async () => {
 }
 
 const seedTaggedRel = async () => {
-    log(`***** TAGGED RELATIONSHIPS SEEDING *****`, `blue`)
+    log(`\n***** TAGGED relationships seeding *****`, `blue`)
     const relByUser = 6;
-    await deleteAllRel("TAGGED");
-    log(`Creating "TAGGED" relationships...`);
     const userCount = await getUserCount();
     const tagCount = await session.run(`MATCH (t:Tag) RETURN count(t)`);
+    await deleteAllRel("TAGGED");
+    log(`Creating ${relByUser * userCount} "TAGGED" relationships...`);
     for (userId = 0; userId < userCount; userId++) {
         const selectedTagId = [];
         for (relCount = 0; relCount < relByUser; relCount++) {
@@ -207,11 +216,11 @@ const seedTaggedRel = async () => {
 }
 
 const seedLikedRel = async () => {
-    log(`***** LIKED RELATIONSHIPS SEEDING *****`, `blue`)
+    log(`\n***** LIKED relationships seeding *****`, `blue`)
     const relByUser = 20;
     const maxId = await getUserCount();
     await deleteAllRel("LIKED");
-    log(`Creating "LIKED" relationships...`);
+    log(`Creating ${relByUser * maxId} "LIKED" relationships...`);
     for (userId = 0; userId < maxId; userId++) {
         for (relCount = 0; relCount < relByUser; relCount++) {
             let randomId = Math.floor(Math.random() * maxId);
@@ -247,11 +256,11 @@ const seedRelationships = async () => {
         await seedBlockedRel();
         await seedVisitedRel();
         await seedLikedRel();
-        log(`RELATIONSHIPS SEEDING COMPLETE !`, `blue`)
+        log(`\nRelationships seeding complete !`, `cyan`)
         process.exit(0);
     } catch(error) {
         log(error, `red`);
-        log(`Terminating seeding process.`, `red`);
+        log(`\nTerminating seeding process.`, `red`);
         process.exit(1);
     }
 }
