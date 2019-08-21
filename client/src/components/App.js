@@ -1,35 +1,64 @@
-import React, { useState, useEffect } from 'react';
-import Main from './Main';
+import React, { useState, useEffect, Fragment } from 'react';
+import AuthenticatedMain from './AuthenticatedMain';
+import UnauthenticatedMain from './UnauthenticatedMain';
 import Header from './Header/Header';
 import { AppProvider } from '../AppContext';
 import { actionIsAuthenticated } from '../actions/authActions';
-import { ThemeProvider } from "styled-components";
-import Theme from "./theme.json";
+import setupSocket from '../actions/socketActions';
+import { ThemeProvider } from 'styled-components';
+import Theme from './theme.json';
+import axios from 'axios';
 
 function App() {
-
   const [connected, setConnected] = useState(false);
+  const [socket, setSocket] = useState(null);
+  const [connectedUsers, setConnectedUsers] = useState([]);
+  const [unseenNotificationsNb, setUnseenNotificationsNb] = useState(0);
   
   useEffect(() => {
-    actionIsAuthenticated(localStorage.getItem('token'))
-      .then(isAuthenticated => isAuthenticated ? setConnected(true) : setConnected(false))
-      .catch(err => setConnected(false));
-  });
+      async function fetchData() {
+        try {
+          const userId = await actionIsAuthenticated(localStorage.getItem('token'));
+          if (userId !== null) {
+            const authToken = localStorage.getItem('token');
+            const resNotif = await axios.get(`/notifications/unseenNotificationsNb?authToken=${authToken}`);
+            appState.setUnseenNotificationsNb(resNotif.data.nb);
+            setupSocket(userId, setSocket, setConnectedUsers);
+            setConnected(true);
+          } else {
+            setConnected(false)
+          }
+        } catch {
+          setConnected(false)
+        }
+      };
+      fetchData();
+  }, []);
 
-  const appState = { 
-      connected: connected,
-      toggleConnected: () => {setConnected(!connected)}
+  const appState = {
+      connected,
+      setConnected,
+      toggleConnected: () => {setConnected(!connected)},
+      connectedUsers,
+      setConnectedUsers,
+      socket,
+      setSocket,
+      unseenNotificationsNb, 
+      setUnseenNotificationsNb,
   };
 
   return (
-    <AppProvider value={appState}>
-      <ThemeProvider theme={Theme}>
-       <div>
-        <Header />
-        <Main />
-        </div>
-      </ThemeProvider>
-    </AppProvider>
+    <Fragment>
+      <AppProvider value={appState}>
+      {!connected ? <UnauthenticatedMain /> : 
+        <ThemeProvider theme={Theme}>
+          <div>
+            <Header />
+            <AuthenticatedMain />
+          </div>
+        </ThemeProvider> }
+      </AppProvider>
+    </Fragment>
   );
 }
 

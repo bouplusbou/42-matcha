@@ -18,6 +18,9 @@ router.route('/createRelationship')
 router.route('/deleteRelationship')
       .delete(authenticate, (req, res) => { UserController.deleteRelationship(req, res); });
 
+router.route('/hasFullProfile')
+      .get(authenticate, (req, res) => { UserController.hasFullProfile(req, res); });
+
 router.route('/resetPasswordEmail')
       .post((req, res) => { UserController.resetPasswordEmail(req, res); });
 
@@ -35,4 +38,8 @@ router.route(`/removeTag`)
 
 router.route(`/uploadPic`)
       .post(authenticate, (req, res) => { UserController.uploadPic(req, res); });
+      
 module.exports = router;
+
+
+

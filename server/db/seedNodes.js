@@ -28,7 +28,6 @@ const Color = {
 }
 const log = (text, color = "yellow") => console.log(`${Color[color]}${text}${Color.Reset}`);
 
-
 const tagsList = [
   'burritos',
   'physiquequantique',
@@ -242,7 +241,7 @@ const setConstraints = async () => {
   log(`Constraint set for : userId, uuid, email, username, hash.`)
 }
 
-const seedUserNodes = async (requestedNodes = 450) => {
+const seedUserNodes = async (requestedNodes = 300) => {
   log(`\n***** User nodes seeding *****`, `blue`);
   const usersByGender = Math.floor(requestedNodes / 3);
   let createdNodes = 0;
@@ -250,7 +249,7 @@ const seedUserNodes = async (requestedNodes = 450) => {
   createdNodes += await createUsersByGender(`male`, usersByGender, createdNodes);
   createdNodes += await createUsersByGender(`female`, usersByGender, createdNodes);
   createdNodes += await createUsersByGender(`non-binary`, usersByGender, createdNodes);
-  log(`${createdNodes} user nodes created in total.`, `green`)
+  log(`${createdNodes} user nodes created in total.`, `green`);
 }
 
 const seedNodes = async () => {

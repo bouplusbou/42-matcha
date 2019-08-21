@@ -5,5 +5,6 @@ router.use('/users', require('./routes/userRoutes'));
 router.use('/tags', require('./routes/tagRoutes'));
 router.use('/auth', require('./routes/authRoutes'));
 router.use(`/search`, require(`./routes/searchRoutes`));
+router.use('/notifications', require('./routes/notificationsRoutes'));
 
 module.exports = router;

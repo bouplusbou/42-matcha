@@ -41,7 +41,7 @@ export default function UserCard({ user, width, height }) {
     display: flex;
     scrollbar-width: none;
     overflow-y: scroll;
-    ::-webkit-scrollbar: { display: none };
+    /* ::-webkit-scrollbar: { display: none }; */
   `;
   const Tag = styled.p`
     background-color: #E3D4FF;

@@ -120,7 +120,7 @@ const createNotification = async (type, fromId, toUuid) => {
 
 const seedVisitedRel = async () => {
     log(`\n***** VISITED relationships seeding *****`, `blue`)
-    const relByUser = 20;
+    const relByUser = 5;
     const maxId = await getUserCount();
     await deleteAllRel("VISITED");
     log(`Creating ${relByUser * maxId} "VISITED" relationships...`);
@@ -217,7 +217,7 @@ const seedTaggedRel = async () => {
 
 const seedLikedRel = async () => {
     log(`\n***** LIKED relationships seeding *****`, `blue`)
-    const relByUser = 20;
+    const relByUser = 5;
     const maxId = await getUserCount();
     await deleteAllRel("LIKED");
     log(`Creating ${relByUser * maxId} "LIKED" relationships...`);

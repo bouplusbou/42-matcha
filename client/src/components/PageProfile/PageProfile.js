@@ -1,5 +1,6 @@
-import React, { Fragment, useState, useEffect } from "react";
+import React, { Fragment, useState, useEffect, useContext } from "react";
 import axios from 'axios';
+import AppContext from '../../AppContext';
 
 import { ProfileProvider } from './ProfileContext';
 import { faEye, faHeart } from '@fortawesome/free-solid-svg-icons';
@@ -26,6 +27,7 @@ const GridContainer = styled.div `
 `
 
 export default function PageProfile(props) {
+    const appState = useContext(AppContext);
 
     const [profileState, setProfileState] = useState({
         fetchData: fetchData,
@@ -66,6 +68,12 @@ export default function PageProfile(props) {
     
     useEffect(() => {
         fetchData();
+        appState.socket.emit('visit', props.match.params.username);
+        const data = {
+            type: 'visited',
+            usernameVisited: props.match.params.username,
+        }
+        axios.post(`/notifications?authToken=${authToken}`, data);
     }, [])
     
     async function fetchData(edit) {

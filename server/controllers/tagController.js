@@ -1,7 +1,7 @@
-const Tag = require('../models/TagModel');
+const TagModel = require('../models/TagModel');
 
 const allTags = (req, res) => {
-    Tag.allTags()
+    TagModel.allTags()
           .then( tags => {
                 const formatedTags = tags.map((tag, key) => {
                       return { value: key, label: tag}
@@ -13,7 +13,7 @@ const allTags = (req, res) => {
 }
 
 const createTag = async (req, res) => {
-      Tag.createTag(req.body)
+      TagModel.createTag(req.body)
             .then(() => { res.json({message: "ca marche"})})
             .catch(err => { console.log(err)})
 }

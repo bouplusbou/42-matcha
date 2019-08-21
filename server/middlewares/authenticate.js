@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const config = require('./config');
-const User = require('../models/UserModel');
+const UserModel = require('../models/UserModel');
 
 const authenticate = (req, res, next) => {
   const token = req.body.authToken || req.query.authToken;
@@ -9,7 +9,7 @@ const authenticate = (req, res, next) => {
   } else {
     jwt.verify(token, config.jwtSecret, async (err, decoded) => {
       if (decoded) {
-        const uuidIsValid = await User.uuidExists(decoded.uuid);
+        const uuidIsValid = await UserModel.uuidExists(decoded.uuid);
         uuidIsValid ? next() : res.status(401).send('Unauthorized: Invalid token');
       } else {
         res.status(401).send('Unauthorized: Invalid token');

@@ -80,7 +80,7 @@ const updateProfile = async (uuid, editedValues) => {
     if (editedValues.newPassword)
       editedValues.password = await bcrypt.hash(editedValues.newPassword, 10);
     let cypher = "MATCH (u:User {uuid: $uuid})\n";
-    for (var key in editedValues) { cypher += `SET u.${key} = $${key}\n` }
+    for (var key in editedValues) { cypher += `SET u.${key} = $${key}\n` }
     await session.run(cypher, {
       ...editedValues,
       uuid: uuid
@@ -111,7 +111,7 @@ const getUserByUsername = async username => {
   } catch(error) { Log.error(error, "getUserByUsername", __filename) }
 }
 
-const getProfile = async uuid => {
+const getProfileByUuid = async uuid => {
   try {
     const res = await session.run(`
     MATCH (u:User)
@@ -129,7 +129,7 @@ const getProfile = async uuid => {
     delete user[`uuid`];
     const age = res.records[0].get(`age`).low;
     const tags = res.records[0].get(`tags`);
-    return {
+    return {
       ...user, age, tags
     }
   } catch(error) { Log.error(error, "getProfile", __filename) }
@@ -189,11 +189,29 @@ const deleteRelationship = async (type, userUuid, targetUuid) => {
   } catch (error) { Log.error(error, "deleteRelationship", __filename) }
 }
 
+async function updateRelationship(uuid, { choice, username }) { 
+  const relation = {
+    'like': 'CREATE (me)-[r:LIKED]->(other)',
+    'dislike': 'CREATE (me)-[r:DISLIKED]->(other)'
+  }
+  try {
+    const res = await session.run(`
+      MATCH (me:User {uuid: $uuid}), (other:User {username: $username})
+      ${relation[choice]}
+      SET r.timestamp = timestamp()
+    `, { 
+      uuid: uuid,
+      username: username,
+    });
+    session.close();
+  } catch(err) { console.log(err) }
+}
+
 const removeTag = async (uuid, req) => {
   try {
     await session.run(`
       MATCH (u:User {uuid: $uuid}), (t:Tag {tag: $tag})
-      MATCH (u)-(r:TAGGED]->(t)
+      MATCH (u)-[r:TAGGED]->(t)
       DELETE r
     `, {
       uuid: uuid,
@@ -207,7 +225,7 @@ const addTag = async (uuid, req) => {
   try {
     await session.run(`
       MATCH (u:User {uuid: $uuid}), (t:Tag {tag: $tag})
-      CREATE (u)-r:TAGGED]->(t)
+      CREATE (u)-[r:TAGGED]->(t)
     `, {
       uuid: uuid,
       tag: req.tag,
@@ -228,6 +246,19 @@ const getUuidByHash = async ({ hash }) => {
     const uuid = res.records[0].get('uuid');
     return uuid;
   } catch(error) { Log.error(error, "getUuidByHash", __filename) }
+}
+
+async function userIdFromUsername(username) { 
+  try {
+    const res = await session.run(`
+      MATCH (u:User {username: $username})
+      RETURN u.userId AS userId
+    `, { username: username });
+    session.close();
+    if (res.records[0] === undefined) return null;
+    const userId = res.records[0].get('userId');
+    return userId;
+  } catch(err) { console.log(err) }
 }
 
 const confirmUser = async uuid => { 
@@ -256,20 +287,109 @@ const resetPasswordEmail = async email => {
   } catch(error) { Log.error(error, "resetPasswordEmail", __filename) }
 }
 
+async function resetPassword({ hash, newPassword }) { 
+  await bcrypt.hash(newPassword, 10, async (error, hashedPassword) => {
+    try {
+      const res = await session.run(`
+        MATCH (u:User)
+        WHERE u.hash = $hash
+        SET u.password = $hashedPassword
+        RETURN u.username AS username
+      `,
+      { 
+        hash: hash,
+        hashedPassword: hashedPassword,
+      });
+      session.close();
+      if (res.records[0] === undefined) return null;
+      const username = res.records[0].get('username');
+      return username;
+    } catch(err) { console.log(err) }
+  })
+}
+
+async function hasFullProfile(uuid) { 
+  try {
+    const res = await session.run(`
+      MATCH (u:User)
+      WHERE u.uuid = $uuid
+      RETURN u.lookingFor AS lookingFor, 
+      u.gender AS gender,
+      u.birthDate AS birthDate,
+      u.orientation AS orientation
+    `,
+    { uuid: uuid });
+    session.close();
+    if (res.records[0] === undefined) return null;
+    const lookingFor = res.records[0].get('lookingFor');
+    const gender = res.records[0].get('gender');
+    const birthDate = res.records[0].get('birthDate');
+    const orientation = res.records[0].get('orientation');
+    return { lookingFor, gender, birthDate, orientation };
+  } catch(err) { console.log(err) }
+}
+
+async function userIdFromUuid(uuid) { 
+  try {
+    const res = await session.run(`
+      MATCH (u:User {uuid: $uuid})
+      RETURN u.userId AS userId
+    `, { uuid: uuid });
+    session.close();
+    if (res.records[0] === undefined) return null;
+    const userId = res.records[0].get('userId');
+    return userId;
+  } catch(err) { console.log(err) }
+}
+
+async function usernameFromUserId(userId) { 
+  try {
+    const res = await session.run(`
+      MATCH (u:User {userId: $userId})
+      RETURN u.username AS username
+    `, { userId: userId });
+    session.close();
+    if (res.records[0] === undefined) return null;
+    const username = res.records[0].get('username');
+    return username;
+  } catch(err) { console.log(err) }
+}
+
+async function uuidFromUsername(username) { // refacto possible avec getUserByUsername
+  try {
+    const res = await session.run(`
+      MATCH (u:User {username: $username})
+      RETURN u.uuid AS uuid
+    `, { username: username });
+    session.close();
+    if (res.records[0] === undefined) return null;
+    const uuid = res.records[0].get('uuid');
+    return uuid;
+  } catch(err) { console.log(err) }
+}
+
 module.exports = {
+  getUserByUsername,
+  createRelationship,
+  deleteRelationship,
+  getHistoric,
+  confirmUser,
+  getUuidByHash,
   createUser,
   usernameExists,
   emailExists,
   uuidExists,
-  getUserByUsername,
-  getProfile,
+  getProfileByUuid,
   updateProfile,
   addTag,
   removeTag,
-  createRelationship,
-  deleteRelationship,
+  updateRelationship,
   resetPasswordEmail,
-  getHistoric,
-  confirmUser,
-  getUuidByHash,
+  resetPassword,
+  hasFullProfile,
+  userIdFromUuid,
+  userIdFromUsername,
+  usernameFromUserId,
+  uuidFromUsername,
 }
+ 
