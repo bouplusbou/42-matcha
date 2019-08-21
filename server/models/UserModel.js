@@ -69,7 +69,7 @@ async function updateProfile(uuid, req) {
       ${req.latLng ? `SET u.letLng = $latLng` : ""}
     `, { req });
     session.close();
-  } catch (err) { console.log(err.stack) }
+  } catch (err) { console.log(err) }
 }
 
 async function emailExists(email) { 
@@ -89,15 +89,15 @@ async function userFromUsername(username) {
     const res = await session.run(`
       MATCH (u:User)
       WHERE u.username = $username
-      RETURN u.password AS password, u.uuid AS uuid, u.username AS username, u.confirmed AS confirmed
+      RETURN u.password AS password, u.uuid AS uuid, u.userId AS userId, u.confirmed AS confirmed
     `, { username: username });
     session.close();
     if (res.records[0] !== undefined) {
       const password = res.records[0].get('password');
       const uuid = res.records[0].get('uuid');
-      const username = res.records[0].get('username');
+      const userId = res.records[0].get('userId');
       const confirmed = res.records[0].get('confirmed');
-      const user = { password, uuid, username, confirmed };
+      const user = { password, uuid, userId, confirmed };
       return user;
     } else {
       return null;
@@ -185,11 +185,10 @@ async function getProfile(uuid) {
       lastConnection,
       city
     }
-  } catch(err) { console.log(err.stack)};
+  } catch(err) { console.log(err)};
 }
 
 async function searchUsers(uuid, { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags, offset }) { 
-  // console.log(uuid);
   const sorting = { 
     'Closest': 'ORDER BY dist_city',
     'Farthest': 'ORDER BY dist_city DESC',
@@ -246,7 +245,6 @@ async function searchUsers(uuid, { sortingChoice, filterAge, filterScore, filter
       offset: offset,
     });
     session.close();
-    console.log(res.records);
     const users = res.records.map(record => {
       const username = record.get('username');
       const gender = record.get('gender');
@@ -281,7 +279,6 @@ async function filtersMinMax() {
 }
 
 async function suggestedUsers(uuid, { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags }) { 
-  // console.log(uuid);
   const sorting = { 
     'Closest': 'ORDER BY dist_city',
     'Farthest': 'ORDER BY dist_city DESC',
@@ -370,7 +367,7 @@ async function updateRelationship(uuid, { choice, username }) {
       username: username,
     });
     session.close();
-  } catch(err) { console.log(err.stack) }
+  } catch(err) { console.log(err) }
 }
 
 async function addTag(uuid, req) {
@@ -383,7 +380,7 @@ async function addTag(uuid, req) {
       tag: req.tag
     });
     session.close();
-  } catch(err) { console.log(err.stack) }
+  } catch(err) { console.log(err) }
 }
 
 async function removeTag(uuid, req) {
@@ -412,6 +409,19 @@ async function uuidFromHash({ hash }) {
   } catch(err) { console.log(err) }
 }
 
+async function userIdFromUsername(username) { 
+  try {
+    const res = await session.run(`
+      MATCH (u:User {username: $username})
+      RETURN u.userId AS userId
+    `, { username: username });
+    session.close();
+    if (res.records[0] === undefined) return null;
+    const userId = res.records[0].get('userId');
+    return userId;
+  } catch(err) { console.log(err) }
+}
+
 async function confirmation(uuid) { 
   try {
     const res = await session.run(`
@@ -423,7 +433,6 @@ async function confirmation(uuid) {
 }
 
 async function resetPasswordEmail(email) { 
-  console.log(email);
   try {
     const res = await session.run(`
       MATCH (u:User)
@@ -480,16 +489,42 @@ async function hasFullProfile(uuid) {
   } catch(err) { console.log(err) }
 }
 
-async function usernameFromUuid(uuid) { 
+async function userIdFromUuid(uuid) { 
   try {
     const res = await session.run(`
-      MATCH (me:User {uuid: $uuid})
-      RETURN me.username AS username
+      MATCH (u:User {uuid: $uuid})
+      RETURN u.userId AS userId
     `, { uuid: uuid });
+    session.close();
+    if (res.records[0] === undefined) return null;
+    const userId = res.records[0].get('userId');
+    return userId;
+  } catch(err) { console.log(err) }
+}
+
+async function usernameFromUserId(userId) { 
+  try {
+    const res = await session.run(`
+      MATCH (u:User {userId: $userId})
+      RETURN u.username AS username
+    `, { userId: userId });
     session.close();
     if (res.records[0] === undefined) return null;
     const username = res.records[0].get('username');
     return username;
+  } catch(err) { console.log(err) }
+}
+
+async function uuidFromUsername(username) { 
+  try {
+    const res = await session.run(`
+      MATCH (u:User {username: $username})
+      RETURN u.uuid AS uuid
+    `, { username: username });
+    session.close();
+    if (res.records[0] === undefined) return null;
+    const uuid = res.records[0].get('uuid');
+    return uuid;
   } catch(err) { console.log(err) }
 }
 
@@ -512,6 +547,9 @@ module.exports = {
   resetPasswordEmail,
   resetPassword,
   hasFullProfile,
-  usernameFromUuid,
+  userIdFromUuid,
+  userIdFromUsername,
+  usernameFromUserId,
+  uuidFromUsername,
 }
  

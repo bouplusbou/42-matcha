@@ -145,11 +145,12 @@ export default function PageLogin(props) {
       event.preventDefault();
       const credentials = {username: values.username, password: values.password};
       const res = await axios.post(`/auth`, credentials);
-      const username = await actionLogin(res.data.token, res.data.username);
+      await actionLogin(res.data.token);
       const resNotif = await axios.get(`/notifications/unseenNotificationsNb?authToken=${res.data.token}`);
       appState.setUnseenNotificationsNb(resNotif.data.nb);
       appState.toggleConnected();
-      setupSocket(username, appState.setSocket, appState.setConnectedUsers);
+      const userId = res.data.userId;
+      setupSocket(userId, appState.setSocket, appState.setConnectedUsers);
       props.history.push('/search');
     } catch(err) {
       setValues({ ...values, error: true, errorMsg: err.response.data.errorMsg});

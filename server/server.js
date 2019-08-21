@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const router = require('./router');
 const server = require('http').createServer(app);
 const io = require('socket.io').listen(server);
+const UserModel = require('./models/UserModel');
 
 app.use(cookieParser());
 app.use(bodyParser.json());
@@ -15,47 +16,45 @@ app.use('/api', router);
 
 
 io.use((client, next) => {
-  console.log('username:', client.handshake.query.username);
-  const username = client.handshake.query.username;
-  client.username = username;
+  console.log('userId:', client.handshake.query.userId);
+  const userId = client.handshake.query.userId;
+  client.userId = userId;
   return next();
 });
 
 io.on('connection', client => { 
   console.log('Client has connected to socket');
   console.log('connected socketIds:', Object.keys(io.sockets.sockets));
-  console.log(`client.id: ${client.id}, client.username: ${client.username}`);
+  console.log(`client.id: ${client.id}, client.userId: ${client.userId}`);
 
-  client.join(`${client.username}-room`);
-  console.log(`${client.username} joined "${client.username}-room"`);
+  client.join(`${client.userId}-room`);
+  console.log(`${client.userId} joined "${client.userId}-room"`);
 
-  const usernames = Object.keys(io.sockets.sockets).map(elem => io.sockets.sockets[elem].username);
-  console.log(`usernames: ${usernames}`);
+  const userIds = Object.keys(io.sockets.sockets).map(elem => io.sockets.sockets[elem].userId);
+  console.log(`userIds: ${userIds}`);
 
-  // io.emit('isConnected', usernames);
-  // client.emit('isConnected', usernames);
-  client.broadcast.emit('isConnected', usernames);
+  client.broadcast.emit('isConnected', userIds);
 
 	client.on('disconnect', () => {
     console.log('Client has disconnected');
-    const usernames = Object.keys(io.sockets.sockets).map(elem => io.sockets.sockets[elem].username);
-    io.emit('isConnected', usernames);
+    const userIds = Object.keys(io.sockets.sockets).map(elem => io.sockets.sockets[elem].userId);
+    io.emit('isConnected', userIds);
   });
 
   client.on('logout', () => {
-    // connectedUsers.splice(connected  Users.indexOf(username), 1);
-
-    const filteredUsernames = Object.keys(io.sockets.sockets).map(elem => io.sockets.sockets[elem].username).filter(username => {
-      return !(io.sockets.sockets[client.id].username === username);
+    const filteredUserIds = Object.keys(io.sockets.sockets).map(elem => io.sockets.sockets[elem].userId).filter(userId => {
+      return !(io.sockets.sockets[client.id].userId === userId);
     });
-    client.broadcast.emit('isConnected', filteredUsernames);
+    client.broadcast.emit('isConnected', filteredUserIds);
     console.log('Client has logout');
     client.disconnect();
 	});
 
-  client.on('visit', username => {
-    console.log(`Client has visited ${username}'s profile`);
-    client.to(`${username}-room`).emit('visited', client.username);
+  client.on('visit', async username => {
+    const userIdVisited = await UserModel.userIdFromUsername(username);
+    const usernameVisiter = await UserModel.usernameFromUserId(parseInt(client.userId, 10));
+    console.log(`${usernameVisiter} with userId ${client.userId} has visited ${username}'s profile with userId ${userIdVisited}`);
+    client.to(`${userIdVisited}-room`).emit('visited', usernameVisiter);
   });
 });
 

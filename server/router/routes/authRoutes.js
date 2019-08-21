@@ -5,8 +5,7 @@ const authController = require('../../controllers/authController');
 const userController = require('../../controllers/userController');
 
 router.route('/')
-      .get(authenticate, (req,res) => { userController.usernameFromUuid(req, res) })
+      .get(authenticate, (req,res) => { userController.userIdFromUuid(req, res) })
       .post((req,res) => { authController.login(req, res) })
-      // .get(authenticate, (req,res) => { res.sendStatus(200) })
 
 module.exports = router;

@@ -19,13 +19,13 @@ function App() {
   useEffect(() => {
       async function fetchData() {
         try {
-          const username = await actionIsAuthenticated(localStorage.getItem('token'));
-          if (username) {
+          const userId = await actionIsAuthenticated(localStorage.getItem('token'));
+          if (userId !== null) {
             const authToken = localStorage.getItem('token');
             const resNotif = await axios.get(`/notifications/unseenNotificationsNb?authToken=${authToken}`);
             appState.setUnseenNotificationsNb(resNotif.data.nb);
+            setupSocket(userId, setSocket, setConnectedUsers);
             setConnected(true);
-            setupSocket(username, setSocket, setConnectedUsers);
           } else {
             setConnected(false)
           }

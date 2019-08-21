@@ -37,18 +37,22 @@ async function getNotifications(uuid) {
   } catch(err) { console.log(err) }
 }
 
-async function createNotification(uuid, { type, userId }) { 
+async function createNotification(uuid, type, userId) { 
+  console.log(uuid, type, userId);
   try {
-    const notification = {
-      type: type,
-      from: userId,
-      to: uuid,
-      status: "unseen",
-    };
     await session.run(`
-      CREATE (n:Notification $notification) 
-      SET n.dateTime = DateTime()
-    `, {notification: notification});
+      CREATE (n:Notification {
+        type: $type,
+        from: $userId,
+        to: $uuid,
+        status: 'unseen',
+        dateTime: DateTime() 
+      })
+      `, {
+      type: type,
+      userId: userId,
+      uuid: uuid,
+    });
     session.close();
   } catch(err) { console.log(err) }
 }
