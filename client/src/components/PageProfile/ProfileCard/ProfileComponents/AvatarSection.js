@@ -4,9 +4,13 @@ import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFireAlt } from '@fortawesome/free-solid-svg-icons';
 import { Modal } from '@material-ui/core';
+import cloudinary from 'cloudinary-core';
+
 
 import ProfileContext from '../../ProfileContext';
 import PhotosModal from '../Components/PhotosModal';
+
+const cloudinaryCore = new cloudinary.Cloudinary({cloud_name: 'matchacn'});
 
 const StyledSection = styled.section `
     display:flex;
@@ -16,7 +20,7 @@ const StyledSection = styled.section `
     align-items:flex-end;
     
     border-radius:${props => props.theme.borderRadius} 0 0 ${props => props.theme.borderRadius};
-    background-image: url(${props => props.avatar ? props => props.avatar : "https://icon-library.net/images/no-profile-picture-icon/no-profile-picture-icon-12.jpg"});
+    background-image: url(${props => props.avatar});
     background-position: center center;
     background-size: cover;
     @media (max-width: 1000px) { 
@@ -62,7 +66,10 @@ export default function AvatarSection(props) {
     const [open, setOpen] = useState(false);
     const profile = useContext(ProfileContext);
     
+    const avatar = cloudinaryCore.url(profile.photos[profile.avatarIndex]);
+
     const OpenModal = () => {
+        console.log(avatar);
         if (profile.photos.length > 0)  {
             setOpen(true);
         }
@@ -76,7 +83,7 @@ export default function AvatarSection(props) {
 
     return (
         <Fragment>
-            <StyledSection avatar={profile.photos[profile.avatarIndex]} onClick={OpenModal}>
+            <StyledSection avatar={avatar} onClick={OpenModal}>
                 <ScoreContainer>
                     <Score>
                         <ScoreIcon icon={faFireAlt}/>

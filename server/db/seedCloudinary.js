@@ -6,6 +6,8 @@ const SeedCloudinary = async () => {
     try {
         Log.log(`***** Cloudinary Seed *****`, `blue`);
         Log.log(`Uploading woman pictures...`)
+        await cloudinary.api.delete_resources_by_prefix(`manSeed`)
+        await cloudinary.api.delete_resources_by_prefix(`womanSeed`)
         const womanPic = unsplash.arrWoman;
         for (i = 0; i < womanPic.length; i++) {
             await cloudinary.uploader.upload(womanPic[i], { public_id: `womanSeed/${i}`})
@@ -14,7 +16,7 @@ const SeedCloudinary = async () => {
         Log.log(`Uploading man pictures...`)
         const manPic = unsplash.arrMan;
         for (i = 0; i < manPic.length ; i++) {
-            await cloudinary.uploader.upload(manPic[i], { public_id: `manSeed/${i + womanPic.length}`})
+            await cloudinary.uploader.upload(manPic[i], { public_id: `manSeed/${i}`})
         }
         Log.log(`Man pictures successfully uploaded.`, `green`);
         Log.log(`Cloudinary seeding complete !`, `blue`)
