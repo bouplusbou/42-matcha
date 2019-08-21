@@ -8,6 +8,7 @@ import axios from 'axios';
 
 export default function Notifications() {
     const appState = useContext(AppContext);
+    const setUnseenNotificationsNb = appState.setUnseenNotificationsNb;
 
     useEffect(() => {
         if (appState.socket !== null) {
@@ -15,10 +16,10 @@ export default function Notifications() {
                 console.log(`${username} visited your profile !`);
                 const authToken = localStorage.getItem('token');
                 const resNotif = await axios.get(`/notifications/unseenNotificationsNb?authToken=${authToken}`);
-                appState.setUnseenNotificationsNb(resNotif.data.nb);
+                setUnseenNotificationsNb(resNotif.data.nb);
             });
         }
-    }, [appState]);
+    }, [appState.socket, setUnseenNotificationsNb]);
 
     return (
         <Link to="/notifications" style={{textDecoration: 'none'}}>

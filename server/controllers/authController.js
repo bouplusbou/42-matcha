@@ -8,7 +8,6 @@ const login = async (req, res) => {
     const { username, password } = req.body;
     try {
         const user = await UserModel.getUserByUsername(username);
-        console.log(user);
         if (user !== null) {
             if (user.confirmed) {
                 bcrypt.compare(password, user.password, (err, result) => {

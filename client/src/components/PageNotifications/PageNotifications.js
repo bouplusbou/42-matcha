@@ -62,17 +62,17 @@ export default function PageNotifications() {
 
   const [notifications, setNotifications] = useState([]);
   const appState = useContext(AppContext);
-
+  const setUnseenNotificationsNb = appState.setUnseenNotificationsNb;
 
   useEffect(() => {
     async function fetchData() {
       const authToken = localStorage.getItem('token');
       const res = await axios.get(`/notifications?authToken=${authToken}`);
       setNotifications(res.data.notifications);
-      appState.setUnseenNotificationsNb(0);
+      setUnseenNotificationsNb(0);
     };
     fetchData();
-  }, [appState]);
+  }, [setUnseenNotificationsNb]);
 
   return (
     <Hero>

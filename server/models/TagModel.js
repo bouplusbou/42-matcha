@@ -14,7 +14,6 @@ async function allTags() {
 }
 
 async function createTag(req) {
-  console.log(req);
   try {
     await session.run(`
       CREATE (t:Tag {tag: $tag})
