@@ -81,8 +81,10 @@ const InputSection = styled.section`
 const Date = styled.p`
   margin-right: 20px;
 `;
-
-
+const IncomingMessage = styled.div`
+`;
+const SentMessage = styled.div`
+`;
 export default function PageChat() {
 
   return (
@@ -99,7 +101,12 @@ export default function PageChat() {
           </Discussion>
         </DiscussionsSection>
         <ChatSection>
-          <ChatWindow></ChatWindow>
+          <ChatWindow>
+            <IncomingMessage>
+              <ProfilePic></ProfilePic>
+            </IncomingMessage>
+            <SentMessage></SentMessage>
+          </ChatWindow>
           <InputSection></InputSection>
         </ChatSection>
       </Container>
