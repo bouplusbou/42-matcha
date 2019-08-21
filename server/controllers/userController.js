@@ -169,8 +169,8 @@ const deleteRelationship = async (req, res) => {
 
 const uploadPic = async (req, res) => {
       try {
+            console.log(req.body.image);
             const test = await cloudinary.uploader.upload(req.body.image, { public_id: Date.now() })
-            console.log(test)
       } catch (error) { Log.error(error, `uploadPic`, __filename) }
 }
 

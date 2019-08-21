@@ -9,9 +9,6 @@ import ProfileCard from './ProfileCard/ProfileCard';
 import UserList from './UserList/UserList'
 import styled from 'styled-components';
 
-import { Image } from 'cloudinary-react'
-import { Button } from "@material-ui/core";
-
 const authToken = localStorage.getItem('token');
 
 const GridContainer = styled.div `
@@ -86,11 +83,16 @@ export default function PageProfile(props) {
     function uploadPicture(event) {
         event.preventDefault();
         const file = event.target.files[0];
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => {
-            const image  = reader.result;
-            axios.post(`/users/uploadPic?authToken=${authToken}`, { image })
+        console.log(file.size);
+        if (file.size < 1000000) {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                const image  = reader.result;
+                axios.post(`/users/uploadPic?authToken=${authToken}`, { image })
+            }
+        } else {
+            console.log(`Picture is too big`);
         }
     }
 
@@ -98,9 +100,6 @@ export default function PageProfile(props) {
         <ProfileProvider value={{...profileState}}>
             <Container>
                 <GridContainer>
-                    {/* <p onClick={testUpload}>rzoigjrojgoizrj</p>
-                    <input type='file' accept="image/png, image/jpeg"></input> */}
-                 
                     <ProfileCard/>
                     {profileState.account &&
                         <Fragment>
