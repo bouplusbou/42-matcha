@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye } from '@fortawesome/free-solid-svg-icons';
@@ -73,7 +72,7 @@ export default function PageNotifications() {
       appState.setUnseenNotificationsNb(0);
     };
     fetchData();
-  }, []);
+  }, [appState]);
 
   return (
     <Hero>

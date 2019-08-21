@@ -145,7 +145,7 @@ const getHistoric = async (uuid, type) => {
       duration.between(date(t.birthDate),date()).years AS age,
       toString(r.timestamp) AS timestamp
       ORDER BY r.timestamp 
-    `, { uuid:uuid })
+    `, { uuid: uuid })
     session.close();
     const historic = []
     for (i = 0; i < res.records.length; i++) {

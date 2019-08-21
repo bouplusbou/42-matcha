@@ -6,8 +6,6 @@ import UsernameRow from './UsernameRow';
 import InfosRow from './InfosRow';
 import TagsRow from './TagsRow';
 import BiographyRow from './BiographyRow';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEllipsisH } from '@fortawesome/free-solid-svg-icons';
 
 
 const StyledSection = styled.section `

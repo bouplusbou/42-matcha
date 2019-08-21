@@ -22,7 +22,7 @@ function App() {
           if (userId !== null) {
             const authToken = localStorage.getItem('token');
             const resNotif = await axios.get(`/notifications/unseenNotificationsNb?authToken=${authToken}`);
-            appState.setUnseenNotificationsNb(resNotif.data.nb);
+            setUnseenNotificationsNb(resNotif.data.nb);
             setupSocket(userId, setSocket, setConnectedUsers);
             setConnected(true);
           } else {

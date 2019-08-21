@@ -1,9 +1,6 @@
 import React, { useContext } from 'react';
-import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import AppContext from '../../AppContext';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBell } from '@fortawesome/free-solid-svg-icons';
 
 const NotificationDot = styled.div`
     position: absolute;

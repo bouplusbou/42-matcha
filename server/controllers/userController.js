@@ -26,23 +26,6 @@ const passwordIsOK = password => {
       return regex.test(String(password));
 };
 
-
-
-const searchUsers = (req, res) => {
-      const token = req.body.authToken || req.query.authToken;
-      jwt.verify(token, config.jwtSecret, async (err, decoded) => {
-            UserModel.searchUsers(decoded.uuid, req.body)
-                  .then(users => { res.json({usersArr: users}) })
-                  .catch(err => { console.log(err) })
-      });
-};
-
-const filtersMinMax = (req, res) => {
-      UserModel.filtersMinMax()
-            .then(filtersMinMax => { res.json({ age: filtersMinMax.age, score: filtersMinMax.score }) })
-            .catch(err => { console.log(err) })
-};
-
 const createUser = (req, res) => {
       try {
             const newUserIsOK = async (email, firstName, lastName, username, password) => {

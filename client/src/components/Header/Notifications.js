@@ -18,7 +18,7 @@ export default function Notifications() {
                 appState.setUnseenNotificationsNb(resNotif.data.nb);
             });
         }
-    }, [appState.socket]);
+    }, [appState]);
 
     return (
         <Link to="/notifications" style={{textDecoration: 'none'}}>

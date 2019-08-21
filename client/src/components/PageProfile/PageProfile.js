@@ -68,12 +68,14 @@ export default function PageProfile(props) {
     
     useEffect(() => {
         fetchData();
-        appState.socket.emit('visit', props.match.params.username);
-        const data = {
-            type: 'visited',
-            usernameVisited: props.match.params.username,
+        if (props.match.params.username !== undefined) {
+            appState.socket.emit('visit', props.match.params.username);
+            const data = {
+                type: 'visited',
+                usernameVisited: props.match.params.username,
+            }
+            axios.post(`/notifications?authToken=${authToken}`, data);
         }
-        axios.post(`/notifications?authToken=${authToken}`, data);
     }, [])
     
     async function fetchData(edit) {

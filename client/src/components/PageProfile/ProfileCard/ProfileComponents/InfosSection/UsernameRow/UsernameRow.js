@@ -8,8 +8,6 @@ import LikeButton from './LikeButton';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCog, faPlus } from '@fortawesome/free-solid-svg-icons';
 
-const FileInput = React.createRef();
-
 const StyledRow = styled.div `
     display:flex;
     box-sizing:border-box;

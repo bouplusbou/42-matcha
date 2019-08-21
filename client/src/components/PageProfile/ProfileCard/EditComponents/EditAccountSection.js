@@ -1,11 +1,10 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import Separator from '../Components/Separator';
-import { faAt, faTimes, faCheck, faUser, faLock } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faCheck, faUser } from '@fortawesome/free-solid-svg-icons';
 import { TextField } from '@material-ui/core';
 import ProfileContext from '../../ProfileContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-const authToken = localStorage.getItem('token');
 
 const StyledSection = styled.section `
     padding:1rem;
