@@ -1,5 +1,6 @@
 const driver = require('./database.js');
 const session = driver.session();
+const uuidv1 = require('uuid/v1');
 
 const Color = {
     Reset: "\x1b[0m",
@@ -120,7 +121,7 @@ const createNotification = async (type, fromId, toUuid) => {
 
 const seedVisitedRel = async () => {
     log(`\n***** VISITED relationships seeding *****`, `blue`)
-    const relByUser = 5;
+    const relByUser = 15;
     const maxId = await getUserCount();
     await deleteAllRel("VISITED");
     log(`Creating ${relByUser * maxId} "VISITED" relationships...`);
@@ -154,7 +155,7 @@ const seedVisitedRel = async () => {
 
 const seedBlockedRel = async () => {
     log(`\n***** BLOCKED relationships seeding *****`, `blue`)
-    const relByUser = 2;
+    const relByUser = 5;
     const maxId = await getUserCount();
     await deleteAllRel("BLOCKED");
     log(`Creating ${relByUser * maxId} "BLOCKED" relationships...`);
@@ -217,7 +218,7 @@ const seedTaggedRel = async () => {
 
 const seedLikedRel = async () => {
     log(`\n***** LIKED relationships seeding *****`, `blue`)
-    const relByUser = 5;
+    const relByUser = 10;
     const maxId = await getUserCount();
     await deleteAllRel("LIKED");
     log(`Creating ${relByUser * maxId} "LIKED" relationships...`);
@@ -239,8 +240,21 @@ const seedLikedRel = async () => {
                 randomuserId: randomId,
             })
             await createNotification("liked", randomId, res.records[0].get(`uuid`));
-            if (await hasMatched(userId, randomId))
+            if (await hasMatched(userId, randomId)) {
+                await session.run(`CREATE CONSTRAINT ON (m:Match) ASSERT m.machId IS UNIQUE`);
+                await session.run(`
+                    CREATE (m:Match {
+                        userIds: $userIds,
+                        matchId: $matchId,
+                        dateTime: DateTime()
+                    })
+                    `, {
+                        userIds: [userId, randomId],
+                        matchId: uuidv1(),
+                    }
+                );
                 await createNotification("matched", randomId, res.records[0].get(`uuid`));
+            }
         }
     }
     const result = await session.run(`

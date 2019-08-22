@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
 import UserListItem from './UserListItem';
-import Separator from '../ProfileCard/Components/Separator';
+import Separator from '../../Separator';
 
 const StyledSection = styled.section `
     display:flex;

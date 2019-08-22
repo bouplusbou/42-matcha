@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faCog } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faCog, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 const StyledSection = styled.section `
     display:flex;
@@ -55,12 +55,16 @@ export default function EditMenu(props) {
         <StyledSection>
             <ButtonContainer>
                 {props.selectedTab === "profile" ? 
-                    <StyledSelectedButton><FontAwesomeIcon icon={faUser} size={"3x"}/> PROFILE</StyledSelectedButton> :
+                    <StyledSelectedButton><FontAwesomeIcon icon={faUser} size={"3x"}/>PROFILE</StyledSelectedButton> :
                     <StyledButton id="profile" onClick={props.handleClick}><FontAwesomeIcon icon={faUser} size={"3x"}/> PROFILE</StyledButton>
                 }
                 {props.selectedTab === "account" ? 
-                    <StyledSelectedButton><FontAwesomeIcon icon={faCog} size={"3x"}/> ACCOUNT</StyledSelectedButton> :                    
+                    <StyledSelectedButton><FontAwesomeIcon icon={faCog} size={"3x"}/>ACCOUNT</StyledSelectedButton> :                    
                     <StyledButton id="account" onClick={props.handleClick}><FontAwesomeIcon icon={faCog} size={"3x"} /> ACCOUNT</StyledButton>
+                }
+                {props.selectedTab === "blockedList" ? 
+                    <StyledSelectedButton><FontAwesomeIcon icon={faEyeSlash} size={"3x"}/>BLOCKED USERS</StyledSelectedButton> :                    
+                    <StyledButton id="blockedList" onClick={props.handleClick}><FontAwesomeIcon icon={faEyeSlash} size={"3x"} />BLOCKED USERS</StyledButton>
                 }
             </ButtonContainer>
         </StyledSection>

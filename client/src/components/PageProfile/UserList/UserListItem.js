@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart } from '@fortawesome/free-solid-svg-icons';
 import { Image } from 'cloudinary-react';
+import { Link } from 'react-router-dom';
 
 const StyledDiv = styled.div `
     display:flex;
@@ -23,10 +24,11 @@ const ProfilePhoto = styled(Image) `
     object-fit:cover;
 `
 
-const InfosContainer = styled.div `
+const InfosContainer = styled(Link) `
     display:flex;
     flex-direction:column;
     justify-content:center;
+    text-decoration:none;
     flex:1;
     padding:0.5rem;
 `
@@ -57,7 +59,7 @@ export default function UserListItem(props) {
     return (
         <StyledDiv>
             <ProfilePhoto cloudName='matchacn' publicId={props.photos[props.avatarIndex]}/>
-            <InfosContainer>
+            <InfosContainer to={`/profile/${props.username}`}>
                 <Username color={props.color}>{props.username}</Username>
                 <Age>{props.age}, {props.city}</Age>
             </InfosContainer>

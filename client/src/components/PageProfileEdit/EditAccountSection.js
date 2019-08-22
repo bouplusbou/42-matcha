@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
-import Separator from '../PageProfile/ProfileCard/Components/Separator';
+import Separator from '../Separator';
 import { faTimes, faCheck, faUser } from '@fortawesome/free-solid-svg-icons';
 import { TextField } from '@material-ui/core';
 import ProfileContext from '../ProfileContext';

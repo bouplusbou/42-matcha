@@ -6,6 +6,7 @@ import styled from 'styled-components'
 import EditMenu from './EditMenu';
 import EditProfileSection from './EditProfileSection'
 import EditAccountSection from './EditAccountSection'
+import BlockedList from "./BlockedList";
 
 const authToken = localStorage.getItem('token');
 
@@ -27,6 +28,7 @@ export default function PageProfileEdit() {
     const sectionsList = {
         "profile": <EditProfileSection/>,
         "account": <EditAccountSection/>,
+        "blockedList": <BlockedList/>
     }
 
     useEffect(() => {
