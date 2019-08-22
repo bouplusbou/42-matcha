@@ -1,12 +1,12 @@
 import React, { useContext, Fragment } from 'react';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 
-import ProfileContext from '../../../../ProfileContext';
-import ConnectedIcon from './ConnectedIcon';
-import GenderIcon from './GenderIcon';
-import LikeButton from './LikeButton';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCog, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faMars, faVenus, faTransgender, faCog, faPlus, faCircle, faDotCircle } from '@fortawesome/free-solid-svg-icons';
+import Tooltip from '@material-ui/core/Tooltip';
+
+import ProfileContext from '../../../ProfileContext';
 
 const StyledRow = styled.div `
     display:flex;
@@ -49,6 +49,38 @@ const EditButton = styled(FontAwesomeIcon) `
     color:${props => props.theme.color.purple};
 `
 
+const ConnectedIcon = (props) => {
+    const StyledIcon = styled(FontAwesomeIcon) `
+        color: ${props => props.connected ? "#1af033" : "#9c9c9c"};
+        margin-right:0.75rem;
+    `
+    
+    return (
+        <Tooltip title={props.connected ? "Online" : props.lastConnection}>
+            <StyledIcon
+            connected={props.connected}
+            icon={props.connected ? faCircle : faDotCircle}
+            size={props.size}
+            />
+        </Tooltip>
+    )
+}
+
+const GenderIcon = (props) => {
+    const icons = {
+        "male": faMars,
+        "female": faVenus,
+        "non-binary": faTransgender
+    }
+
+    const GenderIcon = styled(FontAwesomeIcon) `
+        color: ${props => props.theme.color.lightRed};
+    `
+    return (
+        <GenderIcon icon={icons[props.gender]} size={props.size}/>
+    );
+}
+
 export default function UsernameRow(props) {
     const profile = useContext(ProfileContext)
 
@@ -79,9 +111,11 @@ export default function UsernameRow(props) {
                 <label htmlFor="uploadFileButton">
                     <EditButton icon={faPlus} size={"2x"}/>
                 </label>
-                <EditButton icon={faCog} size={"2x"} onClick={profile.openEdit}/>
+                <Link to="/profile/edit">
+                    <EditButton icon={faCog} size={"2x"} onClick={profile.openEdit}/>
+                </Link>
                 </Fragment> :
-                <LikeButton {...profile}/>
+                <p/>
             }
             </UsernameContainer>
         </StyledRow>

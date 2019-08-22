@@ -1,12 +1,8 @@
-import React, { useContext, useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
-import AvatarSection from './ProfileComponents/AvatarSection';
-import InfosSection from './ProfileComponents/InfosSection';
-import ProfileContext from '../ProfileContext.js';
-import EditProfileSection from './EditComponents/EditProfileSection';
-import EditAccountSection from './EditComponents/EditAccountSection';
-import EditSectionMenu from './EditComponents/EditMenu';
+import AvatarSection from './AvatarSection';
+import InfosSection from './InfosSection';
 
 const StyledCard = styled.section `
     display:flex;
@@ -23,35 +19,10 @@ const StyledCard = styled.section `
 `
 
 export default function ProfileCard(props) {
-    const profile = useContext(ProfileContext);
-    const [editState, setEditState] = useState({
-        selectedTab: "profile"
-    })
-
-    const editSectionsList = {
-        profile: <EditProfileSection/>,
-        account: <EditAccountSection/>
-    }
-
-    const handleTabChange = event => {
-        const selectedTab = event.target.id;
-        setEditState({ selectedTab: selectedTab })
-    }
-
     return (
         <StyledCard>
-            {profile.username &&
-            <React.Fragment>
-                    {profile.edit ?
-                        <EditSectionMenu selectedTab={editState.selectedTab} handleClick={handleTabChange}/> :
-                        <AvatarSection/>
-                    }
-                    {profile.edit ? 
-                        editSectionsList[editState.selectedTab] :
-                        <InfosSection/>
-                    }
-            </React.Fragment>
-        }
+            <AvatarSection/>
+            <InfosSection/>
         </StyledCard>
     )
 }

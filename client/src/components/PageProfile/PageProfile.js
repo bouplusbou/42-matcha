@@ -1,14 +1,14 @@
 import React, { Fragment, useState, useEffect, useContext } from "react";
 import axios from 'axios';
-import AppContext from '../../AppContext';
+import styled from 'styled-components';
 
-import { ProfileProvider } from './ProfileContext';
+import { ProfileProvider } from '../ProfileContext';
 import { faEye, faHeart } from '@fortawesome/free-solid-svg-icons';
 
+import AppContext from '../../AppContext';
 import Container from "../Container";
 import ProfileCard from './ProfileCard/ProfileCard';
 import UserList from './UserList/UserList'
-import styled from 'styled-components';
 
 const authToken = localStorage.getItem('token');
 
@@ -29,45 +29,18 @@ const GridContainer = styled.div `
 export default function PageProfile(props) {
     const appState = useContext(AppContext);
 
-    const [profileState, setProfileState] = useState({
-        fetchData: fetchData,
-        handleLike: handleLike,
-        handleCancelLike: handleCancelLike,
-        openEdit: OpenEdit,
-        closeAndSaveEdit: CloseAndSaveEdit,
-        uploadPicture: uploadPicture
-    });
-    
-    async function handleLike() {
-        setProfileState({
-            ...profileState,
-            liked: true
-        })
-    }
-    
-    async function handleCancelLike() {
-        setProfileState({
-            ...profileState,
-            liked: false
-        })
-    }
-    
-    async function OpenEdit() {
-        fetchData(true);
-    }
-    
-    async function CloseAndSaveEdit(editedValues) {
-        if (Object.keys(editedValues).length > 0) {
-            await axios.post(`/users/updateProfile?authToken=${authToken}`, editedValues)
-                .then( fetchData(false))
-                .catch(err => console.log(err))
-        } else {
-            fetchData(false);
-        }
-    }
+    const [profileState, setProfileState] = useState({});
     
     useEffect(() => {
-        fetchData();
+        async function fetchProfile(edit) {
+            const username = props.match.params.username ? `/${props.match.params.username}` : "";
+            const profile = await axios.get(`/users${username}?authToken=${authToken}`)
+            setProfileState({
+                uploadPicture: uploadPicture,
+                ...profile.data.profile,
+            })
+        }
+        fetchProfile();
         if (props.match.params.username !== undefined) {
             appState.socket.emit('visit', props.match.params.username);
             const data = {
@@ -76,19 +49,8 @@ export default function PageProfile(props) {
             }
             axios.post(`/notifications?authToken=${authToken}`, data);
         }
-    }, [])
+    }, [props.match.params.username])
     
-    async function fetchData(edit) {
-        console.log("fetching data...")
-        const username = props.match.params.username ? `/${props.match.params.username}` : "";
-        const profile = await axios.get(`/users${username}?authToken=${authToken}`)
-        console.log(profileState);
-        setProfileState({
-            ...profileState,
-            ...profile.data.profile,
-            edit: edit,
-        })
-    }
 
     function uploadPicture(event) {
         event.preventDefault();
@@ -110,11 +72,10 @@ export default function PageProfile(props) {
         <ProfileProvider value={{...profileState}}>
             <Container>
                 <GridContainer>
-                    <ProfileCard/>
+                    {profileState.username && <ProfileCard/>}
                     {profileState.account &&
                         <Fragment>
                             {profileState.likedHistoric &&
-                            !profileState.edit &&
                                 <UserList
                                 title={"Users who likes you"} 
                                 list={profileState.likedHistoric}
@@ -123,7 +84,6 @@ export default function PageProfile(props) {
                                 />
                             }
                             {profileState.visitedHistoric &&
-                            !profileState.edit &&
                                 <UserList 
                                 title={"Users who visited your profile"}
                                 list={profileState.visitedHistoric}

@@ -65,7 +65,8 @@ const emailExists = async email => {
 }
 
 const uuidExists = async uuid => { 
-  try {
+    console.log("Calling uuidExists()...")
+    try {
     const res = await session.run(`
       MATCH (u:User {uuid: $uuid})
       RETURN u
