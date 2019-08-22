@@ -1,10 +1,9 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import TextField from '@material-ui/core/TextField';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
-import AppContext from '../../AppContext';
 
 const Hero = styled.section`
   display: flex;
@@ -42,7 +41,7 @@ const Discussion = styled.div`
   border-radius: 10px;
   position: relative;
 `;
-const ProfilePic = styled.div`
+const Avatar = styled.div`
   background-color: lightgrey;
   height: 50px;
   width: 50px;
@@ -111,7 +110,7 @@ const MessagesSection = styled.div`
   overflow: hidden;
   overflow-y: scroll;
 `;
-const InputSection = styled.section`
+const Form = styled.form`
   background-color: white;
   border-radius: 20px;
   padding: 30px;
@@ -180,56 +179,100 @@ const SendButton = styled.button`
 
 
 export default function PageChat() {
+  const [discussions, setDiscussions] = useState([]);
+  const [currentDiscussion, setCurrentDiscussion] = useState({});
+  const [inputValue, setInputValue] = useState('');
+  const authToken = localStorage.getItem('token');
+
+  useEffect(() => {
+    async function fetchData() {
+      const res = await axios.get(`/chat/discussions?authToken=${authToken}`);
+      setDiscussions(res.data.discussions);
+    };
+    fetchData();
+  }, [authToken]);
+
+  const loadCurrentDiscussion = async (matchId, youUserId, youUsername, youAvatar) => {
+    console.log(matchId);
+    const res = await axios.post(`/chat/currentDiscussion?authToken=${authToken}`, { matchId });
+    const setupCurrentDiscussion = {
+      matchId,
+      youUserId, 
+      youUsername,
+      youAvatar,
+      messages: res.data.currentDiscussion,
+    };
+    setCurrentDiscussion(setupCurrentDiscussion);
+  };
+
+  const handleChange = event => {
+    setInputValue(event.target.value);
+  };
+
+  const handleSubmit = async event => {
+    event.preventDefault();
+    try {
+      const matchId = currentDiscussion.matchId;
+      const youUserId = currentDiscussion.youUserId;
+      const message = inputValue;
+      await axios.post(`/chat?authToken=${authToken}`, { matchId, youUserId, message });
+      setInputValue('');
+    } catch(error) { console.log(error) }
+  }
 
   return (
     <Hero>
       <Container>
         <DiscussionsContainer>
           <DiscussionsSection>
-            <Discussion>
-              <ProfilePic></ProfilePic>
-              <Username>Boris Johnson</Username>
+            {discussions.map((discussion, index) => 
+            <Discussion
+              key={index}
+              onClick={() => loadCurrentDiscussion(discussion.matchId, discussion.youUserId, discussion.youUsername, discussion.youAvatar)}
+            >
+              <Avatar></Avatar>
+              <Username>{discussion.youUsername}</Username>
               <Status>new</Status>
-              <Date>2 feb</Date>
+              <Date>1 day ago</Date>
             </Discussion>
-            <Discussion>
-              <ProfilePic></ProfilePic>
-              <Username>Boris Johnson</Username>
-              <Status>new</Status>
-              <Date>2 feb</Date>
-            </Discussion>
+            )}
           </DiscussionsSection>
         </DiscussionsContainer>
         <ChatSection>
           <ChatInfo>
-            <ProfilePic></ProfilePic>
-            <ChatInfoUsername>Boris Johnson</ChatInfoUsername>
+            <Avatar></Avatar>
+            <ChatInfoUsername>{currentDiscussion.youUsername}</ChatInfoUsername>
           </ChatInfo>
           <ChatWindow>
             <MessagesSection>
-              <ReceivedMessageBlock>
-                <ProfilePic></ProfilePic>
-                <ReceivedMessage>Hello sweet child</ReceivedMessage>
-              </ReceivedMessageBlock>
-              <SentMessageBlock>
-                <SentMessage>Hi you perv</SentMessage>
-              </SentMessageBlock>
+            {currentDiscussion.messages && currentDiscussion.messages.map((msg, index) => {
+                return msg.type === 'received' ?
+                  <ReceivedMessageBlock
+                    key={index}
+                  >
+                    <Avatar></Avatar>
+                    <ReceivedMessage>{msg.message}</ReceivedMessage>
+                  </ReceivedMessageBlock>
+                :
+                <SentMessageBlock
+                  key={index}
+                >
+                  <SentMessage>{msg.message}</SentMessage>
+                </SentMessageBlock>
+            })}
             </MessagesSection>
-            <InputSection>
+            <Form noValidate autoComplete="off" onSubmit={handleSubmit}>
               <TextField
-                id="standard-multiline-flexible"
                 placeholder="Type a message..."
                 multiline
                 rowsMax="3"
-                // value={values.multiline}
-                // onChange={handleChange('multiline')}
-                // className={classes.textField}
-                // margin="normal"
+                value={inputValue}
+                onChange={handleChange}
               />
-              <SendButton>
+              <SendButton type='submit'>
                 <FontAwesomeIcon icon={faPaperPlane}/>
               </SendButton>
-            </InputSection>
+            </Form>
           </ChatWindow>
         </ChatSection>
       </Container>

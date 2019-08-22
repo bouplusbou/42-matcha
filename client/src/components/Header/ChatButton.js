@@ -1,9 +1,7 @@
-import React, { useContext, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-// import AppContext from '../../AppContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faComment } from '@fortawesome/free-solid-svg-icons';
-// import axios from 'axios';
 
 export default function ChatButton() {
     // const appState = useContext(AppContext);
