@@ -50,7 +50,7 @@ const seedChatMessage = async () => {
                 await session.run(`
                     CREATE (m:Message { 
                         matchId: $matchId,
-                        form: $from,
+                        from: $from,
                         to: $to,
                         message: $message,
                         status: $status,
@@ -66,7 +66,7 @@ const seedChatMessage = async () => {
                 await session.run(`
                     CREATE (m:Message { 
                         matchId: $matchId,
-                        form: $from,
+                        from: $from,
                         to: $to,
                         message: $message,
                         status: $status,
