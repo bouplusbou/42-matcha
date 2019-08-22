@@ -53,12 +53,14 @@ const seedChatMessage = async () => {
                         form: $from,
                         to: $to,
                         message: $message,
+                        status: $status,
                         dateTime: DateTime()
                     })
                 `, {
                     matchId: matchs[i].matchId,
                     from: matchs[i].userIds[0],
                     to: matchs[i].userIds[1],
+                    status: "unread",
                     message: messages[j]
                 })
                 await session.run(`
@@ -67,12 +69,14 @@ const seedChatMessage = async () => {
                         form: $from,
                         to: $to,
                         message: $message,
+                        status: $status,
                         dateTime: DateTime()
                     })
                 `, {
                     matchId: matchs[i].matchId,
                     from: matchs[i].userIds[1],
                     to: matchs[i].userIds[0],
+                    status: "unread",
                     message: messages[j]
                 })
             }
