@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faComment } from '@fortawesome/free-solid-svg-icons';
+import AppContext from '../../AppContext';
+import NotificationDot from './NotificationDot';
 
 export default function ChatButton() {
-    // const appState = useContext(AppContext);
-    // const setUnseenNotificationsNb = appState.setUnseenNotificationsNb;
+    const appState = useContext(AppContext);
+    // const setUnreadMessagesNb = appState.setUnreadMessagesNb;
 
     // useEffect(() => {
     //     if (appState.socket !== null) {
@@ -16,10 +18,15 @@ export default function ChatButton() {
     //             setUnseenNotificationsNb(resNotif.data.nb);
     //         });
     //     }
-    // }, [appState.socket, setUnseenNotificationsNb]);
+    // }, [appState.socket, setUnreadMessagesNb]);
 
     return (
         <Link to="/chat" style={{textDecoration: 'none'}}>
+            {appState.unreadMessagesNb !== 0 &&
+                <NotificationDot 
+                    nb={appState.unreadMessagesNb}
+                />
+            }
             <FontAwesomeIcon  style={{fontSize: '25px', cursor: 'pointer', color: 'white'}} icon={faComment}/>
         </Link>
     );

@@ -9,6 +9,9 @@ router.route('/')
 router.route('/discussions')
       .get(authenticate, (req, res) => { ChatController.getDiscussions(req, res); })
 
+router.route('/unreadMessagesNb')
+      .get(authenticate, (req, res) => { ChatController.getUnreadMessagesNb(req, res); })
+
 router.route('/currentDiscussion')
       .post(authenticate, (req, res) => { ChatController.getCurrentDiscussion(req, res); })
 

@@ -14,6 +14,7 @@ function App() {
   const [socket, setSocket] = useState(null);
   const [connectedUsers, setConnectedUsers] = useState([]);
   const [unseenNotificationsNb, setUnseenNotificationsNb] = useState(0);
+  const [unreadMessagesNb, setUnreadMessagesNb] = useState(0);
   
   useEffect(() => {
       async function fetchData() {
@@ -23,6 +24,8 @@ function App() {
             const authToken = localStorage.getItem('token');
             const resNotif = await axios.get(`/notifications/unseenNotificationsNb?authToken=${authToken}`);
             setUnseenNotificationsNb(resNotif.data.nb);
+            const resMsg = await axios.get(`/chat/unreadMessagesNb?authToken=${authToken}`);
+            setUnreadMessagesNb(resMsg.data.nb);
             setupSocket(userId, setSocket, setConnectedUsers);
             setConnected(true);
           } else {
@@ -45,6 +48,8 @@ function App() {
       setSocket,
       unseenNotificationsNb, 
       setUnseenNotificationsNb,
+      unreadMessagesNb, 
+      setUnreadMessagesNb,
   };
 
   return (

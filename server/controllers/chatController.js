@@ -40,8 +40,22 @@ const createMessage = async (req, res) => {
       });
 };
 
+const getUnreadMessagesNb = async (req, res) => {
+      const token = req.body.authToken || req.query.authToken;
+      jwt.verify(token, config.jwtSecret, async (err, decoded) => {
+            try {
+                  const nb = await ChatModel.getUnreadMessagesNb(decoded.uuid);
+                  res.status(200).json({ nb });
+            } catch {
+                  res.status(400).send('Error');
+            }
+      });
+};
+
 module.exports = {
       getDiscussions,
       getCurrentDiscussion,
       createMessage,
+      getUnreadMessagesNb,
 };
+

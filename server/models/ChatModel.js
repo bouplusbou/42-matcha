@@ -50,7 +50,6 @@ async function getCurrentDiscussion(uuid, matchId) {
   } catch(err) { console.log(err) }
 }
 
-
 async function createMessage(uuid, matchId, youUserId, message) { 
   try {
     await session.run(`
@@ -72,10 +71,26 @@ async function createMessage(uuid, matchId, youUserId, message) {
   } catch(err) { console.log(err) }
 }
 
+async function getUnreadMessagesNb(uuid) { 
+  try {
+    const res = await session.run(`
+      MATCH (u:User {uuid: $uuid}), (m:Message)
+      WHERE m.status = 'unread' AND u.userId = m.to
+      RETURN COUNT(m) AS nb
+    `, { uuid });
+    session.close();
+    if (res.records[0] === undefined) return null;
+    const nb = res.records[0].get('nb').low;
+    console.log(`nb: ${nb}`);
+    return nb;
+  } catch(err) { console.log(err) }
+}
+
 module.exports = {
   getDiscussions,
   getCurrentDiscussion,
   createMessage,
+  getUnreadMessagesNb,
 }
 
 // {

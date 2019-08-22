@@ -24,7 +24,9 @@ export default function Notifications() {
     return (
         <Link to="/notifications" style={{textDecoration: 'none'}}>
         {appState.unseenNotificationsNb !== 0 &&
-            <NotificationDot />
+            <NotificationDot 
+                nb={appState.unseenNotificationsNb}
+            />
         }
             <FontAwesomeIcon  style={{fontSize: '25px', cursor: 'pointer', color: 'white'}} icon={faBell}/>
         </Link>

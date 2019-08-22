@@ -1,11 +1,11 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useState, useContext } from 'react';
 import styled from 'styled-components';
 import TextField from '@material-ui/core/TextField';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-
+import AppContext from '../../AppContext';
 
 const Hero = styled.section`
   display: flex;
@@ -204,12 +204,12 @@ const UnreadDot = styled.div`
     align-items: center;
 `;
 
-
 export default function PageChat() {
   const [discussions, setDiscussions] = useState(null);
   const [currentDiscussion, setCurrentDiscussion] = useState(null);
   const [inputValue, setInputValue] = useState('');
   const authToken = localStorage.getItem('token');
+  const appState = useContext(AppContext);
 
   useEffect(() => {
     async function fetchData() {
@@ -232,6 +232,8 @@ export default function PageChat() {
     setCurrentDiscussion(setupCurrentDiscussion);
     const resAll = await axios.get(`/chat/discussions?authToken=${authToken}`);
     setDiscussions(resAll.data.discussions);
+    const resMsg = await axios.get(`/chat/unreadMessagesNb?authToken=${authToken}`);
+    appState.setUnreadMessagesNb(resMsg.data.nb);
   };
 
   const handleChange = event => {
