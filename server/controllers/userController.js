@@ -74,6 +74,7 @@ const getCurrentProfile = async (req, res) => {
             const uuid = await getUuidFromToken(req, res);
             if (uuid) {
                   const profile = await UserModel.getProfileByUuid(uuid);
+                  console.log(profile);
                   profile.account = false;
                   profile.visitedHistoric = await UserModel.getHistoric(uuid, "VISITED");
                   profile.likedHistoric = await UserModel.getHistoric(uuid, "LIKED");

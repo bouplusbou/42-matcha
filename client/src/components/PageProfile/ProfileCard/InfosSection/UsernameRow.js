@@ -81,8 +81,26 @@ const GenderIcon = (props) => {
     );
 }
 
+
 export default function UsernameRow(props) {
     const profile = useContext(ProfileContext)
+        
+    const PhotoUploadButton = () => {
+        return(
+            <Fragment>
+                <input
+                   accept="image/*"
+                   style={{ display: 'none' }}
+                   id="uploadFileButton"
+                   type="file"
+                   onChange={profile.uploadPicture}
+                   />
+                <label htmlFor="uploadFileButton">
+                    <EditButton icon={faPlus} size={"2x"}/>
+                </label>
+            </Fragment>
+        )
+    }
 
     return (
         <StyledRow>
@@ -101,16 +119,7 @@ export default function UsernameRow(props) {
             <UsernameContainer>
                 {profile.account ?
                 <Fragment>
-                <input
-                   accept="image/*"
-                   style={{ display: 'none' }}
-                   id="uploadFileButton"
-                   type="file"
-                   onChange={profile.uploadPicture}
-                   />
-                <label htmlFor="uploadFileButton">
-                    <EditButton icon={faPlus} size={"2x"}/>
-                </label>
+                {profile.photos.length < 5 && <PhotoUploadButton/>}
                 <Link to="/profile/edit">
                     <EditButton icon={faCog} size={"2x"} onClick={profile.openEdit}/>
                 </Link>

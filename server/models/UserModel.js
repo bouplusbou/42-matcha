@@ -23,7 +23,9 @@ const createUser = async (email, firstName, lastName, username, password, city, 
         hash: $hash,
         fame: $fame,
         city: $city,
-        latLng: $latLng })
+        latLng: $latLng,
+        photos: $photos
+        })
     `, {
       uuid: uuid,
       email: email,
@@ -36,6 +38,7 @@ const createUser = async (email, firstName, lastName, username, password, city, 
       fame: 100,
       city: city,
       latLng: latLng,
+      photos: ["profilePlaceholder"]
     });
     session.close();
     sendEmail('confirmUser', email, hash);
@@ -80,6 +83,8 @@ const updateProfile = async (uuid, editedValues) => {
   try {
     if (editedValues.newPassword)
       editedValues.password = await bcrypt.hash(editedValues.newPassword, 10);
+    if (editedValues.photos && editedValues.photos.length === 0)
+      editedValues.photos = ["https://www.cloudraxak.com/wp-content/uploads/2017/03/profile-pic-placeholder.png"];
     let cypher = "MATCH (u:User {uuid: $uuid})\n";
     for (var key in editedValues) { cypher += `SET u.${key} = $${key}\n` }
     await session.run(cypher, {
