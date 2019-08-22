@@ -6,7 +6,10 @@ async function getDiscussions(uuid) {
     const res = await session.run(`
       MATCH (me:User {uuid: $uuid}), (you:User), (m:Match)
       WHERE NOT (me = you) AND me.userId IN m.userIds AND you.userId IN m.userIds
-      RETURN you.username AS youUsername, you.photos AS youPhotos, you.avatarIndex AS youAvatarIndex, you.userId AS youUserId, m.matchId AS matchId
+      WITH me, you.username AS youUsername, you.photos AS youPhotos, you.avatarIndex AS youAvatarIndex, you.userId AS youUserId, m.matchId AS matchId
+      OPTIONAL MATCH (msg:Message)
+      WHERE msg.matchId = matchId AND msg.status = 'unread' AND msg.to = me.userId
+      RETURN youUsername, youPhotos, youAvatarIndex, youUserId, matchId, COUNT(msg) AS unreadNb
     `, { uuid: uuid });
     session.close();
     if (res.records[0] === undefined) return null;
@@ -16,8 +19,9 @@ async function getDiscussions(uuid) {
       const youPhotos = record.get('youPhotos');
       const youAvatarIndex = record.get('youAvatarIndex');
       const matchId = record.get('matchId');
+      const unreadNb = record.get('unreadNb').low;
       const youAvatar = youPhotos[youAvatarIndex];
-      return { youUserId, youUsername, youAvatar, matchId };
+      return { youUserId, youUsername, youAvatar, matchId, unreadNb };
     });
     return discussions;
   } catch(err) { console.log(err) }
@@ -27,7 +31,8 @@ async function getCurrentDiscussion(uuid, matchId) {
   try {
     const res = await session.run(`
       MATCH (m:Message {matchId: $matchId}), (me:User {uuid: $uuid})
-      RETURN m.message AS message, m.status AS status, 
+      SET m.status = 'read'
+      RETURN m.message AS message,
       CASE WHEN me.userId = m.from THEN 'sent' ELSE 'received' END AS type
       ORDER BY m.dateTime ASC
     `, { 
@@ -38,9 +43,8 @@ async function getCurrentDiscussion(uuid, matchId) {
     if (res.records[0] === undefined) return null;
     const currentDiscussion = res.records.map(record => {
       const message = record.get('message');
-      const status = record.get('status');
       const type = record.get('type');
-      return { message, status, type };
+      return { message, type };
     });
     return currentDiscussion;
   } catch(err) { console.log(err) }

@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import TextField from '@material-ui/core/TextField';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
+
 
 const Hero = styled.section`
   display: flex;
@@ -20,7 +22,6 @@ const Container = styled.aside`
   column-gap: 20px;
 `;
 const DiscussionsContainer = styled.aside`
-  /* padding: 20px; */
   border-radius: 20px;
   background-color: ${props => props.theme.color.lightPurple};
   overflow: hidden;
@@ -65,18 +66,18 @@ const Date = styled.p`
   font-size: 0.8em;
 `;
 
-const Status = styled.p`
-  margin-right: 50px;
-  color: ${props => props.theme.color.lightRed};
-  justify-self: right;
-  font-family: Roboto;
-  font-weight: 500;
-  font-size: 0.8em;
-  background-color: ${props => props.theme.color.ultraLightRed};
-  padding: 6px 10px;
-  border-radius: 10px;
-  border: solid ${props => props.theme.color.lightRed} 0.5px;
-`;
+// const Status = styled.p`
+//   margin-right: 50px;
+//   color: ${props => props.theme.color.lightRed};
+//   justify-self: right;
+//   font-family: Roboto;
+//   font-weight: 500;
+//   font-size: 0.8em;
+//   background-color: ${props => props.theme.color.ultraLightRed};
+//   padding: 6px 10px;
+//   border-radius: 10px;
+//   border: solid ${props => props.theme.color.lightRed} 0.5px;
+// `;
 
 
 
@@ -97,12 +98,14 @@ const ChatInfoUsername = styled.p`
   font-weight: 500;
   color: ${props => props.theme.color.textBlack};
   margin-left: 30px;
+  &:hover {
+    color: ${props => props.theme.color.purple};
+  }
 `;
 const ChatWindow = styled.section`
   height: 650px;
   display: grid;
   grid-template-rows: 8fr 2fr;
-  padding-top: 20px;
   background-color: ${props => props.theme.color.lightPurple};
   border-radius: 20px;
 `;
@@ -132,6 +135,7 @@ const ReceivedMessage = styled.p`
   padding: 15px 25px;
   border-radius: 40px;
   margin-left: 20px;
+  max-width: 50%;
 `;
 const SentMessageBlock = styled.div`
   display: flex;
@@ -147,6 +151,7 @@ const SentMessage = styled.p`
   padding: 15px 25px;
   border-radius: 40px;
   margin-left: 20px;
+  max-width: 50%;
 `;
 const SendButton = styled.button`
   height: 50px;
@@ -176,11 +181,33 @@ const SendButton = styled.button`
       transform: scale(0.99);
   }
 `;
+const NoMatchContainer = styled.section`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  height: 200px;
+  border-radius: 30px;
+  padding: 50px;
+  font-family: Roboto;
+  font-weight: 500;
+  color: ${props => props.theme.color.textBlack};
+`;
+
+const UnreadDot = styled.div`
+    width: 25px;
+    height: 25px;
+    background-color: ${props => props.theme.color.red};
+    border-radius: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+`;
 
 
 export default function PageChat() {
-  const [discussions, setDiscussions] = useState([]);
-  const [currentDiscussion, setCurrentDiscussion] = useState({});
+  const [discussions, setDiscussions] = useState(null);
+  const [currentDiscussion, setCurrentDiscussion] = useState(null);
   const [inputValue, setInputValue] = useState('');
   const authToken = localStorage.getItem('token');
 
@@ -194,15 +221,17 @@ export default function PageChat() {
 
   const loadCurrentDiscussion = async (matchId, youUserId, youUsername, youAvatar) => {
     console.log(matchId);
-    const res = await axios.post(`/chat/currentDiscussion?authToken=${authToken}`, { matchId });
+    const resCurrent = await axios.post(`/chat/currentDiscussion?authToken=${authToken}`, { matchId });
     const setupCurrentDiscussion = {
       matchId,
       youUserId, 
       youUsername,
       youAvatar,
-      messages: res.data.currentDiscussion,
+      messages: resCurrent.data.currentDiscussion,
     };
     setCurrentDiscussion(setupCurrentDiscussion);
+    const resAll = await axios.get(`/chat/discussions?authToken=${authToken}`);
+    setDiscussions(resAll.data.discussions);
   };
 
   const handleChange = event => {
@@ -222,6 +251,7 @@ export default function PageChat() {
 
   return (
     <Hero>
+    { discussions !== null ?
       <Container>
         <DiscussionsContainer>
           <DiscussionsSection>
@@ -232,50 +262,64 @@ export default function PageChat() {
             >
               <Avatar></Avatar>
               <Username>{discussion.youUsername}</Username>
-              <Status>new</Status>
+              { discussion.unreadNb > 0 &&
+                <UnreadDot>
+                    <p style={{fontWeight: 900, fontSize: '10px', color: 'white'}}>{discussion.unreadNb}</p>
+                </UnreadDot>
+              }
               <Date>1 day ago</Date>
             </Discussion>
             )}
           </DiscussionsSection>
         </DiscussionsContainer>
         <ChatSection>
-          <ChatInfo>
-            <Avatar></Avatar>
-            <ChatInfoUsername>{currentDiscussion.youUsername}</ChatInfoUsername>
-          </ChatInfo>
-          <ChatWindow>
-            <MessagesSection>
-            {currentDiscussion.messages && currentDiscussion.messages.map((msg, index) => {
-                return msg.type === 'received' ?
-                  <ReceivedMessageBlock
-                    key={index}
-                  >
-                    <Avatar></Avatar>
-                    <ReceivedMessage>{msg.message}</ReceivedMessage>
-                  </ReceivedMessageBlock>
-                :
-                <SentMessageBlock
-                  key={index}
-                >
-                  <SentMessage>{msg.message}</SentMessage>
-                </SentMessageBlock>
-            })}
-            </MessagesSection>
-            <Form noValidate autoComplete="off" onSubmit={handleSubmit}>
-              <TextField
-                placeholder="Type a message..."
-                multiline
-                rowsMax="3"
-                value={inputValue}
-                onChange={handleChange}
-              />
-              <SendButton type='submit'>
-                <FontAwesomeIcon icon={faPaperPlane}/>
-              </SendButton>
-            </Form>
-          </ChatWindow>
+          { currentDiscussion !== null &&
+            <Fragment>
+              <ChatInfo>
+                <Avatar></Avatar>
+                <Link to={`/profile/${currentDiscussion.youUsername}`} style={{textDecoration: 'none'}}>
+                  <ChatInfoUsername>{currentDiscussion.youUsername}</ChatInfoUsername>
+                </Link>
+              </ChatInfo>
+              <ChatWindow>
+                <MessagesSection>
+                {currentDiscussion.messages.map((msg, index) => {
+                    return msg.type === 'received' ?
+                      <ReceivedMessageBlock
+                        key={index}
+                      >
+                        <Avatar></Avatar>
+                        <ReceivedMessage>{msg.message}</ReceivedMessage>
+                      </ReceivedMessageBlock>
+                    :
+                    <SentMessageBlock
+                      key={index}
+                    >
+                      <SentMessage>{msg.message}</SentMessage>
+                    </SentMessageBlock>
+                })}
+                </MessagesSection>
+                <Form noValidate autoComplete="off" onSubmit={handleSubmit}>
+                  <TextField
+                    placeholder="Type a message..."
+                    multiline
+                    rowsMax="3"
+                    value={inputValue}
+                    onChange={handleChange}
+                  />
+                  <SendButton type='submit'>
+                    <FontAwesomeIcon icon={faPaperPlane}/>
+                  </SendButton>
+                </Form>
+              </ChatWindow> 
+            </Fragment> }
         </ChatSection>
-      </Container>
+      </Container> 
+      :
+      <NoMatchContainer>
+        <p>Sorry but you have not yet matched with anyone</p>
+      </NoMatchContainer>  
+    }
     </Hero>
   );
 }
