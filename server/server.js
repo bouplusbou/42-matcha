@@ -6,29 +6,41 @@ const router = require('./router');
 const server = require('http').createServer(app);
 const io = require('socket.io').listen(server);
 const UserModel = require('./models/UserModel');
+const ChatModel = require('./models/ChatModel');
+const jwt = require('jsonwebtoken');
+const config = require('./middlewares/config');
 
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/api', router);
 
-// const connectedUsers = [];
-
-
-io.use((client, next) => {
-  console.log('userId:', client.handshake.query.userId);
-  const userId = client.handshake.query.userId;
-  client.userId = userId;
-  return next();
+io.use(async (client, next) => {
+  console.log('token:', client.handshake.query.token);
+  const token = client.handshake.query.token;
+  jwt.verify(token, config.jwtSecret, async (err, decoded) => {
+    const userId = await UserModel.userIdFromUuid(decoded.uuid);
+    console.log(`userId: ${userId}`);
+    client.userId = userId;
+    return next();
+  });
 });
 
-io.on('connection', client => { 
+io.on('connection', async client => { 
   console.log('Client has connected to socket');
   console.log('connected socketIds:', Object.keys(io.sockets.sockets));
   console.log(`client.id: ${client.id}, client.userId: ${client.userId}`);
 
   client.join(`${client.userId}-room`);
   console.log(`${client.userId} joined "${client.userId}-room"`);
+
+  const matchIds = await ChatModel.getMatchIdsByUserId(client.userId);
+  if (matchIds !== null) {
+    matchIds.map(matchId => {
+      client.join(`${matchId}-room`);
+      console.log(`${client.userId} joined "${matchId}-room"`);
+    });
+  }
 
   const userIds = Object.keys(io.sockets.sockets).map(elem => io.sockets.sockets[elem].userId);
   console.log(`userIds: ${userIds}`);
@@ -55,6 +67,18 @@ io.on('connection', client => {
     const usernameVisiter = await UserModel.usernameFromUserId(parseInt(client.userId, 10));
     console.log(`${usernameVisiter} with userId ${client.userId} has visited ${username}'s profile with userId ${userIdVisited}`);
     client.to(`${userIdVisited}-room`).emit('visited', usernameVisiter);
+  });
+
+  client.on('newMessageSent', async data => {
+    console.log(`userId ${client.userId} sent a new message: "${data.message}" to ${data.matchId}-room`);
+    const response = {
+      message: data.message,
+      matchId: data.matchId,
+    };
+    client.to(`${data.matchId}-room`).emit('newMessageReceived', response);
+    // const userIdVisited = await UserModel.userIdFromUsername(username);
+    // const usernameVisiter = await UserModel.usernameFromUserId(parseInt(client.userId, 10));
+    // console.log(`${usernameVisiter} with userId ${client.userId} has visited ${username}'s profile with userId ${userIdVisited}`);
   });
 });
 

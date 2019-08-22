@@ -26,7 +26,7 @@ function App() {
             setUnseenNotificationsNb(resNotif.data.nb);
             const resMsg = await axios.get(`/chat/unreadMessagesNb?authToken=${authToken}`);
             setUnreadMessagesNb(resMsg.data.nb);
-            setupSocket(userId, setSocket, setConnectedUsers);
+            setupSocket(authToken, setSocket, setConnectedUsers);
             setConnected(true);
           } else {
             setConnected(false)

@@ -58,6 +58,7 @@ async function createMessage(uuid, matchId, youUserId, message) {
         matchId: $matchId,
         from: u.userId,
         to: n.userId,
+        status: 'unread',
         message: $message,
         dateTime: DateTime()
       })
@@ -86,11 +87,29 @@ async function getUnreadMessagesNb(uuid) {
   } catch(err) { console.log(err) }
 }
 
+async function getMatchIdsByUserId(userId) { 
+  try {
+    const res = await session.run(`
+      MATCH (m:Match)
+      WHERE $userId IN m.userIds
+      RETURN m.matchId AS matchId
+    `, { userId });
+    session.close();
+    if (res.records[0] === undefined) return null;
+    const matchIds = res.records.map(record => {
+      const matchId = record.get('matchId');
+      return matchId;
+    });
+    return matchIds;
+  } catch(err) { console.log(err) }
+}
+
 module.exports = {
   getDiscussions,
   getCurrentDiscussion,
   createMessage,
   getUnreadMessagesNb,
+  getMatchIdsByUserId,
 }
 
 // {

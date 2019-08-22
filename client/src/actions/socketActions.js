@@ -1,9 +1,9 @@
 import io from 'socket.io-client';
 
-export default function setupSocket(userId, setSocket, setConnectedUsers) {
+export default function setupSocket(token, setSocket, setConnectedUsers) {
     const socket = io('http://localhost:5000', {
         query: {
-            userId: userId
+            token: token
         }
     });
     

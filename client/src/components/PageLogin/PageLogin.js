@@ -152,7 +152,7 @@ export default function PageLogin(props) {
       appState.setUnreadMessagesNb(resMsg.data.nb);
       appState.toggleConnected();
       const userId = res.data.userId;
-      setupSocket(userId, appState.setSocket, appState.setConnectedUsers);
+      setupSocket(res.data.token, appState.setSocket, appState.setConnectedUsers);
       props.history.push('/search');
     } catch(err) {
       setValues({ ...values, error: true, errorMsg: err.response.data.errorMsg});

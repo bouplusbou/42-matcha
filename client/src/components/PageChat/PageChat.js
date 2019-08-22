@@ -210,6 +210,7 @@ export default function PageChat() {
   const [inputValue, setInputValue] = useState('');
   const authToken = localStorage.getItem('token');
   const appState = useContext(AppContext);
+  const setUnreadMessagesNb = appState.setUnreadMessagesNb;
 
   useEffect(() => {
     async function fetchData() {
@@ -218,6 +219,23 @@ export default function PageChat() {
     };
     fetchData();
   }, [authToken]);
+
+  useEffect(() => {
+    if (appState.socket !== null) {
+        appState.socket.on('newMessageReceived', async data => {
+            const { message, matchId } = data;
+            console.log(`New message received: "${message}" in ${matchId}-room`);
+            const resAll = await axios.get(`/chat/discussions?authToken=${authToken}`);
+            console.log(resAll.data.discussions);
+            setDiscussions(resAll.data.discussions);
+            const resMsg = await axios.get(`/chat/unreadMessagesNb?authToken=${authToken}`);
+            console.log(resMsg.data.nb);
+            setUnreadMessagesNb(resMsg.data.nb);
+            const resCurrent = await axios.post(`/chat/currentDiscussion?authToken=${authToken}`, { matchId });
+            setCurrentDiscussion({...currentDiscussion, messages: resCurrent.data.currentDiscussion});
+        });
+    }
+}, [appState.socket, setUnreadMessagesNb, authToken, currentDiscussion]);
 
   const loadCurrentDiscussion = async (matchId, youUserId, youUsername, youAvatar) => {
     console.log(matchId);
@@ -248,6 +266,7 @@ export default function PageChat() {
       const message = inputValue;
       await axios.post(`/chat?authToken=${authToken}`, { matchId, youUserId, message });
       setInputValue('');
+      appState.socket.emit('newMessageSent', {message, matchId});
     } catch(error) { console.log(error) }
   }
 
