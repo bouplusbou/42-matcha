@@ -120,8 +120,7 @@ const getUserByUsername = async username => {
 const getProfileByUuid = async uuid => {
   try {
     const res = await session.run(`
-    MATCH (u:User)
-    WHERE u.uuid = $uuid
+    MATCH (u:User {uuid: $uuid})
     OPTIONAL MATCH (u)-[:TAGGED]->(t:Tag)
     RETURN
     u,
@@ -129,6 +128,7 @@ const getProfileByUuid = async uuid => {
     collect(t.tag) AS tags
     `, {uuid: uuid});
     session.close();
+    console.log(res)
     const user = res.records[0].get(`u`).properties;
     delete user['password'];
     delete user['hash'];

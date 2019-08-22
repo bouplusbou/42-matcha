@@ -78,7 +78,9 @@ const getCurrentProfile = async (req, res) => {
                   profile.account = false;
                   profile.visitedHistoric = await UserModel.getHistoric(uuid, "VISITED");
                   profile.likedHistoric = await UserModel.getHistoric(uuid, "LIKED");
+                  profile.blockedList = await UserModel.getHistoric(uuid, "BLOCKED");
                   profile.account = true;
+                  console.log(profile);
                   res.json({profile: profile})
             }
       } catch (error) { Log.error(error, `getCurrentProfile`, __filename) }
@@ -94,6 +96,7 @@ const getProfile = async (req, res) => {
                   if (uuid === reqUser.uuid) {
                         profile.visitedHistoric = await UserModel.getHistoric(uuid, "VISITED");
                         profile.likedHistoric = await UserModel.getHistoric(uuid, "LIKED");
+                        profile.blockedList = await UserModel.getHistoric(uuid, "BLOCKED");
                         profile.account = true;
                   }
                   res.json({profile: profile})
@@ -154,8 +157,8 @@ const createRelationship = async (req, res) => {
       try {
             const uuid = await getUuidFromToken(req, res);
             const targetUser = await UserModel.getUserByUsername(req.body.username);
-            await UserModel.createRelationship(req.body.choice, uuid, targetUser.uuid);
-            res.status(200).json({ message: `${req.body.choice} relationship created.`})
+            await UserModel.createRelationship(req.body.type, uuid, targetUser.uuid);
+            res.status(200).json({ message: `${req.body.type} relationship created.`})
       } catch (error) { Log.error(error, `createRelationship`, __filename) }
 }
 
@@ -163,8 +166,8 @@ const deleteRelationship = async (req, res) => {
       try {
             const uuid = await getUuidFromToken(req, res);
             const targetUser = await UserModel.getUserByUsername(req.body.username);
-            await UserModel.deleteRelationship(req.body.choice, uuid, targetUser.uuid);
-            res.status(200).json({ message: `${req.body.choice} relationship deleted.`})
+            await UserModel.deleteRelationship(req.body.type, uuid, targetUser.uuid);
+            res.status(200).json({ message: `${req.body.type} relationship deleted.`})
       } catch (error) { Log.error(error, `deleteRelationship`, __filename) }
 }
 
