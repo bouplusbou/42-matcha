@@ -38,7 +38,6 @@ async function getNotifications(uuid) {
 }
 
 async function createNotification(uuid, type, userId) { 
-  console.log(uuid, type, userId);
   try {
     await session.run(`
       CREATE (n:Notification {

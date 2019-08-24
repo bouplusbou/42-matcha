@@ -7,6 +7,7 @@ import { faMars, faVenus, faTransgender, faCog, faPlus, faCircle, faDotCircle } 
 import Tooltip from '@material-ui/core/Tooltip';
 
 import ProfileContext from '../../../ProfileContext';
+import LikeButton from '../Components/LikeButton';
 
 const StyledRow = styled.div `
     display:flex;
@@ -124,7 +125,7 @@ export default function UsernameRow(props) {
                     <EditButton icon={faCog} size={"2x"} onClick={profile.openEdit}/>
                 </Link>
                 </Fragment> :
-                <p/>
+                <LikeButton/>
             }
             </UsernameContainer>
         </StyledRow>

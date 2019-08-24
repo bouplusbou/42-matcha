@@ -1,13 +1,15 @@
-import React, { useContext } from 'react';
+import React, { useContext, Fragment } from 'react';
 import styled from 'styled-components';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCalendarAlt, faSearch, faMapMarkedAlt } from '@fortawesome/free-solid-svg-icons';
+import { faCalendarAlt, faSearch, faMapMarkedAlt, faFlag, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 import ProfileContext from '../../../ProfileContext';
 import UsernameRow from './UsernameRow';
 import TagChip from '../Components/TagChip'
+import axios from 'axios';
 
+const authToken = localStorage.getItem('token');
 
 const StyledSection = styled.section `
     display:flex;
@@ -55,6 +57,20 @@ export default function InfosSection() {
         { info: profile.lookingFor, icon: faSearch }
     ]
     
+    const handleReport = event => {
+        const confirm = window.confirm("Do you really want to report that user ?");
+        if (confirm) {
+            axios.post(`/users/reportUser?authToken=${authToken}`, {targetUsername: profile.username})
+        }
+    }
+
+    const handleBlock = event => {
+        const confirm = window.confirm('Do you really want to block this user ?');
+        if (confirm) {
+            axios.post(`/users/blockUser?authToken=${authToken}`, {targetUsername: profile.username});
+        }
+    }
+
     const InfoCase = (props) => { 
         const StyledCase = styled.div `
             display:flex;
@@ -100,6 +116,12 @@ export default function InfosSection() {
             <Tags>
                 {profile.tags.map((tag, index)=> <TagChip tag={tag} key={index}/>)}
             </Tags>
+            {!profile.account && 
+                <Fragment>
+                    <FontAwesomeIcon onClick={handleReport} icon={faFlag} size={"2x"}/>
+                    <FontAwesomeIcon onClick={handleBlock} icon={faEyeSlash} size={"2x"}/>
+                </Fragment>
+            }
         </StyledSection>
     )
 }

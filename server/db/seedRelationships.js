@@ -167,7 +167,7 @@ const seedBlockedRel = async () => {
             }
             await session.run(`
                 MATCH (randomUser:User {userId: $randomuserId}), (user:User {userId: $userId})
-                CREATE (randomUser)-[r:BLOCKED]->(user)
+                CREATE (user)-[r:BLOCKED]->(randomUser)
                 SET r.timestamp = timestamp()
             `, {
                 userId: userId,

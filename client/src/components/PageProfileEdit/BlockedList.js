@@ -1,10 +1,13 @@
 import React, { useContext } from 'react';
 import styled from 'styled-components';
+import axios from 'axios';
 import Separator from '../Separator';
 import { faEyeSlash, faEye } from '@fortawesome/free-solid-svg-icons';
 import ProfileContext from '../ProfileContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Image } from 'cloudinary-react';
+
+const authToken = localStorage.getItem('token');
 
 const StyledSection = styled.section `
     padding:1rem;
@@ -72,15 +75,15 @@ const StyledButton = styled(FontAwesomeIcon) `
 export default function BlockedList() {
     const profile = useContext(ProfileContext);
     
-    const handleClick = event => {
-        const req = {
-            type: "blocked",
-            userId: event.target.id,
-        }
-        console.log(req);
-    }
     
     function User(props) {
+        const handleClick = event => {
+            const params = {data: {
+                type: "blocked",
+                username: props.user.username,
+            }};
+            axios.delete(`/users/deleteRelationship?authToken=${authToken}`, params);
+        }
         return (
             <StyledDiv>
                 <ProfilePhoto cloudName='matchacn' publicId={props.user.photos[props.user.avatarIndex]}/>
@@ -88,7 +91,7 @@ export default function BlockedList() {
                     <Username>{props.user.username}</Username>
                     <Age>{props.user.age}, {props.user.city}</Age>
                 </InfosContainer>
-                <StyledButton id={props.user.userId} onClick={handleClick} icon={faEye} size={"lg"}/>
+                <StyledButton onClick={handleClick} icon={faEye} size={"lg"}/>
             </StyledDiv>
         )
     }

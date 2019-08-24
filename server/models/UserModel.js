@@ -68,7 +68,6 @@ const emailExists = async email => {
 }
 
 const uuidExists = async uuid => { 
-    console.log("Calling uuidExists()...")
     try {
     const res = await session.run(`
       MATCH (u:User {uuid: $uuid})
@@ -128,7 +127,6 @@ const getProfileByUuid = async uuid => {
     collect(t.tag) AS tags
     `, {uuid: uuid});
     session.close();
-    console.log(res)
     const user = res.records[0].get(`u`).properties;
     delete user['password'];
     delete user['hash'];
@@ -169,6 +167,34 @@ const getHistoric = async (uuid, type) => {
   } catch(error) { Log.error(error, "getHistoric", __filename) }
 }
 
+const getBlockedList = async uuid => {
+  try {
+    const res = await session.run(`
+      MATCH (u:User {uuid: $uuid})
+      MATCH (u)-[r:BLOCKED]->(t:User)
+      RETURN 
+      t AS user,
+      duration.between(date(t.birthDate),date()).years AS age,
+      toString(r.timestamp) AS timestamp
+      ORDER BY r.timestamp 
+    `, { uuid: uuid })
+    session.close();
+    const historic = []
+    for (i = 0; i < res.records.length; i++) {
+      const user = res.records[i].get(`user`).properties;
+      delete user['password'];
+      delete user['hash'];
+      delete user[`uuid`];
+      historic.push({
+          relTime : new Date(parseInt(res.records[i].get(`timestamp`))),
+          age : res.records[i].get(`age`).low,
+          ...user,
+      })
+    }
+    return historic
+  } catch(error) { Log.error(error, "getBlockedList", __filename) }
+}
+
 const createRelationship = async (type, userUuid, targetUuid) => {
   try {
     await session.run(`
@@ -186,7 +212,7 @@ const deleteRelationship = async (type, userUuid, targetUuid) => {
   try {
     await session.run(`
       MATCH (u:User {uuid: $userUuid}), (t:User {uuid: $targetUuid})
-      MATCH (u)-[r:${type.toUpperCase()}]->(t)
+      MATCH (u)-[r:BLOCKED]->(t)
       DELETE r
     `, {
       userUuid: userUuid,
@@ -374,6 +400,22 @@ async function uuidFromUsername(username) { // refacto possible avec getUserByUs
   } catch(err) { console.log(err) }
 }
 
+const createReportTicket = async (userUuid, targetUuid) => {
+  try {
+    console.log(targetUuid);
+    await session.run(`
+      CREATE (r:Report {
+        from: $from,
+        to: $to,
+        dateTime: DateTime()
+      })
+    `, {
+      from: userUuid,
+      to: targetUuid
+    })
+  } catch(error) { Log.error(error, `createReportTicket`, __filename) }
+}
+
 module.exports = {
   getUserByUsername,
   createRelationship,
@@ -397,5 +439,7 @@ module.exports = {
   userIdFromUsername,
   usernameFromUserId,
   uuidFromUsername,
+  getBlockedList,
+  createReportTicket
 }
  

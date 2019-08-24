@@ -74,13 +74,11 @@ const getCurrentProfile = async (req, res) => {
             const uuid = await getUuidFromToken(req, res);
             if (uuid) {
                   const profile = await UserModel.getProfileByUuid(uuid);
-                  console.log(profile);
                   profile.account = false;
                   profile.visitedHistoric = await UserModel.getHistoric(uuid, "VISITED");
                   profile.likedHistoric = await UserModel.getHistoric(uuid, "LIKED");
-                  profile.blockedList = await UserModel.getHistoric(uuid, "BLOCKED");
+                  profile.blockedList = await UserModel.getBlockedList(uuid);
                   profile.account = true;
-                  console.log(profile);
                   res.json({profile: profile})
             }
       } catch (error) { Log.error(error, `getCurrentProfile`, __filename) }
@@ -96,7 +94,7 @@ const getProfile = async (req, res) => {
                   if (uuid === reqUser.uuid) {
                         profile.visitedHistoric = await UserModel.getHistoric(uuid, "VISITED");
                         profile.likedHistoric = await UserModel.getHistoric(uuid, "LIKED");
-                        profile.blockedList = await UserModel.getHistoric(uuid, "BLOCKED");
+                        profile.blockedList = await UserModel.getBlockedList(uuid);
                         profile.account = true;
                   }
                   res.json({profile: profile})
@@ -173,8 +171,7 @@ const deleteRelationship = async (req, res) => {
 
 const uploadPic = async (req, res) => {
       try {
-            console.log(req.body.image);
-            const test = await cloudinary.uploader.upload(req.body.image, { public_id: Date.now() })
+            await cloudinary.uploader.upload(req.body.image, { public_id: Date.now() })
       } catch (error) { Log.error(error, `uploadPic`, __filename) }
 }
 
@@ -225,6 +222,18 @@ const userIdFromUuid = (req, res) => {
       });
 };
 
+const reportUser = async (req, res) => {
+      const uuid = await getUuidFromToken(req, res);
+      const target = await UserModel.getUserByUsername(req.body.targetUsername);
+      await UserModel.createReportTicket(uuid, target.uuid);
+}
+
+const blockUser = async (req, res) => {
+      const uuid = await getUuidFromToken(req, res);
+      const target = await UserModel.getUserByUsername(req.body.targetUsername);
+      await UserModel.createRelationship("blocked", uuid, target.uuid);
+}
+
 module.exports = {
       createUser,
       getProfile,
@@ -241,4 +250,6 @@ module.exports = {
       resetPassword,
       hasFullProfile,
       userIdFromUuid,
+      reportUser,
+      blockUser
 }
