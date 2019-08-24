@@ -15,6 +15,9 @@ function App() {
   const [connectedUsers, setConnectedUsers] = useState([]);
   const [unseenNotificationsNb, setUnseenNotificationsNb] = useState(0);
   const [unreadMessagesNb, setUnreadMessagesNb] = useState(0);
+  const [discussions, setDiscussions] = useState(null);
+  const [currentDiscussionInfo, setCurrentDiscussionInfo] = useState(null);
+  const [currentDiscussionMessages, setCurrentDiscussionMessages] = useState(null);
   
   useEffect(() => {
       async function fetchData() {
@@ -50,6 +53,12 @@ function App() {
       setUnseenNotificationsNb,
       unreadMessagesNb, 
       setUnreadMessagesNb,
+      discussions,
+      setDiscussions,
+      currentDiscussionInfo,
+      setCurrentDiscussionInfo,
+      currentDiscussionMessages,
+      setCurrentDiscussionMessages,
   };
 
   return (

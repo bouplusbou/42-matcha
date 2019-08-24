@@ -14,13 +14,13 @@ const getDiscussions = (req, res) => {
       });
 };
 
-const getCurrentDiscussion = async (req, res) => {
+const getCurrentDiscussionMessages = async (req, res) => {
       const token = req.body.authToken || req.query.authToken;
       jwt.verify(token, config.jwtSecret, async (err, decoded) => {
             try {
                   const { matchId } = req.body;
-                  const currentDiscussion = await ChatModel.getCurrentDiscussion(decoded.uuid, matchId);
-                  res.status(200).json({ currentDiscussion });
+                  const currentDiscussionMessages = await ChatModel.getCurrentDiscussionMessages(decoded.uuid, matchId);
+                  res.status(200).json({ currentDiscussionMessages });
             } catch(e) {
                   res.status(400).send('Error');
             }
@@ -54,7 +54,7 @@ const getUnreadMessagesNb = async (req, res) => {
 
 module.exports = {
       getDiscussions,
-      getCurrentDiscussion,
+      getCurrentDiscussionMessages,
       createMessage,
       getUnreadMessagesNb,
 };

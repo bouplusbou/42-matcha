@@ -151,7 +151,7 @@ export default function PageLogin(props) {
       const resMsg = await axios.get(`/chat/unreadMessagesNb?authToken=${res.data.token}`);
       appState.setUnreadMessagesNb(resMsg.data.nb);
       appState.toggleConnected();
-      const userId = res.data.userId;
+      // const userId = res.data.userId;
       setupSocket(res.data.token, appState.setSocket, appState.setConnectedUsers);
       props.history.push('/search');
     } catch(err) {

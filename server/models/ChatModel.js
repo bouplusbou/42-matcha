@@ -27,11 +27,18 @@ async function getDiscussions(uuid) {
   } catch(err) { console.log(err) }
 }
 
-async function getCurrentDiscussion(uuid, matchId) { 
+async function getCurrentDiscussionMessages(uuid, matchId) { 
   try {
+    await session.run(`
+      MATCH(me:User {uuid: $uuid}), (m:Message {matchId: $matchId, status: 'unread', to: me.userId})
+      SET m.status = 'read'
+    `, {
+      matchId: matchId,
+      uuid: uuid,
+    });
+    session.close();
     const res = await session.run(`
       MATCH (m:Message {matchId: $matchId}), (me:User {uuid: $uuid})
-      SET m.status = 'read'
       RETURN m.message AS message,
       CASE WHEN me.userId = m.from THEN 'sent' ELSE 'received' END AS type
       ORDER BY m.dateTime ASC
@@ -82,7 +89,6 @@ async function getUnreadMessagesNb(uuid) {
     session.close();
     if (res.records[0] === undefined) return null;
     const nb = res.records[0].get('nb').low;
-    // console.log(`nb: ${nb}`);
     return nb;
   } catch(err) { console.log(err) }
 }
@@ -104,39 +110,23 @@ async function getMatchIdsByUserId(userId) {
   } catch(err) { console.log(err) }
 }
 
+async function setAllAsReadByMatchIdAndUserId(matchId, userId) { 
+  try {
+    const res = await session.run(`
+      MATCH (m:Message {matchId: $matchId, status: 'unread', to: $userId})
+      SET m.status = 'read'
+      RETURN COUNT(m) AS setAsReadMsgNb
+    `, { matchId, userId });
+    session.close();
+    return;
+  } catch(err) { console.log(err) }
+}
+
 module.exports = {
   getDiscussions,
-  getCurrentDiscussion,
+  getCurrentDiscussionMessages,
   createMessage,
   getUnreadMessagesNb,
   getMatchIdsByUserId,
+  setAllAsReadByMatchIdAndUserId,
 }
-
-// {
-//   youUsername: 'BorisJ',
-//   youAvatar: 'sadasdsadsadsad9879879879',
-//   lastMessageInDays: 2,
-// }
-
-// {
-//   from: 'userId',
-//   to: 'userId',
-//   message: 'fsdfdsfdsfds',
-//   dateTime: DateTime(),
-// }
-
-// {
-//    userIds: [userId, userId],
-//    matchId: uuidMatch,
-//    dateTime: DateTime(),
-// }
-
-// {
-// 	youUsername,
-// 	youAvatar,
-// 	messages: [ // ORDER BY dateTime DESC
-// 		type: 'received' / 'sent',
-// 		status: 'read' / 'unread',
-// 		message: 'fdsfdsf',
-// 	]
-//  }

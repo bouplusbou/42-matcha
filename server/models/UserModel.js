@@ -368,6 +368,19 @@ async function uuidFromUsername(username) { // refacto possible avec getUserByUs
   } catch(err) { console.log(err) }
 }
 
+async function getUuidByUserId(userId) {
+  try {
+    const res = await session.run(`
+      MATCH (u:User {userId: $userId})
+      RETURN u.uuid AS uuid
+    `, { userId: userId });
+    session.close();
+    if (res.records[0] === undefined) return null;
+    const uuid = res.records[0].get('uuid');
+    return uuid;
+  } catch(err) { console.log(err) }
+}
+
 module.exports = {
   getUserByUsername,
   createRelationship,
@@ -391,5 +404,6 @@ module.exports = {
   userIdFromUsername,
   usernameFromUserId,
   uuidFromUsername,
+  getUuidByUserId,
 }
  

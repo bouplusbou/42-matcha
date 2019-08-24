@@ -12,7 +12,7 @@ router.route('/discussions')
 router.route('/unreadMessagesNb')
       .get(authenticate, (req, res) => { ChatController.getUnreadMessagesNb(req, res); })
 
-router.route('/currentDiscussion')
-      .post(authenticate, (req, res) => { ChatController.getCurrentDiscussion(req, res); })
+router.route('/currentDiscussionMessages')
+      .post(authenticate, (req, res) => { ChatController.getCurrentDiscussionMessages(req, res); })
 
 module.exports = router;
