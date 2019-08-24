@@ -82,7 +82,7 @@ async function getUnreadMessagesNb(uuid) {
     session.close();
     if (res.records[0] === undefined) return null;
     const nb = res.records[0].get('nb').low;
-    console.log(`nb: ${nb}`);
+    // console.log(`nb: ${nb}`);
     return nb;
   } catch(err) { console.log(err) }
 }

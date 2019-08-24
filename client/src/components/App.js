@@ -31,7 +31,7 @@ function App() {
           } else {
             setConnected(false)
           }
-        } catch {
+        } catch(e) {
           setConnected(false)
         }
       };

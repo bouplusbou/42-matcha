@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import NavList from './NavList';
 import Notifications from './Notifications';
 import LogoutButton from './LogoutButton';
+import ChatButton from './ChatButton';
 
 const Dropdown = styled.section`
     position: absolute;
@@ -25,6 +26,9 @@ const Dropdown = styled.section`
 const NotificationsSection = styled.section`
     position: relative;
 `;
+const ChatSection = styled.section`
+    position: relative;
+`;
 
 export default function HeaderWide() {
 
@@ -35,6 +39,11 @@ export default function HeaderWide() {
                     <NotificationsSection>
                         <Notifications />
                     </NotificationsSection>
+                </li>
+                <li style={{listStyle: 'none'}}>
+                    <ChatSection>
+                        <ChatButton />
+                    </ChatSection>
                 </li>
             </ul>
             <NavList />

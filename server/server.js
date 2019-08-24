@@ -75,7 +75,9 @@ io.on('connection', async client => {
       message: data.message,
       matchId: data.matchId,
     };
-    client.to(`${data.matchId}-room`).emit('newMessageReceived', response);
+    io.in(`${data.matchId}-room`).emit('newMessageReceived', response);
+    // client.to(`${data.matchId}-room`).emit('newMessageReceived', response);
+    
     // const userIdVisited = await UserModel.userIdFromUsername(username);
     // const usernameVisiter = await UserModel.usernameFromUserId(parseInt(client.userId, 10));
     // console.log(`${usernameVisiter} with userId ${client.userId} has visited ${username}'s profile with userId ${userIdVisited}`);

@@ -9,7 +9,7 @@ const getNotifications = (req, res) => {
             try {
                   const notifications = await NotificationModel.getNotifications(decoded.uuid);
                   res.status(200).json({ notifications });
-            } catch {
+            } catch(e) {
                   res.status(400).send('Error');
             }
       });
@@ -24,7 +24,7 @@ const createNotification = (req, res) => {
                   const userIdVisiter = await UserModel.userIdFromUuid(decoded.uuid);
                   console.log(`usernameVisited: ${usernameVisited}, uuidVisited: ${uuidVisited}, userIdVisiter: ${userIdVisiter}`);
                   NotificationModel.createNotification(uuidVisited, type, userIdVisiter);
-            } catch {
+            } catch(e) {
                   res.status(400).send('Error');
             }
       });
@@ -36,7 +36,7 @@ const unseenNotificationsNb = (req, res) => {
             try {
                   const nb = await NotificationModel.unseenNotificationsNb(decoded.uuid);
                   res.status(200).json({ nb });
-            } catch {
+            } catch(e) {
                   res.status(400).send('Error');
             }
       });

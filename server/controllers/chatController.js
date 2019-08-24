@@ -8,7 +8,7 @@ const getDiscussions = (req, res) => {
             try {
                   const discussions = await ChatModel.getDiscussions(decoded.uuid);
                   res.status(200).json({ discussions });
-            } catch {
+            } catch(e) {
                   res.status(400).send('Error');
             }
       });
@@ -21,7 +21,7 @@ const getCurrentDiscussion = async (req, res) => {
                   const { matchId } = req.body;
                   const currentDiscussion = await ChatModel.getCurrentDiscussion(decoded.uuid, matchId);
                   res.status(200).json({ currentDiscussion });
-            } catch {
+            } catch(e) {
                   res.status(400).send('Error');
             }
       });
@@ -34,7 +34,7 @@ const createMessage = async (req, res) => {
                   const { matchId, youUserId, message } = req.body;
                   await ChatModel.createMessage(decoded.uuid, matchId, youUserId, message);
                   res.status(200).send('OK');
-            } catch {
+            } catch(e) {
                   res.status(400).send('Error');
             }
       });
@@ -46,7 +46,7 @@ const getUnreadMessagesNb = async (req, res) => {
             try {
                   const nb = await ChatModel.getUnreadMessagesNb(decoded.uuid);
                   res.status(200).json({ nb });
-            } catch {
+            } catch(e) {
                   res.status(400).send('Error');
             }
       });
