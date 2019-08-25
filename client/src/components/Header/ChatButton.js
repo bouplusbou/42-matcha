@@ -15,7 +15,7 @@ export default function ChatButton() {
             });
         }
         return () => {
-            socket.off('setUnreadMessagesNb');
+            if (socket !== null) socket.off('setUnreadMessagesNb');
         }
     }, [socket, setUnreadMessagesNb]);
 

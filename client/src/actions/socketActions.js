@@ -7,17 +7,17 @@ export default function setupSocket(token, setSocket, setConnectedUsers) {
         }
     });
     
-    socket.on('isConnected', usernames => {
-        console.log(`The back sent new connectedUsers: ${usernames}`);
-        setConnectedUsers(usernames);
-    });
+    // socket.on('isConnected', usernames => {
+    //     console.log(`The back sent new connectedUsers: ${usernames}`);
+    //     setConnectedUsers(usernames);
+    // });
     
     socket.on('disconnect', () => {
         console.log('The server has disconnected!');
     });
     
     socket.on('message', data => {
-        console.log('Received a message from the server! 4', data);
+        console.log('Received a message from the server!', data);
     });
     
     setSocket(socket);

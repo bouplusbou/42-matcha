@@ -36,18 +36,18 @@ io.on('connection', async client => {
   }
   const userIds = Object.keys(io.sockets.sockets).map(elem => io.sockets.sockets[elem].userId);
   
-  client.broadcast.emit('isConnected', userIds);
+  // client.broadcast.emit('isConnected', userIds);
 
 	client.on('disconnect', () => {
     const userIds = Object.keys(io.sockets.sockets).map(elem => io.sockets.sockets[elem].userId);
-    io.emit('isConnected', userIds);
+    // io.emit('isConnected', userIds);
   });
 
   client.on('logout', () => {
     const filteredUserIds = Object.keys(io.sockets.sockets).map(elem => io.sockets.sockets[elem].userId).filter(userId => {
       return !(io.sockets.sockets[client.id].userId === userId);
     });
-    client.broadcast.emit('isConnected', filteredUserIds);
+    // client.broadcast.emit('isConnected', filteredUserIds);
     client.disconnect();
   });
   

@@ -300,7 +300,7 @@ export default function PageChat() {
                     <p style={{fontWeight: 900, fontSize: '10px', color: 'white'}}>{discussion.unreadNb}</p>
                 </UnreadDot>
               }
-              <Date>1 day ago</Date>
+              <Date>{discussion.duration}</Date>
             </Discussion>
             )}
           </DiscussionsSection>

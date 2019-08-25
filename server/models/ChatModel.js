@@ -9,7 +9,9 @@ async function getDiscussions(uuid) {
       WITH me, you.username AS youUsername, you.photos AS youPhotos, you.avatarIndex AS youAvatarIndex, you.userId AS youUserId, m.matchId AS matchId
       OPTIONAL MATCH (msg:Message)
       WHERE msg.matchId = matchId AND msg.status = 'unread' AND msg.to = me.userId
-      RETURN youUsername, youPhotos, youAvatarIndex, youUserId, matchId, COUNT(msg) AS unreadNb
+      OPTIONAL MATCH (msg2:Message)
+      WHERE msg2.matchId = matchId 
+      RETURN youUsername, youPhotos, youAvatarIndex, youUserId, matchId, COUNT(msg) AS unreadNb, duration.inDays(date(max(msg2.dateTime)), DateTime()).days AS days
     `, { uuid: uuid });
     session.close();
     if (res.records[0] === undefined) return null;
@@ -20,8 +22,13 @@ async function getDiscussions(uuid) {
       const youAvatarIndex = record.get('youAvatarIndex');
       const matchId = record.get('matchId');
       const unreadNb = record.get('unreadNb').low;
+      const days = record.get('days').low;
+      let duration = '';
+      if (days === 0) duration = 'today';
+      if (days === 1) duration = 'yesterday';
+      if (days > 1) duration = `${days} days ago`;
       const youAvatar = youPhotos[youAvatarIndex];
-      return { youUserId, youUsername, youAvatar, matchId, unreadNb };
+      return { youUserId, youUsername, youAvatar, matchId, unreadNb, duration };
     });
     return discussions;
   } catch(err) { console.log(err) }
