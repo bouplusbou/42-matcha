@@ -10,7 +10,8 @@
         "cardBackground" : "white",
         "textBlack" : "#4A4A4A",
         "textGrey" : "#D0D0D0",
-        "green" : "#ABEF99"
+        "green" : "#ABEF99",
+        "white" : "white"
     },
     "borderRadius": "20px"
 }
