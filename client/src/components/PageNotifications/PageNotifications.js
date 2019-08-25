@@ -17,7 +17,7 @@ const NotificationsSection = styled.section`
 `;
 const Container = styled.section`
   flex-basis: 600px;
-  background-color: white;
+  background-color: ${props => props.theme.color.white};
   border-radius: 20px;
   box-shadow: 0px 20px 20px rgba(0, 0, 0, 0.1);
   max-height: 600px;
@@ -26,7 +26,7 @@ const Container = styled.section`
     font-size: 2rem;
     text-align: center;
     font-family: Roboto;
-    color: #292929;
+    color: ${props => props.theme.color.textBlack};
   }
 `;
 const Notifications = styled.div`

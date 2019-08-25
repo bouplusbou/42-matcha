@@ -17,9 +17,10 @@ const Filtering = styled.aside`
     font-family: Roboto;
     border-radius: 30px;
     padding: 3em;
+    background-color: ${props => props.theme.color.white};
     p {
         font-weight: 500;
-        color: #292929;
+        color: ${props => props.theme.color.textBlack};
     }
     @media (max-width: 630px) {
         width: 180px;

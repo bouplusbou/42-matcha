@@ -11,7 +11,7 @@ const NavList = styled.ul`
     }
     a {
         text-decoration: none;
-        color: white;
+        color: ${props => props.theme.color.white};
         font-family: Roboto;
         font-style: normal;
         font-weight: 500;

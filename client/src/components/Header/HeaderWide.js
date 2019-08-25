@@ -13,8 +13,8 @@ const HeaderWide = styled.section`
     justify-content: space-between;
     align-items: center;
     height: 56px;
-    background-color: #6F48BD;
-    color: white;
+    background-color: ${props => props.theme.color.purple};
+    color: ${props => props.theme.color.white};
     @media (max-width: 1080px) {
         display: none;
     }

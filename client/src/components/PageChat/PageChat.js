@@ -116,7 +116,7 @@ const ReceivedMessage = styled.p`
   font-family: Roboto;
   color: ${props => props.theme.color.textBlack};
   font-size: 0.9em; 
-  background-color: #E7E7E8;
+  background-color: ${props => props.theme.color.lightGrey};
   padding: 15px 25px;
   border-radius: 40px;
   margin-left: 20px;
