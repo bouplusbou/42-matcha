@@ -190,6 +190,20 @@ const UnreadDot = styled.div`
     justify-content: center;
     align-items: center;
 `;
+const OnlineDot = styled.div`
+    width: 10px;
+    height: 10px;
+    background-color: ${props => props.theme.color.green};
+    border-radius: 100%;
+    margin: 0 20px;
+`;
+const OfflineDot = styled.div`
+    width: 10px;
+    height: 10px;
+    background-color: ${props => props.theme.color.red};
+    border-radius: 100%;
+    margin: 0 20px;
+`;
 
 export default function PageChat() {
   const {
@@ -201,6 +215,7 @@ export default function PageChat() {
     setCurrentDiscussionMessages,
     setUnreadMessagesNb,
     socket,
+    connectedUsers,
   } = useContext(AppContext);
   const [inputValue, setInputValue] = useState('');
   const authToken = localStorage.getItem('token');
@@ -256,7 +271,8 @@ export default function PageChat() {
 
   const loadCurrentDiscussion = async (matchId, youUserId, youUsername, youAvatar) => {
     socket.emit('setCurrentDiscussionMatchId', matchId);
-    setCurrentDiscussionInfo({ matchId, youUserId, youUsername, youAvatar });
+    const youIsOnline = false;
+    setCurrentDiscussionInfo({ matchId, youUserId, youUsername, youAvatar, youIsOnline });
     const resCurrent = await axios.post(`/chat/currentDiscussionMessages?authToken=${authToken}`, { matchId });
     setCurrentDiscussionMessages(resCurrent.data.currentDiscussionMessages);
     const resAll = await axios.get(`/chat/discussions?authToken=${authToken}`);
@@ -313,6 +329,11 @@ export default function PageChat() {
                 <Link to={`/profile/${currentDiscussionInfo.youUsername}`} style={{textDecoration: 'none'}}>
                   <ChatInfoUsername>{currentDiscussionInfo.youUsername}</ChatInfoUsername>
                 </Link>
+                {connectedUsers.includes(currentDiscussionInfo.youUserId) ? 
+                  <OnlineDot aria-label="This is my cool tooltip"></OnlineDot>
+                  : 
+                  <OfflineDot aria-label="This is my cool tooltip"></OfflineDot>
+                }
               </ChatInfo>
               <ChatWindow>
                 <MessagesSection
