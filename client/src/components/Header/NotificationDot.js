@@ -1,8 +1,7 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import AppContext from '../../AppContext';
 
-const NotificationDot = styled.div`
+const Dot = styled.div`
     position: absolute;
     top: -10px;
     right: -10px;
@@ -15,12 +14,10 @@ const NotificationDot = styled.div`
     align-items: center;
 `;
 
-export default function Notifications() {
-    const appState = useContext(AppContext);
-
+export default function NotificationDot(props) {
     return (
-        <NotificationDot>
-            <p style={{fontWeight: 900, fontSize: '10px', color: 'white'}}>{appState.unseenNotificationsNb}</p>
-        </NotificationDot>
+        <Dot>
+            <p style={{fontWeight: 900, fontSize: '10px', color: 'white'}}>{props.nb}</p>
+        </Dot>
     );
 }

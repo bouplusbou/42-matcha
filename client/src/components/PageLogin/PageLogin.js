@@ -148,9 +148,11 @@ export default function PageLogin(props) {
       await actionLogin(res.data.token);
       const resNotif = await axios.get(`/notifications/unseenNotificationsNb?authToken=${res.data.token}`);
       appState.setUnseenNotificationsNb(resNotif.data.nb);
+      const resMsg = await axios.get(`/chat/unreadMessagesNb?authToken=${res.data.token}`);
+      appState.setUnreadMessagesNb(resMsg.data.nb);
       appState.toggleConnected();
-      const userId = res.data.userId;
-      setupSocket(userId, appState.setSocket, appState.setConnectedUsers);
+      // const userId = res.data.userId;
+      setupSocket(res.data.token, appState.setSocket, appState.setConnectedUsers);
       props.history.push('/search');
     } catch(err) {
       setValues({ ...values, error: true, errorMsg: err.response.data.errorMsg});

@@ -29,6 +29,7 @@ const NotifSection = styled.section`
     position: relative;
 `;
 const ChatSection = styled.section`
+    position: relative;
 `;
  
 export default function () {
