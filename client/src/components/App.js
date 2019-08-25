@@ -64,13 +64,13 @@ function App() {
   return (
     <Fragment>
       <AppProvider value={appState}>
-      {!connected ? <UnauthenticatedMain /> : 
         <ThemeProvider theme={Theme}>
+      {!connected ? <UnauthenticatedMain /> : 
           <div>
             <Header />
             <AuthenticatedMain />
-          </div>
-        </ThemeProvider> }
+          </div> }
+        </ThemeProvider> 
       </AppProvider>
     </Fragment>
   );

@@ -35,7 +35,7 @@ const Discussion = styled.div`
   display: grid;
   grid-template-columns: 2fr 4fr 2fr;
   align-items: center;
-  background-color: white;
+  background-color: ${props => props.theme.color.white};
   height: 100px;
   width: 100%;
   margin-bottom: 20px;
@@ -72,7 +72,7 @@ const ChatSection = styled.section`
   overflow: hidden;
 `;
 const ChatInfo = styled.section`
-  background-color: white;
+  background-color: ${props => props.theme.color.white};
   height: 100px;
   display: flex;
   align-items: center;
@@ -99,7 +99,7 @@ const MessagesSection = styled.div`
   overflow-y: scroll;
 `;
 const Form = styled.form`
-  background-color: white;
+  background-color: ${props => props.theme.color.white};
   border-radius: 20px;
   padding: 30px;
   display: grid;
@@ -131,7 +131,7 @@ const SentMessageBlock = styled.div`
 `;
 const SentMessage = styled.p`
   font-family: Roboto;
-  color: white;
+  color: ${props => props.theme.color.white};
   font-size: 0.9em; 
   background-color: ${props => props.theme.color.purple};
   padding: 15px 25px;
@@ -150,7 +150,7 @@ const SendButton = styled.button`
   justify-content: center;
   border: none;
   background-color: ${props => props.theme.color.purple};
-  color: white;
+  color: ${props => props.theme.color.white};
   font-size: 1.5rem;
   cursor: pointer;
   text-decoration: none;
@@ -160,7 +160,7 @@ const SendButton = styled.button`
   -moz-appearance: none;
   &:hover,
   &:focus {
-    background: white;
+    background: ${props => props.theme.color.white};
     color: ${props => props.theme.color.purple};
     border: solid 0.5px ${props => props.theme.color.purple};
   }
@@ -172,7 +172,7 @@ const NoMatchContainer = styled.section`
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: white;
+  background-color: ${props => props.theme.color.white};
   height: 200px;
   border-radius: 30px;
   padding: 50px;
