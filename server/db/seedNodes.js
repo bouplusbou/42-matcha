@@ -66,11 +66,11 @@ const seedTagNodes = async () => {
     await session.run(`
       CREATE (t:Tag { 
         tag: $tag,
-        userId: $userId 
+        seedId: $seedId 
       })
     `, { 
       tag: tagsList[i],
-      userId: i
+      seedId: i
     });
   }
   const result = await session.run(`
@@ -182,7 +182,7 @@ const defineLookingFor = orientationGenderArr => {
   }
 }
 
-const createUserNode = async (gender, userId) => {
+const createUserNode = async (gender, seedId) => {
   const maxPhotosId = {
     "male": unsplash.arrMan.length,
     "female": unsplash.arrWoman.length,
@@ -193,13 +193,13 @@ const createUserNode = async (gender, userId) => {
   user.gender = gender;
   user.password = await bcrypt.hashSync('password', 10);
   user.uuid = uuidv1();
+  user.userId = uuidv1();
   user.lastName = faker.name.lastName();
   user.email = `${user.firstName}.${user.lastName}@`+ emailProvider[Math.floor(Math.random() * emailProvider.length)];
   user.username = `${user.firstName}${user.lastName.slice(0,1)}`;
   user.confirmed = true;
   user.hash = crypto.randomBytes(20).toString('hex');
   user.birthDate = getRandomDate('birthDate');
-  user.lastConnection = null;
   user.orientation = orientationArr[Math.floor(Math.random() * orientationArr.length)];
   user.lookingFor = defineLookingFor([user.orientation, gender]);
   user.bio = faker.lorem.paragraph();
@@ -216,8 +216,11 @@ const createUserNode = async (gender, userId) => {
     `${gender === "male" ? "man" : "woman"}Seed/${Math.floor(Math.random() * maxPhotosId[gender])}`,
     `${gender === "male" ? "man" : "woman"}Seed/${Math.floor(Math.random() * maxPhotosId[gender])}`
   ];
-  user.userId = userId;
-  await session.run(`CREATE (u:User $props)`, { props: user })
+  user.seedId = seedId;
+  await session.run(`
+    CREATE (u:User $props)
+    SET u.lastConnection = DateTime({timezone: 'Europe/Paris'})  
+  `, { props: user })
 }
 
 const createUsersByGender = async (gender, count, currentMaxId) => {
@@ -236,12 +239,12 @@ const createUsersByGender = async (gender, count, currentMaxId) => {
 const setConstraints = async () => {
   log(`Setting up constraints...`);
   await session.run(`CREATE 
-      CONSTRAINT ON (u:User) ASSERT u.userId IS UNIQUE
+      CONSTRAINT ON (u:User) ASSERT u.seedId IS UNIQUE
   `)
-  log(`Constraint set for : userId, uuid, email, username, hash.`)
+  log(`Constraint set for : seedId, uuid, email, username, hash.`)
 }
 
-const seedUserNodes = async (requestedNodes = 600) => {
+const seedUserNodes = async (requestedNodes = 30) => {
   log(`\n***** User nodes seeding *****`, `blue`);
   const usersByGender = Math.floor(requestedNodes / 3);
   let createdNodes = 0;

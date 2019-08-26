@@ -58,8 +58,8 @@ const seedChatMessage = async () => {
                     })
                 `, {
                     matchId: matchs[i].matchId,
-                    from: matchs[i].userIds[0],
-                    to: matchs[i].userIds[1],
+                    from: matchs[i].seedIds[0],
+                    to: matchs[i].seedIds[1],
                     status: "unread",
                     message: messages[j]
                 })
@@ -74,8 +74,8 @@ const seedChatMessage = async () => {
                     })
                 `, {
                     matchId: matchs[i].matchId,
-                    from: matchs[i].userIds[1],
-                    to: matchs[i].userIds[0],
+                    from: matchs[i].seedIds[1],
+                    to: matchs[i].seedIds[0],
                     status: "unread",
                     message: messages[j]
                 })

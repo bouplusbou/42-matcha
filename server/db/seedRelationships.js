@@ -49,61 +49,61 @@ const deleteAllRel = async (relationship) => {
     }
 }
 
-const hasMatched = async(userId, targetuserId) => {
+const hasMatched = async(seedId, targetseedId) => {
     const res = await session.run(`
-        MATCH (u:User { userId: $userId })-[r:LIKED]-(t:User { userId: $targetuserId })
+        MATCH (u:User { seedId: $seedId })-[r:LIKED]-(t:User { seedId: $targetseedId })
         RETURN count(r)
     `, {
-        userId: userId,
-        targetuserId: targetuserId
+        seedId: seedId,
+        targetseedId: targetseedId
     })
     const matched = res.records[0].get(0).low;
     return matched === 2;
 }
 
-const isBlocked = async(userId, targetuserId) => {
+const isBlocked = async(seedId, targetseedId) => {
     const res = await session.run(`
-        MATCH (u:User { userId: $userId })-[r:BLOCKED]->(t:User { userId: $targetuserId })
+        MATCH (u:User { seedId: $seedId })-[r:BLOCKED]->(t:User { seedId: $targetseedId })
         RETURN count(r)
     `, {
-        userId: userId,
-        targetuserId: targetuserId
+        seedId: seedId,
+        targetseedId: targetseedId
     })
     const blocked = res.records[0].get(0);
     return blocked === 1;
 }
 
-const hasVisited = async(userId, targetuserId) => {
+const hasVisited = async(seedId, targetseedId) => {
     const res = await session.run(`
-        MATCH (u:User { userId: $userId })-[r:VISITED]->(t:User { userId: $targetuserId })
+        MATCH (u:User { seedId: $seedId })-[r:VISITED]->(t:User { seedId: $targetseedId })
         RETURN count(r)
     `, {
-        userId: userId,
-        targetuserId: targetuserId
+        seedId: seedId,
+        targetseedId: targetseedId
     })
     const visited = res.records[0].get(0);
     return visited === 1;
 }
 
-const isLiked = async(userId, targetuserId) => {
+const isLiked = async(seedId, targetseedId) => {
     const res = await session.run(`
-        MATCH (u:User { userId: $userId })-[r:LIKED]->(t:User { userId: $targetuserId })
+        MATCH (u:User { seedId: $seedId })-[r:LIKED]->(t:User { seedId: $targetseedId })
         RETURN count(r)
     `, {
-        userId: userId,
-        targetuserId: targetuserId
+        seedId: seedId,
+        targetseedId: targetseedId
     })
     const liked = res.records[0].get(0);
     return liked === 1;
 }
 
-const hasAnyRelationship = async (firstUserId, secondUserId) => {
+const hasAnyRelationship = async (firstseedId, secondseedId) => {
     const res = await session.run(`
-        MATCH (u1:User {userId: $firstUserId})-[r]-(u2:User {userId: $secondUserId})
+        MATCH (u1:User {seedId: $firstseedId})-[r]-(u2:User {seedId: $secondseedId})
         RETURN count(r)
     `, {
-        firstUserId: firstUserId,
-        secondUserId: secondUserId,
+        firstseedId: firstseedId,
+        secondseedId: secondseedId,
     })
     const relCount = res.records[0].get(0);
     return relCount > 0;
@@ -121,29 +121,31 @@ const createNotification = async (type, fromId, toUuid) => {
 
 const seedVisitedRel = async () => {
     log(`\n***** VISITED relationships seeding *****`, `blue`)
-    const relByUser = 15;
+    const relByUser = 10;
     const maxId = await getUserCount();
     await deleteAllRel("VISITED");
     log(`Creating ${relByUser * maxId} "VISITED" relationships...`);
-    for (userId = 0; userId < maxId; userId++) {
+    for (seedId = 0; seedId < maxId; seedId++) {
         for (relCount = 0; relCount < relByUser; relCount++) {
             let randomId = Math.floor(Math.random() * maxId);
-            while (userId === randomId ||
-                await isBlocked(userId, randomId) ||
-                await isBlocked(randomId, userId) ||
-                await hasVisited(randomId, userId)) {
+            while (seedId === randomId ||
+                await isBlocked(seedId, randomId) ||
+                await isBlocked(randomId, seedId) ||
+                await hasVisited(randomId, seedId)) {
                 randomId = Math.floor(Math.random() * maxId);
             }
             const res = await session.run(`
-                MATCH (randomUser:User {userId: $randomuserId}), (user:User {userId: $userId})
+                MATCH (randomUser:User {seedId: $randomSeedId}), (user:User {seedId: $seedId})
                 CREATE (randomUser)-[r:VISITED]->(user)
                 SET r.timestamp = timestamp()
-                RETURN user.uuid AS uuid
+                RETURN 
+                user.userId AS userId,
+                randomUser.userId AS targetUserId
             `, {
-                userId: userId,
-                randomuserId: randomId,
+                seedId: seedId,
+                randomSeedId: randomId,
             })
-            await createNotification("visited", randomId, res.records[0].get(`uuid`));
+            await createNotification("visited", res.records[0].get(`targetUserId`), res.records[0].get(`userId`));
         }
     }
     const result = await session.run(`
@@ -155,23 +157,23 @@ const seedVisitedRel = async () => {
 
 const seedBlockedRel = async () => {
     log(`\n***** BLOCKED relationships seeding *****`, `blue`)
-    const relByUser = 5;
+    const relByUser = 3;
     const maxId = await getUserCount();
     await deleteAllRel("BLOCKED");
     log(`Creating ${relByUser * maxId} "BLOCKED" relationships...`);
-    for (userId = 0; userId < maxId; userId++) {
+    for (seedId = 0; seedId < maxId; seedId++) {
         for (relCount = 0; relCount < relByUser; relCount++) {
             let randomId = Math.floor(Math.random() * maxId);
-            while (userId === randomId || await hasAnyRelationship(userId, randomId)) {
+            while (seedId === randomId || await hasAnyRelationship(seedId, randomId)) {
                 randomId = Math.floor(Math.random() * maxId);
             }
             await session.run(`
-                MATCH (randomUser:User {userId: $randomuserId}), (user:User {userId: $userId})
+                MATCH (randomUser:User {seedId: $randomSeedId}), (user:User {seedId: $seedId})
                 CREATE (user)-[r:BLOCKED]->(randomUser)
                 SET r.timestamp = timestamp()
             `, {
-                userId: userId,
-                randomuserId: randomId,
+                seedId: seedId,
+                randomSeedId: randomId,
             })
         }
     }
@@ -189,7 +191,7 @@ const seedTaggedRel = async () => {
     const tagCount = await session.run(`MATCH (t:Tag) RETURN count(t)`);
     await deleteAllRel("TAGGED");
     log(`Creating ${relByUser * userCount} "TAGGED" relationships...`);
-    for (userId = 0; userId < userCount; userId++) {
+    for (seedId = 0; seedId < userCount; seedId++) {
         const selectedTagId = [];
         for (relCount = 0; relCount < relByUser; relCount++) {
             let randomId = Math.floor(Math.random() * tagCount.records[0].get(0).low);
@@ -200,11 +202,11 @@ const seedTaggedRel = async () => {
         };
         for (tagId of selectedTagId) {
             await session.run(`
-                MATCH (u:User {userId: $userId}), (t:Tag {userId: $tagId})
+                MATCH (u:User {seedId: $seedId}), (t:Tag {seedId: $tagId})
                 CREATE (u)-[r:TAGGED]->(t)
                 SET r.timestamp = timestamp()
             `, {
-                userId: userId,
+                seedId: seedId,
                 tagId: tagId
             })
         }
@@ -222,25 +224,29 @@ const seedLikedRel = async () => {
     const maxId = await getUserCount();
     await deleteAllRel("LIKED");
     log(`Creating ${relByUser * maxId} "LIKED" relationships...`);
-    for (userId = 0; userId < maxId; userId++) {
+    for (seedId = 0; seedId < maxId; seedId++) {
         for (relCount = 0; relCount < relByUser; relCount++) {
             let randomId = Math.floor(Math.random() * maxId);
-            while (userId === randomId ||
-                await !hasVisited(randomId, userId) ||
-                await isLiked(randomId, userId)) {
+            while (seedId === randomId ||
+                await !hasVisited(randomId, seedId) ||
+                await isLiked(randomId, seedId)) {
                 randomId = Math.floor(Math.random() * maxId);
             }
             const res = await session.run(`
-                MATCH (randomUser:User {userId: $randomuserId}), (user:User {userId: $userId})
+                MATCH (randomUser:User {seedId: $randomSeedId}), (user:User {seedId: $seedId})
                 CREATE (randomUser)-[r:LIKED]->(user)
                 SET r.timestamp = timestamp()
-                RETURN user.uuid AS uuid
+                RETURN
+                user.userId AS userId,
+                randomUser.userId AS targetUserId
             `, {
-                userId: userId,
-                randomuserId: randomId,
+                seedId: seedId,
+                randomSeedId: randomId,
             })
-            await createNotification("liked", randomId, res.records[0].get(`uuid`));
-            if (await hasMatched(userId, randomId)) {
+            const targetUserId = res.records[0].get(`targetUserId`);
+            const userId = res.records[0].get(`userId`);
+            await createNotification("liked", targetUserId, userId);
+            if (await hasMatched(userId, targetUserId)) {
                 await session.run(`CREATE CONSTRAINT ON (m:Match) ASSERT m.machId IS UNIQUE`);
                 await session.run(`
                     CREATE (m:Match {
@@ -249,11 +255,11 @@ const seedLikedRel = async () => {
                         dateTime: DateTime({timezone: 'Europe/Paris'})
                     })
                     `, {
-                        userIds: [userId, randomId],
+                        userIds: [userId, targetUserId],
                         matchId: uuidv1(),
                     }
                 );
-                await createNotification("matched", randomId, res.records[0].get(`uuid`));
+                await createNotification("matched", targetUserId, userId);
             }
         }
     }
