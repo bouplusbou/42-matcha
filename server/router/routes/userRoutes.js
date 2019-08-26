@@ -21,6 +21,9 @@ router.route('/deleteRelationship')
 router.route('/hasFullProfile')
       .get(authenticate, (req, res) => { UserController.hasFullProfile(req, res); });
 
+router.route('/resetPassword')
+      .post((req, res) => { UserController.resetPassword(req, res); });
+
 router.route('/resetPasswordEmail')
       .post((req, res) => { UserController.resetPasswordEmail(req, res); });
 
