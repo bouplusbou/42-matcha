@@ -139,6 +139,31 @@ const getProfileByUuid = async uuid => {
   } catch(error) { Log.error(error, "getProfile", __filename) }
 }
 
+const getRelationWithUser = async (uuid, targetUuid) => {
+  try {
+    const res = await session.run(`
+    MATCH (u:User {uuid: $uuid}), (t:User {uuid: $targetUuid})
+    RETURN
+    exists((u)-[:LIKED]->(t)) AS liked,
+    exists((t)-[:LIKED]->(u)) AS likedBy,
+    exists((t)-[:BLOCKED]->(u)) AS blockedBy,
+    exists((u)-[:BLOCKED]->(t)) AS blocked
+    `, {
+      uuid: uuid,
+      targetUuid: targetUuid
+    });
+    session.close();
+    const ret = {
+      liked: res.records[0].get(`liked`),
+      likedBy: res.records[0].get(`likedBy`),
+      blocked: res.records[0].get(`blocked`),
+      blockedBy: res.records[0].get(`blockedBy`),
+      match: res.records[0].get(`likedBy`) && res.records[0].get(`liked`),
+    }
+    return ret;
+  } catch(error) { Log.error(error, "getProfile", __filename) }
+}
+
 const getHistoric = async (uuid, type) => {
   try {
     const res = await session.run(`
@@ -212,7 +237,7 @@ const deleteRelationship = async (type, userUuid, targetUuid) => {
   try {
     await session.run(`
       MATCH (u:User {uuid: $userUuid}), (t:User {uuid: $targetUuid})
-      MATCH (u)-[r:BLOCKED]->(t)
+      MATCH (u)-[r:${type.toUpperCase()}]->(t)
       DELETE r
     `, {
       userUuid: userUuid,
@@ -440,6 +465,7 @@ module.exports = {
   usernameFromUserId,
   uuidFromUsername,
   getBlockedList,
-  createReportTicket
+  createReportTicket,
+  getRelationWithUser
 }
  

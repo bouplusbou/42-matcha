@@ -96,6 +96,12 @@ const getProfile = async (req, res) => {
                         profile.likedHistoric = await UserModel.getHistoric(uuid, "LIKED");
                         profile.blockedList = await UserModel.getBlockedList(uuid);
                         profile.account = true;
+                  } else {
+                        const ret = await UserModel.getRelationWithUser(uuid, reqUser.uuid)
+                        profile.liked = ret.liked;
+                        profile.likedBy = ret.likedBy;
+                        profile.blocked = ret.blocked;
+                        profile.blockedBy = ret.blockedBy;
                   }
                   res.json({profile: profile})
             }
@@ -154,6 +160,7 @@ const removeTag = async (req, res) => {
 const createRelationship = async (req, res) => {
       try {
             const uuid = await getUuidFromToken(req, res);
+            console.log(req.body)
             const targetUser = await UserModel.getUserByUsername(req.body.username);
             await UserModel.createRelationship(req.body.type, uuid, targetUser.uuid);
             res.status(200).json({ message: `${req.body.type} relationship created.`})

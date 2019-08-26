@@ -48,6 +48,11 @@ export default function PageProfile(props) {
                 usernameVisited: props.match.params.username,
             }
             axios.post(`/notifications?authToken=${authToken}`, data);
+            axios.post(`/users/createRelationship?authToken=${authToken}`, {
+                type: "visited",
+                username: props.match.params.username,
+            })
+            console.log("visit sent")
         }
     }, [props.match.params.username])
     

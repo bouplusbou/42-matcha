@@ -1,13 +1,19 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart } from '@fortawesome/free-solid-svg-icons';
 import { Image } from 'cloudinary-react';
 import { Link } from 'react-router-dom';
+import LikeButton from '../ProfileCard/Components/LikeButton';
+import { ProfileProvider } from '../../ProfileContext';
+import Axios from 'axios';
+
+const authToken = localStorage.getItem(`token`);
 
 const StyledDiv = styled.div `
     display:flex;
     height:80px;
+    padding-right:0.75rem;
 
     overflow:hidden;
     align-items:center;
@@ -55,15 +61,30 @@ const StyledButton = styled(FontAwesomeIcon) `
 
 export default function UserListItem(props) {
     
-    
+    const [profileState, setProfileState] = useState({});
+
+    useEffect(() => {
+        async function fetchProfile(edit) {
+            const username = `/${props.username}`;
+            const profile = await Axios.get(`/users${username}?authToken=${authToken}`)
+            console.log(profile)
+            setProfileState({
+                ...profile.data.profile,
+            })
+        }
+        fetchProfile();
+    }, [])
+
     return (
-        <StyledDiv>
-            <ProfilePhoto cloudName='matchacn' publicId={props.photos[props.avatarIndex]}/>
-            <InfosContainer to={`/profile/${props.username}`}>
-                <Username color={props.color}>{props.username}</Username>
-                <Age>{props.age}, {props.city}</Age>
-            </InfosContainer>
-            <StyledButton icon={faHeart} size={"lg"} color={props.color}/>
-        </StyledDiv>
+        <ProfileProvider value={{...profileState}}>
+            <StyledDiv>
+                <ProfilePhoto cloudName='matchacn' publicId={props.photos[props.avatarIndex]}/>
+                <InfosContainer to={`/profile/${props.username}`}>
+                    <Username color={props.color}>{props.username}</Username>
+                    <Age>{props.age}, {props.city}</Age>
+                </InfosContainer>
+                <LikeButton size={"2rem"} small/>
+            </StyledDiv>
+        </ProfileProvider>
     )
 }
