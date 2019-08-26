@@ -14,7 +14,7 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 
 
 const Hero = styled.section`
-  background-color: #6F48BD;
+  background-color: ${props => props.theme.color.purple};
   height: 100vh;
 `;
 const Section = styled.section`
@@ -25,15 +25,15 @@ const Section = styled.section`
 const Container = styled.section`
   flex-basis: 400px;
   padding: 50px;
-  background-color: white;
+  background-color: ${props => props.theme.color.white};
   border-radius: 20px;
   box-shadow: 0px 20px 20px rgba(0, 0, 0, 0.1);
-  color: #4A4A4A;
+  color: ${props => props.theme.color.textBlack};
   h1 {
     font-size: 2rem;
     text-align: center;
     font-family: Roboto;
-    color: #292929;
+    color: ${props => props.theme.color.textBlack};
   }
 `;
 const Form = styled.form`
@@ -46,16 +46,16 @@ const SubmitButton = styled.button`
   display: block;
   margin: 0 auto;
   margin-top: 40px;
-  background-color: #FF0041;
+  background-color: ${props => props.theme.color.red};
   width: 50%;
   text-align: center;
   border-radius: 100px;
-  color: white;
+  color: ${props => props.theme.color.white};
   font-family: Roboto;
   font-size: 1em;
 `;
 const ErrorBox = styled.section`
-  background-color: #FFECEC;
+  background-color: ${props => props.theme.color.ultraLightRed};
   color: red;
   padding: 5px;
   width: 60%;
@@ -129,14 +129,16 @@ export default function PageResetPassword(props) {
     const toggleShowPassword = () => setShowPassword(!showPassword);
 
     useEffect(() => {
+      let isSubscribed = true;
         async function fetchData() {
             try {
                 await axios.post('/users/confirmation', {hash: props.match.params.hash});
-                setIsError(false);
+                if (isSubscribed) setIsError(false);
             } catch(error) {}
-            setIsLoading(false);
+            if (isSubscribed) setIsLoading(false);
         }
         fetchData();
+        return () => isSubscribed = false;
     }, [props.match.params.hash]);
 
     return (

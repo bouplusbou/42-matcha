@@ -10,8 +10,8 @@ export default function MoreButton({ handleClickMoreButton }) {
         padding: 8px 10px;
         border: solid 0.5px #AE86FF;
         border-radius: 10px;
-        background-color: #6F48BD;
-        color: #AE86FF;
+        background-color: ${props => props.theme.color.purple};
+        color: ${props => props.theme.color.lightPurple};
         font-size: 1rem;
         cursor: pointer;
         text-decoration: none;
@@ -22,7 +22,7 @@ export default function MoreButton({ handleClickMoreButton }) {
         &:hover,
         &:focus {
             background: white;
-            color: #6F48BD;
+            color: ${props => props.theme.color.purple};
         }
         &:focus {
             outline: 1px solid #fff;

@@ -26,7 +26,7 @@ export default function UserCard({ user, width, height }) {
     }
   `;
   const UserInfos = styled.div`
-    background-color: white;
+    background-color: ${props => props.theme.color.white};
     margin: 0 auto;
     height: 100px;
     width: 80%;
@@ -41,11 +41,10 @@ export default function UserCard({ user, width, height }) {
     display: flex;
     scrollbar-width: none;
     overflow-y: scroll;
-    /* ::-webkit-scrollbar: { display: none }; */
   `;
   const Tag = styled.p`
-    background-color: #E3D4FF;
-    color: #6F48BD;
+    background-color: ${props => props.theme.color.lightPurple};
+    color: ${props => props.theme.color.purple};
     border-radius: 10px;
     padding: 5px;
     margin: 3px 5px 0 0;
@@ -53,12 +52,12 @@ export default function UserCard({ user, width, height }) {
   const Username = styled.p`
     font-size: 1.5em;
     margin: 0;
-    color: #4A4A4A;
+    color: ${props => props.theme.color.textBlack};
     font-family: Roboto;
     font-weight: 500px;
   `;
   const Score = styled.p`
-    color: #4A4A4A;
+    color: ${props => props.theme.color.textBlack};
     font-family: Roboto;
     font-weight: 500px;
     text-transform: capitalize;

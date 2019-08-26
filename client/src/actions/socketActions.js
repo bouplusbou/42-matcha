@@ -8,16 +8,12 @@ export default function setupSocket(token, setSocket, setConnectedUsers) {
     });
     
     socket.on('isConnected', userIds => {
-        console.log(`The back sent new connectedUsers: ${userIds}`);
+        // console.log(`The back sent new connectedUsers: ${userIds}`);
         setConnectedUsers(userIds);
     });
     
     socket.on('disconnect', () => {
-        console.log('The server has disconnected!');
-    });
-    
-    socket.on('message', data => {
-        console.log('Received a message from the server!', data);
+        // console.log('The server has disconnected!');
     });
     
     setSocket(socket);

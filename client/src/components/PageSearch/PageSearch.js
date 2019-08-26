@@ -8,7 +8,6 @@ import IncompleteProfile from '../IncompleteProfile';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 
-
 const SearchSection = styled.section`
   margin: 3vw 10vw;
   display: grid;
@@ -53,12 +52,28 @@ const NoMore = styled.section`
   justify-content: center;
 `;
 
-export default function PageSearch(props) {
+export default function PageSearch() {
   const [isLoading, setIsLoading] = useState(true);
-
+  const [hasNoMore, setHasNoMore] = useState(false);
+  const [sortingChoice, setSortingChoice] = useState('Closest');
+  const [filterCity, setFilterCity] = useState(null);
+  const [filterLatLng, setFilterLatLng] = useState(null);
+  const [isOwnCity, setIsOwnCity] = useState(true);
+  const [filterDistance, setFilterDistance] = useState(20);
+  const [filterTags, setFilterTags] = useState([]);
+  const [filterAge, setFilterAge] = useState([18, 60]);
+  const [rangeAge, setRangeAge] = useState([0, 100]);
+  const [filterScore, setFilterScore] = useState([0, 100000]);
+  const [rangeScore, setRangeScore] = useState([0, 100000]);
+  const [allTags, setAllTags] = useState(null);
+  const [users, setUsers] = useState([]);
+  const [offset, setOffset] = useState(0);
+  const authToken = localStorage.getItem('token');
   const [hasFullProfile, setHasFullProfile] = useState(true);
   const [missingProfileFields, setMissingProfileFields] = useState(false);
+
   useEffect(() => {
+    let isSubscribed = true;
     setIsLoading(true);
     async function fetchData() {
       const authToken = localStorage.getItem('token');
@@ -69,74 +84,90 @@ export default function PageSearch(props) {
       if (res.data.fields.orientation === null) missingFields.push('your sexual orientation');
       if (res.data.fields.lookingFor === null) missingFields.push('who you are looking for');
       if (missingFields.length !== 0) {
-        setMissingProfileFields(missingFields);
-        setHasFullProfile(false);
+        if (isSubscribed) {
+          setMissingProfileFields(missingFields);
+          setHasFullProfile(false);
+          setIsLoading(false);
+        }
+      }
+    }
+    fetchData();
+    return () => isSubscribed = false;
+  }, []);
+
+  useEffect(() => {
+    let isSubscribed = true;
+    async function fetchData() {
+      const res = await axios.get(`/search/ownCityLatLng?authToken=${authToken}`);
+      if (isSubscribed) {
+        setFilterCity(res.data.cityLatLng.city);
+        setFilterLatLng(res.data.cityLatLng.latLng);
+      }
+    }
+    fetchData();
+    return () => isSubscribed = false;
+  }, [authToken]);
+
+  useEffect(() => {
+    let isSubscribed = true;
+    async function fetchData() {
+      const res = await axios.get(`/search/filtersMinMax?authToken=${authToken}`);
+      if (isSubscribed) {
+        setFilterAge(res.data.age);
+        setRangeAge(res.data.age);
+        setFilterScore(res.data.score);
+        setRangeScore(res.data.score);
+      }
+    }
+    fetchData();
+    return () => isSubscribed = false;
+  }, [authToken]);
+
+  useEffect(() => {
+    let isSubscribed = true;
+    async function fetchData() {
+      const res = await axios.get(`/tags?authToken=${authToken}`);
+      if (isSubscribed) {
+        setAllTags(res.data.tags);
+      }
+    }
+    fetchData();
+    return () => isSubscribed = false;
+  }, [authToken]);
+
+  useEffect(() => {
+    setIsLoading(true);
+    setHasNoMore(false);
+    let isSubscribed = true;
+    async function fetchData() {
+      const filters = { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags, offset }
+      const res = await axios.post(`/search?authToken=${authToken}`, filters);
+      if (isSubscribed) {
+        if (res.data.usersArr.length !== 20) setHasNoMore(true);
+        offset !== 0 ? setUsers( prev => [...prev, ...res.data.usersArr]) : setUsers(res.data.usersArr);
         setIsLoading(false);
       }
     }
     fetchData();
-  }, []);
-
-  const [hasNoMore, setHasNoMore] = useState(false);
-  const [sortingChoice, setSortingChoice] = useState('Closest');
-  const [filterCity, setFilterCity] = useState(null);
-  const [filterLatLng, setFilterLatLng] = useState(null);
-  const [filterDistance, setFilterDistance] = useState(5);
-  const [filterTags, setFilterTags] = useState([]);
-  const [offset, setOffset] = useState(0);
-
-  const [filterAge, setFilterAge] = useState([18, 60]);
-  const [rangeAge, setRangeAge] = useState([0, 100]);
-  const [filterScore, setFilterScore] = useState([0, 100000]);
-  const [rangeScore, setRangeScore] = useState([0, 100000]);
-  useEffect(() => {
-    async function fetchData() {
-      const authToken = localStorage.getItem('token');
-      const res = await axios.get(`/search/filtersMinMax?authToken=${authToken}`);
-      setFilterAge(res.data.age);
-      setRangeAge(res.data.age);
-      setFilterScore(res.data.score);
-      setRangeScore(res.data.score);
-    }
-    fetchData();
-  }, []);
-
-  const [allTags, setAllTags] = useState(null);
-  useEffect(() => {
-    async function fetchData() {
-      const authToken = localStorage.getItem('token');
-      const res = await axios.get(`/tags?authToken=${authToken}`);
-      setAllTags(res.data.tags);
-    }
-    fetchData();
-  }, []);
-
-  const [users, setUsers] = useState([]);
-  useEffect(() => {
-    setIsLoading(true);
-    setHasNoMore(false);
-    async function fetchData() {
-      const authToken = localStorage.getItem('token');
-      const filters = { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags, offset }
-      const res = await axios.post(`/search?authToken=${authToken}`, filters);
-      if (res.data.usersArr.length !== 20) setHasNoMore(true);
-      offset !== 0 ? setUsers( prev => [...prev, ...res.data.usersArr]) : setUsers(res.data.usersArr);
-      setIsLoading(false);
-    }
-    fetchData();
-  }, [sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags, offset]);
+    return () => isSubscribed = false;
+  }, [authToken, sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags, offset]);
 
   const handleSelectSorting = e => { setSortingChoice(e.target.innerText); setOffset(0); };
   const handleAgeChange = values => { setFilterAge(values); setOffset(0); };
   const handleScoreChange = values => { setFilterScore(values); setOffset(0); };
   const handleLatlngChange = ({ suggestion }) => { 
+    setIsOwnCity(false);
     setFilterLatLng([suggestion.latlng.lat, suggestion.latlng.lng]);
     setFilterCity(suggestion.name); 
     setOffset(0); 
   };
-  const handleClickDeleteCity = () => { 
+  const handleClickDeleteCity = async () => { 
     setFilterLatLng(null);
     setFilterCity(null);
+    const res = await axios.get(`/search/ownCityLatLng?authToken=${authToken}`);
+    setFilterCity(res.data.cityLatLng.city);
+    setFilterLatLng(res.data.cityLatLng.latLng);
+    setIsOwnCity(true);
   };
   const handleDistanceChange = value => { setFilterDistance(value); setOffset(0); };
   const handleTagsChange = values => { 
@@ -157,6 +188,7 @@ export default function PageSearch(props) {
           handleScoreChange={handleScoreChange}
           handleLatlngChange={handleLatlngChange}
           filterCity={filterCity}
+          isOwnCity={isOwnCity}
           handleClickDeleteCity={handleClickDeleteCity}
           filterDistance={filterDistance}
           handleDistanceChange={handleDistanceChange}
@@ -191,7 +223,6 @@ export default function PageSearch(props) {
                 height={375}
               />
             </Link>
-
           )}
         </UserCards>
       }

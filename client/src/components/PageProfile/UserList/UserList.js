@@ -22,7 +22,7 @@ const StyledSection = styled.section `
 const Title = styled.h2 `
     margin:0 0 0.5rem 0;
 
-    color: white;
+    color: ${props => props.theme.color.white};
     text-align:center;
 `
 

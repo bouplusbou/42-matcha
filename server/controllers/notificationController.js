@@ -22,7 +22,7 @@ const createNotification = (req, res) => {
                   const {type, usernameVisited} = req.body;
                   const uuidVisited = await UserModel.uuidFromUsername(usernameVisited);
                   const userIdVisiter = await UserModel.userIdFromUuid(decoded.uuid);
-                  console.log(`usernameVisited: ${usernameVisited}, uuidVisited: ${uuidVisited}, userIdVisiter: ${userIdVisiter}`);
+                  // console.log(`usernameVisited: ${usernameVisited}, uuidVisited: ${uuidVisited}, userIdVisiter: ${userIdVisiter}`);
                   NotificationModel.createNotification(uuidVisited, type, userIdVisiter);
             } catch(e) {
                   res.status(400).send('Error');
