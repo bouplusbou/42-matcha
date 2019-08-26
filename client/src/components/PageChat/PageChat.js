@@ -6,6 +6,7 @@ import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import AppContext from '../../AppContext';
+import { Image, Transformation } from 'cloudinary-react';
 
 const Hero = styled.section`
   display: flex;
@@ -42,12 +43,13 @@ const Discussion = styled.div`
   border-radius: 10px;
   position: relative;
 `;
-const Avatar = styled.div`
+const Avatar = styled(Image)`
   background-color: lightgrey;
   height: 50px;
   width: 50px;
   border-radius: 100%;
   justify-self: center;
+  object-fit: cover;
 `;
 const Username = styled.p`
   color: ${props => props.theme.color.textBlack};
@@ -313,7 +315,7 @@ export default function PageChat() {
               key={index}
               onClick={() => loadCurrentDiscussion(discussion.matchId, discussion.youLastConnection, discussion.youUserId, discussion.youUsername, discussion.youAvatar)}
             >
-              <Avatar></Avatar>
+              <Avatar cloudName='matchacn' publicId={discussion.youAvatar}></Avatar>
               <Username>{discussion.youUsername}</Username>
               { discussion.unreadNb > 0 &&
                 <UnreadDot>
@@ -329,7 +331,7 @@ export default function PageChat() {
           { currentDiscussionInfo !== null &&
             <Fragment>
               <ChatInfo>
-                <Avatar></Avatar>
+                <Avatar cloudName='matchacn' publicId={currentDiscussionInfo.youAvatar}></Avatar>
                 <Link to={`/profile/${currentDiscussionInfo.youUsername}`} style={{textDecoration: 'none'}}>
                   <ChatInfoUsername>{currentDiscussionInfo.youUsername}</ChatInfoUsername>
                 </Link>
@@ -351,7 +353,7 @@ export default function PageChat() {
                       <ReceivedMessageBlock
                         key={index}
                       >
-                        <Avatar></Avatar>
+                        <Avatar cloudName='matchacn' publicId={currentDiscussionInfo.youAvatar}></Avatar>
                         <ReceivedMessage>{msg.message}</ReceivedMessage>
                       </ReceivedMessageBlock>
                     :

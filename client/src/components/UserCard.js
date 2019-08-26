@@ -3,16 +3,16 @@ import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
 import { faFireAlt } from '@fortawesome/free-solid-svg-icons';
+import cloudinary from 'cloudinary-core';
+const cloudinaryCore = new cloudinary.Cloudinary({cloud_name: 'matchacn'});
 
-
-export default function UserCard({ user, width, height }) {
   const UserCard = styled.div`
-    background-image: url(${user.photo});
+    background-image: url(${props => props.avatar});
     background-size: cover;
     background-position: center center;
     position: relative;
-    width: ${width}px;
-    height: ${height}px;
+    width: ${props => props.width}px;
+    height: ${props => props.height}px;
     margin: 20px;
     display: flex;
     align-items: flex-end;
@@ -64,11 +64,24 @@ export default function UserCard({ user, width, height }) {
     font-size: 0.8em;
   `;
 
+export default function UserCardComp({ user, width, height }) {
+
   return (
-    <UserCard>
+    <UserCard
+      avatar={cloudinaryCore.url(user.photo)}
+      width={width} 
+      height={height} 
+    >
       <UserInfos>
         <Username>{user.username}</Username>
-        <Score><FontAwesomeIcon style={{marginRight: '8px'}} icon={faMapMarkerAlt}/>{user.city} <FontAwesomeIcon style={{margin: '0 8px 0 15px'}} icon={faFireAlt}/>{user.score}</Score>
+        <Score><FontAwesomeIcon 
+          style={{marginRight: '8px'}} 
+          icon={faMapMarkerAlt}/>
+            {user.city} 
+          <FontAwesomeIcon 
+            style={{margin: '0 8px 0 15px'}} 
+            icon={faFireAlt}
+          />{user.score}</Score>
         <Tags>
           {user.tags.map( (tag, index) =>
             <Tag
