@@ -10,10 +10,12 @@ const createUser = async (email, firstName, lastName, username, password, city, 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     const uuid = uuidv1();
+    const userId = uuidv1();
     const hash = crypto.randomBytes(20).toString('hex');
     await session.run(`
       CREATE (u:User {
         uuid: $uuid,
+        userId: $userId,
         email: $email,
         username: $username,
         firstName: $firstName,
@@ -28,6 +30,7 @@ const createUser = async (email, firstName, lastName, username, password, city, 
         })
     `, {
       uuid: uuid,
+      userId: userId,
       email: email,
       username: username,
       firstName: firstName,
