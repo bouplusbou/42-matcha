@@ -25,21 +25,30 @@ const searchUsers = async (req, res) => {
 
 const filtersMinMax = async (req, res) => {
       try {
-            const filtersMinMax = await SearchModel.filtersMinMax()
-            res.json({ age: filtersMinMax.age, score: filtersMinMax.score })
+            const filtersMinMax = await SearchModel.filtersMinMax();
+            res.json({ age: filtersMinMax.age, score: filtersMinMax.score });
       } catch (error) { Log.error(error, `filtersMinMax`, __filename) }
 };
 
 const suggestedUsers = async (req, res) => {
       try {
             const uuid = await getUuidFromToken(req, res);
-            const users = await SearchModel.suggestedUsers(uuid, req.body)
-            res.json({usersArr: users})
+            const users = await SearchModel.suggestedUsers(uuid, req.body);
+            res.json({usersArr: users});
       } catch (error) { Log.error(error, `suggestedUsers`, __filename) }
+}
+
+const ownCityLatLng = async (req, res) => {
+      try {
+            const uuid = await getUuidFromToken(req, res);
+            const cityLatLng = await SearchModel.ownCityLatLng(uuid);
+            res.json({ cityLatLng });
+      } catch (error) { Log.error(error, `ownCityLatLng`, __filename) }
 }
 
 module.exports = {
       searchUsers,
       suggestedUsers,
       filtersMinMax,
+      ownCityLatLng,
 }

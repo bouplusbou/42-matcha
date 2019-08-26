@@ -58,7 +58,7 @@ const CTA = styled(Link)`
   display: block;
   margin: 0;
   margin-left: 8vw;
-  background-color: ${props => props.theme.color.lightRed};
+  background-color: ${props => props.theme.color.red};
   padding: 20px 0;
   width: 250px;
   height: 20px;

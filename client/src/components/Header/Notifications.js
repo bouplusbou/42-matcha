@@ -12,16 +12,14 @@ export default function Notifications() {
 
     useEffect(() => {
         if (appState.socket !== null) {
-            // console.log('CREATE A NEW on.VISITED SOCKET');
             appState.socket.on('visited', async username => {
-                console.log(`${username} visited your profile !`);
+                // console.log(`${username} visited your profile !`);
                 const authToken = localStorage.getItem('token');
                 const resNotif = await axios.get(`/notifications/unseenNotificationsNb?authToken=${authToken}`);
                 setUnseenNotificationsNb(resNotif.data.nb);
             });
             return () => {
                 appState.socket.off('visited');
-                // console.log('REMOVE VISITED LISTENER');
             }
         }
     }, [appState.socket, setUnseenNotificationsNb]);

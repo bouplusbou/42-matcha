@@ -20,25 +20,29 @@ function App() {
   const [currentDiscussionMessages, setCurrentDiscussionMessages] = useState(null);
   
   useEffect(() => {
-      async function fetchData() {
-        try {
-          const userId = await actionIsAuthenticated(localStorage.getItem('token'));
-          if (userId !== null) {
-            const authToken = localStorage.getItem('token');
-            const resNotif = await axios.get(`/notifications/unseenNotificationsNb?authToken=${authToken}`);
-            setUnseenNotificationsNb(resNotif.data.nb);
-            const resMsg = await axios.get(`/chat/unreadMessagesNb?authToken=${authToken}`);
+    let isSubscribed = true;
+    async function fetchData() {
+      try {
+        const userId = await actionIsAuthenticated(localStorage.getItem('token'));
+        if (userId !== null) {
+          const authToken = localStorage.getItem('token');
+          const resNotif = await axios.get(`/notifications/unseenNotificationsNb?authToken=${authToken}`);
+          if (isSubscribed) setUnseenNotificationsNb(resNotif.data.nb);
+          const resMsg = await axios.get(`/chat/unreadMessagesNb?authToken=${authToken}`);
+          if (isSubscribed) {
             setUnreadMessagesNb(resMsg.data.nb);
             setupSocket(authToken, setSocket, setConnectedUsers);
             setConnected(true);
-          } else {
-            setConnected(false)
           }
-        } catch(e) {
-          setConnected(false)
+        } else {
+          if (isSubscribed) setConnected(false)
         }
-      };
-      fetchData();
+      } catch(e) {
+        if (isSubscribed) setConnected(false)
+      }
+    };
+    fetchData();
+    return () => isSubscribed = false;
   }, []);
 
   const appState = {

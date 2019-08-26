@@ -60,14 +60,16 @@ export default function PageConfirmAccount(props) {
     const [isError, setIsError] = useState(true);
 
     useEffect(() => {
+      let isSubscribed = true;
         async function fetchData() {
             try {
                 await axios.post('/users/confirmation', {hash: props.match.params.hash});
-                setIsError(false);
+                if (isSubscribed) setIsError(false);
             } catch(error) {}
-            setIsLoading(false);
+            if (isSubscribed) setIsLoading(false);
         }
         fetchData();
+        return () =>isSubscribed = false;
     }, [props.match.params.hash]);
 
     return (

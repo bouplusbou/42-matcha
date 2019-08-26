@@ -227,7 +227,7 @@ export default function PageChat() {
 
   useEffect(() => {
     return () => {
-      console.log('UNMOUNT PAGECHAT & setCurrentDiscussionInfo and setCurrentDiscussionMessages to null');
+      // console.log('UNMOUNT PAGECHAT & setCurrentDiscussionInfo and setCurrentDiscussionMessages to null');
       setCurrentDiscussionInfo(null);
       setCurrentDiscussionMessages(null);  
       socket.emit('setCurrentDiscussionMatchId', null);  

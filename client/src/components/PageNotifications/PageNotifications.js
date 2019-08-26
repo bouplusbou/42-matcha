@@ -65,13 +65,17 @@ export default function PageNotifications() {
   const setUnseenNotificationsNb = appState.setUnseenNotificationsNb;
 
   useEffect(() => {
+    let isSubscribed = true;
     async function fetchData() {
       const authToken = localStorage.getItem('token');
       const res = await axios.get(`/notifications?authToken=${authToken}`);
-      setNotifications(res.data.notifications);
-      setUnseenNotificationsNb(0);
+      if (isSubscribed) {
+        setNotifications(res.data.notifications);
+        setUnseenNotificationsNb(0);
+      }
     };
     fetchData();
+    return () => isSubscribed = false;
   }, [setUnseenNotificationsNb]);
 
   return (

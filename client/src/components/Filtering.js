@@ -32,7 +32,7 @@ const TextBox = styled.section`
     align-items: end;
 `;
 
-export default function FilteringComponent({filterAge, handleAgeChange, rangeAge, filterScore, rangeScore, handleScoreChange, filterCity, handleClickDeleteCity, filterDistance, handleDistanceChange, handleLatlngChange, allTags, filterTags, handleTagsChange}) {
+export default function FilteringComponent({filterAge, handleAgeChange, rangeAge, filterScore, rangeScore, handleScoreChange, filterCity, isOwnCity, handleClickDeleteCity, filterDistance, handleDistanceChange, handleLatlngChange, allTags, filterTags, handleTagsChange}) {
     
     const createSliderWithTooltip = Slider.createSliderWithTooltip;
     const Range = createSliderWithTooltip(Slider.Range);
@@ -72,11 +72,12 @@ export default function FilteringComponent({filterAge, handleAgeChange, rangeAge
                     <p>City</p>
                     {filterCity &&
                         <p style={{fontSize: '0.9em'}}>
-                        {filterCity} <FontAwesomeIcon 
+                        {filterCity} 
+                        {!isOwnCity && <FontAwesomeIcon 
                             style={{marginLeft: '8px', color: 'lightgray', cursor: 'pointer'}}
                             icon={faTimes}
                             onClick={handleClickDeleteCity}
-                        />
+                        /> }
                         </p>
                     }
                 </TextBox>
@@ -96,9 +97,9 @@ export default function FilteringComponent({filterAge, handleAgeChange, rangeAge
                     <p style={{fontSize: '0.9em'}}>{filterDistance}km</p>
                 </TextBox>
                 <Slider 
-                    dots
-                    step={200} 
-                    min={0}
+                    // dots
+                    // step={200} 
+                    min={20}
                     max={1000}
                     defaultValue={filterDistance}
                     onAfterChange={handleDistanceChange}
