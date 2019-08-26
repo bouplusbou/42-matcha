@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import Logo from '../Logo';
+import Logo from '../../components/Logo';
 import Burger from './Burger';
 import Dropdown from './Dropdown';
 

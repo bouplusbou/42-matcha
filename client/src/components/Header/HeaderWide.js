@@ -1,11 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
-import Logo from '../Logo';
+import Logo from '../../components/Logo';
 import NavList from './NavList';
 import LogoutButton from './LogoutButton';
 import Notifications from './Notifications';
 import ChatButton from './ChatButton';
-
 
 const HeaderWide = styled.section`
     position: relative;

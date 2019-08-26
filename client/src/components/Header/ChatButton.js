@@ -2,7 +2,7 @@ import React, { useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faComment } from '@fortawesome/free-solid-svg-icons';
-import AppContext from '../../AppContext';
+import AppContext from '../../contexts/AppContext';
 import NotificationDot from './NotificationDot';
 
 export default function ChatButton() {

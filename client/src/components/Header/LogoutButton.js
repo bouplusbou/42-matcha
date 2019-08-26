@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { actionLogout } from '../../actions/authActions';
-import AppContext from '../../AppContext';
+import AppContext from '../../contexts/AppContext';
 
 export default function LogoutButton() {
 
