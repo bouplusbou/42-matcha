@@ -195,14 +195,20 @@ const OnlineDot = styled.div`
     height: 10px;
     background-color: ${props => props.theme.color.green};
     border-radius: 100%;
-    margin: 0 20px;
+    margin: 0 10px 0 20px;
 `;
 const OfflineDot = styled.div`
     width: 10px;
     height: 10px;
     background-color: ${props => props.theme.color.red};
     border-radius: 100%;
-    margin: 0 20px;
+    margin: 0 10px 0 20px;
+`;
+const LastConnection = styled.p`
+  font-family: Roboto;
+  font-size: 0.7em;
+  font-weight: 500;
+  color: ${props => props.theme.color.textGrey};
 `;
 
 export default function PageChat() {
@@ -227,7 +233,6 @@ export default function PageChat() {
 
   useEffect(() => {
     return () => {
-      // console.log('UNMOUNT PAGECHAT & setCurrentDiscussionInfo and setCurrentDiscussionMessages to null');
       setCurrentDiscussionInfo(null);
       setCurrentDiscussionMessages(null);  
       socket.emit('setCurrentDiscussionMatchId', null);  
@@ -252,7 +257,6 @@ export default function PageChat() {
     }
   }, [socket, authToken, setDiscussions]);
 
-
   useEffect(() => {
     socket.on('newMessageReceived', async matchId => {
       if (currentDiscussionInfo !== null && matchId === currentDiscussionInfo.matchId) {
@@ -269,10 +273,10 @@ export default function PageChat() {
     }
   }, [authToken, setCurrentDiscussionMessages, socket, currentDiscussionInfo, setDiscussions]);
 
-  const loadCurrentDiscussion = async (matchId, youUserId, youUsername, youAvatar) => {
+  const loadCurrentDiscussion = async (matchId, youLastConnection, youUserId, youUsername, youAvatar) => {
     socket.emit('setCurrentDiscussionMatchId', matchId);
     const youIsOnline = false;
-    setCurrentDiscussionInfo({ matchId, youUserId, youUsername, youAvatar, youIsOnline });
+    setCurrentDiscussionInfo({ matchId, youLastConnection, youUserId, youUsername, youAvatar, youIsOnline });
     const resCurrent = await axios.post(`/chat/currentDiscussionMessages?authToken=${authToken}`, { matchId });
     setCurrentDiscussionMessages(resCurrent.data.currentDiscussionMessages);
     const resAll = await axios.get(`/chat/discussions?authToken=${authToken}`);
@@ -307,7 +311,7 @@ export default function PageChat() {
             {discussions.map((discussion, index) => 
             <Discussion
               key={index}
-              onClick={() => loadCurrentDiscussion(discussion.matchId, discussion.youUserId, discussion.youUsername, discussion.youAvatar)}
+              onClick={() => loadCurrentDiscussion(discussion.matchId, discussion.youLastConnection, discussion.youUserId, discussion.youUsername, discussion.youAvatar)}
             >
               <Avatar></Avatar>
               <Username>{discussion.youUsername}</Username>
@@ -330,9 +334,12 @@ export default function PageChat() {
                   <ChatInfoUsername>{currentDiscussionInfo.youUsername}</ChatInfoUsername>
                 </Link>
                 {connectedUsers.includes(currentDiscussionInfo.youUserId) ? 
-                  <OnlineDot aria-label="This is my cool tooltip"></OnlineDot>
+                  <OnlineDot></OnlineDot>
                   : 
-                  <OfflineDot aria-label="This is my cool tooltip"></OfflineDot>
+                  <Fragment>
+                    <OfflineDot></OfflineDot>
+                    <LastConnection>{currentDiscussionInfo.youLastConnection === null ? 'never connected' : currentDiscussionInfo.youLastConnection}</LastConnection>
+                  </Fragment>
                 }
               </ChatInfo>
               <ChatWindow>

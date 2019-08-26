@@ -381,6 +381,16 @@ async function getUuidByUserId(userId) {
   } catch(err) { console.log(err) }
 }
 
+async function setlastConnection(userId) {
+  try {
+    await session.run(`
+      MATCH (u:User {userId: $userId})
+      SET u.lastConnection = DateTime({timezone: 'Europe/Paris'})
+    `, { userId: userId });
+    session.close();
+  } catch(err) { console.log(err) }
+}
+
 module.exports = {
   getUserByUsername,
   createRelationship,
@@ -405,5 +415,6 @@ module.exports = {
   usernameFromUserId,
   uuidFromUsername,
   getUuidByUserId,
+  setlastConnection,
 }
  

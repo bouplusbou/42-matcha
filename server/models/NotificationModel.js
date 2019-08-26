@@ -19,7 +19,7 @@ async function getNotifications(uuid) {
   try {
     const res = await session.run(`
       MATCH (n:Notification {to: $uuid})
-      WITH n, n.from AS userId, n.type AS type, duration.inDays(n.dateTime, DateTime()).days as days, n.status AS status
+      WITH n, n.from AS userId, n.type AS type, duration.inDays(n.dateTime, DateTime({timezone: 'Europe/Paris'})).days as days, n.status AS status
       MATCH (u:User {userId: userId})
       RETURN u.username AS username, type, days, status
       ORDER BY n.dateTime DESC
@@ -46,7 +46,7 @@ async function createNotification(uuid, type, userId) {
         from: $userId,
         to: $uuid,
         status: 'unseen',
-        dateTime: DateTime() 
+        dateTime: DateTime({timezone: 'Europe/Paris'}) 
       })
       `, {
       type: type,
