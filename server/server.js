@@ -40,8 +40,7 @@ io.on('connection', async client => {
   io.emit('isConnected', userIds);
 
 	client.on('disconnect', () => {
-    // console.log(`${client.userId} DISCONNECTED`);
-    UserModel.setLastConnected(client.userId);
+    UserModel.setlastConnection(client.userId);
     const userIds = Object.keys(io.sockets.sockets).map(elem => io.sockets.sockets[elem].userId);
     io.emit('isConnected', userIds);
   });

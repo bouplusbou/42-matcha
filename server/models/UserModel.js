@@ -381,7 +381,7 @@ async function getUuidByUserId(userId) {
   } catch(err) { console.log(err) }
 }
 
-async function setLastConnected(userId) {
+async function setlastConnection(userId) {
   try {
     await session.run(`
       MATCH (u:User {userId: $userId})
@@ -415,6 +415,6 @@ module.exports = {
   usernameFromUserId,
   uuidFromUsername,
   getUuidByUserId,
-  setLastConnected,
+  setlastConnection,
 }
  

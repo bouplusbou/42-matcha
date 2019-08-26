@@ -257,7 +257,6 @@ export default function PageChat() {
     }
   }, [socket, authToken, setDiscussions]);
 
-
   useEffect(() => {
     socket.on('newMessageReceived', async matchId => {
       if (currentDiscussionInfo !== null && matchId === currentDiscussionInfo.matchId) {
