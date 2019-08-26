@@ -6,16 +6,18 @@ async function getDiscussions(uuid) {
     const res = await session.run(`
       MATCH (me:User {uuid: $uuid}), (you:User), (m:Match)
       WHERE NOT (me = you) AND me.userId IN m.userIds AND you.userId IN m.userIds
-      WITH me, you.username AS youUsername, you.photos AS youPhotos, you.avatarIndex AS youAvatarIndex, you.userId AS youUserId, m.matchId AS matchId
+      WITH me, you.lastConnection AS l, you.username AS youUsername, you.photos AS youPhotos, you.avatarIndex AS youAvatarIndex, you.userId AS youUserId, m.matchId AS matchId
+      WITH me, youUsername, youPhotos, youAvatarIndex, youUserId, matchId, l.year AS year, l.month AS month, l.day AS day, l.hour AS hour, l.minute AS minute
       OPTIONAL MATCH (msg:Message)
       WHERE msg.matchId = matchId AND msg.status = 'unread' AND msg.to = me.userId
       OPTIONAL MATCH (msg2:Message)
       WHERE msg2.matchId = matchId 
-      RETURN youUsername, youPhotos, youAvatarIndex, youUserId, matchId, COUNT(msg) AS unreadNb, duration.inDays(date(max(msg2.dateTime)), DateTime()).days AS days
+      RETURN youUsername, youPhotos, youAvatarIndex, youUserId, matchId, COUNT(msg) AS unreadNb, duration.inDays(date(max(msg2.dateTime)), DateTime({timezone: 'Europe/Paris'})).days AS days, year+'-'+month+'-'+day+' '+hour+':'+minute AS youLastConnection
     `, { uuid: uuid });
     session.close();
     if (res.records[0] === undefined) return null;
     const discussions = res.records.map(record => {
+      const youLastConnection = record.get('youLastConnection');
       const youUserId = record.get('youUserId');
       const youUsername = record.get('youUsername');
       const youPhotos = record.get('youPhotos');
@@ -28,7 +30,7 @@ async function getDiscussions(uuid) {
       if (days === 1) duration = 'yesterday';
       if (days > 1) duration = `${days} days ago`;
       const youAvatar = youPhotos[youAvatarIndex];
-      return { youUserId, youUsername, youAvatar, matchId, unreadNb, duration };
+      return { youLastConnection, youUserId, youUsername, youAvatar, matchId, unreadNb, duration };
     });
     return discussions;
   } catch(err) { console.log(err) }
@@ -74,7 +76,7 @@ async function createMessage(uuid, matchId, youUserId, message) {
         to: n.userId,
         status: 'unread',
         message: $message,
-        dateTime: DateTime()
+        dateTime: DateTime({timezone: 'Europe/Paris'})
       })
     `, { 
       uuid,

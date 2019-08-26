@@ -54,7 +54,7 @@ const seedChatMessage = async () => {
                         to: $to,
                         message: $message,
                         status: $status,
-                        dateTime: DateTime()
+                        dateTime: DateTime({timezone: 'Europe/Paris'})
                     })
                 `, {
                     matchId: matchs[i].matchId,
@@ -70,7 +70,7 @@ const seedChatMessage = async () => {
                         to: $to,
                         message: $message,
                         status: $status,
-                        dateTime: DateTime()
+                        dateTime: DateTime({timezone: 'Europe/Paris'})
                     })
                 `, {
                     matchId: matchs[i].matchId,
