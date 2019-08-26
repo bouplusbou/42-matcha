@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
+import { Image } from 'cloudinary-react';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight, faArrowLeft, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
-import ProfileContext from '../../ProfileContext';
-import { Image } from 'cloudinary-react';
+
+import ProfileContext from '../../../ProfileContext';
 
 const authToken = localStorage.getItem('token');
 

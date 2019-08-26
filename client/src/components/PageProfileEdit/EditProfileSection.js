@@ -1,14 +1,15 @@
 import React, { useContext, useState, useEffect } from 'react';
 import styled from 'styled-components';
-import Separator from '../Components/Separator';
+import Separator from '../Separator';
 import { faPencilAlt, faTimes, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { TextField } from '@material-ui/core';
-import ProfileContext from '../../ProfileContext';
+import ProfileContext from '../ProfileContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import TagChip from '../Components/TagChip';
+import TagChip from '../PageProfile/ProfileCard/Components/TagChip';
 import CreatableSelect from 'react-select/creatable';
 import axios from 'axios';
 import AlgoliaPlaces from 'algolia-places-react';
+import { Redirect } from 'react-router-dom';
 const authToken = localStorage.getItem('token');
 
 const StyledSection = styled.section `
@@ -148,18 +149,19 @@ export default function InfosSection(props) {
     const profile = useContext(ProfileContext);
     const [valueState, setValueState] = useState({
         ...profile,
-        newTag: ""
+        newTag: "",
+        redirect: false,
     })
     
     const [errorState, setErrorState] = useState({});
 
-    const [editState, setEditState] = useState({});
+    const [editedValuesState, setEditedValueState] = useState({});
     
     const [tagsList, setTagsList] = useState([]);
     const Tags = valueState.tags && valueState.tags.map((tag, index) => <TagChip deletable={true} tag={tag} key={index} index={index} onDelete={deleteTag}/>)
     useEffect(() => {
         fetchTagsList();
-    });
+    }, []);
     
     async function fetchTagsList() {
         const tags = await axios.get(`/tags?authToken=${authToken}`);
@@ -180,11 +182,14 @@ export default function InfosSection(props) {
         if (name === "bio") {
             if (valueState.bio.length < 300 && value.length < 300) {
                 setValueState({ ...valueState, bio: value })
-                setEditState({ ...editState, bio: value })
+                setEditedValueState({ ...editedValuesState, bio: value })
+            } else {
+                setErrorState({ ...errorState, 
+                    [`bioError`]: true})
             }
         } else {
             setValueState({ ...valueState, [name]: value });
-            setEditState({ ...editState, [name]: value });
+            setEditedValueState({ ...editedValuesState, [name]: value });
         }
     };
 
@@ -194,8 +199,8 @@ export default function InfosSection(props) {
             latLng: [suggestion.latlng.lat, suggestion.latlng.lng],
             city: suggestion.city,
         });
-        setEditState({
-            ...editState,
+        setEditedValueState({
+            ...editedValuesState,
             latLng: [suggestion.latlng.lat, suggestion.latlng.lng],
             city: suggestion.city,
         })
@@ -264,9 +269,10 @@ export default function InfosSection(props) {
         fetchTagsList();
     }
 
-    function SubmitChanges() {
-        if (Object.keys(errorState).length === 0)
-            profile.closeAndSaveEdit(editState);
+    const SubmitChanges = async () => {
+        if (Object.keys(editedValuesState).length > 0)
+            await axios.post(`/users/updateProfile?authToken=${authToken}`, editedValuesState)
+        setValueState({ redirect:true })
     }
 
     function handleInputChange(value) {
@@ -383,6 +389,7 @@ export default function InfosSection(props) {
                     helperText="250 charaters max."
                     fullWidth
                     variant="outlined"
+                    error={errorState.bioError}
                 />
                 <TagSelectContainer>
                     <StyledTagLabel>Add a hashtag</StyledTagLabel>
@@ -406,6 +413,7 @@ export default function InfosSection(props) {
                 <CancelButton onClick={SubmitChanges}><FontAwesomeIcon icon={faTimes} size={'lg'}/></CancelButton>
                 <SubmitButton onClick={SubmitChanges}><FontAwesomeIcon icon={faCheck} size={'lg'}/></SubmitButton>
             </GridForm>
+            {valueState.redirect && <Redirect to='/profile'/>}
         </StyledSection>
     )
 }

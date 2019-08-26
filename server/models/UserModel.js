@@ -23,7 +23,9 @@ const createUser = async (email, firstName, lastName, username, password, city, 
         hash: $hash,
         fame: $fame,
         city: $city,
-        latLng: $latLng })
+        latLng: $latLng,
+        photos: $photos
+        })
     `, {
       uuid: uuid,
       email: email,
@@ -36,6 +38,7 @@ const createUser = async (email, firstName, lastName, username, password, city, 
       fame: 100,
       city: city,
       latLng: latLng,
+      photos: ["profilePlaceholder"]
     });
     session.close();
     sendEmail('confirmUser', email, hash);
@@ -65,7 +68,7 @@ const emailExists = async email => {
 }
 
 const uuidExists = async uuid => { 
-  try {
+    try {
     const res = await session.run(`
       MATCH (u:User {uuid: $uuid})
       RETURN u
@@ -79,6 +82,8 @@ const updateProfile = async (uuid, editedValues) => {
   try {
     if (editedValues.newPassword)
       editedValues.password = await bcrypt.hash(editedValues.newPassword, 10);
+    if (editedValues.photos && editedValues.photos.length === 0)
+      editedValues.photos = ["https://www.cloudraxak.com/wp-content/uploads/2017/03/profile-pic-placeholder.png"];
     let cypher = "MATCH (u:User {uuid: $uuid})\n";
     for (var key in editedValues) { cypher += `SET u.${key} = $${key}\n` }
     await session.run(cypher, {
@@ -114,8 +119,7 @@ const getUserByUsername = async username => {
 const getProfileByUuid = async uuid => {
   try {
     const res = await session.run(`
-    MATCH (u:User)
-    WHERE u.uuid = $uuid
+    MATCH (u:User {uuid: $uuid})
     OPTIONAL MATCH (u)-[:TAGGED]->(t:Tag)
     RETURN
     u,
@@ -132,6 +136,31 @@ const getProfileByUuid = async uuid => {
     return {
       ...user, age, tags
     }
+  } catch(error) { Log.error(error, "getProfile", __filename) }
+}
+
+const getRelationWithUser = async (uuid, targetUuid) => {
+  try {
+    const res = await session.run(`
+    MATCH (u:User {uuid: $uuid}), (t:User {uuid: $targetUuid})
+    RETURN
+    exists((u)-[:LIKED]->(t)) AS liked,
+    exists((t)-[:LIKED]->(u)) AS likedBy,
+    exists((t)-[:BLOCKED]->(u)) AS blockedBy,
+    exists((u)-[:BLOCKED]->(t)) AS blocked
+    `, {
+      uuid: uuid,
+      targetUuid: targetUuid
+    });
+    session.close();
+    const ret = {
+      liked: res.records[0].get(`liked`),
+      likedBy: res.records[0].get(`likedBy`),
+      blocked: res.records[0].get(`blocked`),
+      blockedBy: res.records[0].get(`blockedBy`),
+      match: res.records[0].get(`likedBy`) && res.records[0].get(`liked`),
+    }
+    return ret;
   } catch(error) { Log.error(error, "getProfile", __filename) }
 }
 
@@ -161,6 +190,34 @@ const getHistoric = async (uuid, type) => {
     }
     return historic
   } catch(error) { Log.error(error, "getHistoric", __filename) }
+}
+
+const getBlockedList = async uuid => {
+  try {
+    const res = await session.run(`
+      MATCH (u:User {uuid: $uuid})
+      MATCH (u)-[r:BLOCKED]->(t:User)
+      RETURN 
+      t AS user,
+      duration.between(date(t.birthDate),date()).years AS age,
+      toString(r.timestamp) AS timestamp
+      ORDER BY r.timestamp 
+    `, { uuid: uuid })
+    session.close();
+    const historic = []
+    for (i = 0; i < res.records.length; i++) {
+      const user = res.records[i].get(`user`).properties;
+      delete user['password'];
+      delete user['hash'];
+      delete user[`uuid`];
+      historic.push({
+          relTime : new Date(parseInt(res.records[i].get(`timestamp`))),
+          age : res.records[i].get(`age`).low,
+          ...user,
+      })
+    }
+    return historic
+  } catch(error) { Log.error(error, "getBlockedList", __filename) }
 }
 
 const createRelationship = async (type, userUuid, targetUuid) => {
@@ -368,6 +425,22 @@ async function uuidFromUsername(username) { // refacto possible avec getUserByUs
   } catch(err) { console.log(err) }
 }
 
+const createReportTicket = async (userUuid, targetUuid) => {
+  try {
+    console.log(targetUuid);
+    await session.run(`
+      CREATE (r:Report {
+        from: $from,
+        to: $to,
+        dateTime: DateTime()
+      })
+    `, {
+      from: userUuid,
+      to: targetUuid
+    })
+  } catch(error) { Log.error(error, `createReportTicket`, __filename) }
+}
+
 async function getUuidByUserId(userId) {
   try {
     const res = await session.run(`
@@ -414,7 +487,9 @@ module.exports = {
   userIdFromUsername,
   usernameFromUserId,
   uuidFromUsername,
+  getBlockedList,
+  createReportTicket,
+  getRelationWithUser,
   getUuidByUserId,
   setlastConnection,
 }
- 

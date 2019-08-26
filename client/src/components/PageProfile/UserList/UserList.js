@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
 import UserListItem from './UserListItem';
-import Separator from '../ProfileCard/Components/Separator';
+import Separator from '../../Separator';
 
 const StyledSection = styled.section `
     display:flex;
@@ -16,7 +16,7 @@ const StyledSection = styled.section `
     @media (min-width: 1000px) { border-radius: ${props => props.theme.borderRadius}; }
 
     background-color: ${props => props.color};
-    box-shadow: 0px 20px 20px rgba(0, 0, 0, 0.1);  
+    box-shadow: 0px 20px 20px rgba(0, 0, 0, 0.1);
 `
 
 const Title = styled.h2 `

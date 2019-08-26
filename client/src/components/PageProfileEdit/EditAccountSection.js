@@ -1,9 +1,9 @@
 import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
-import Separator from '../Components/Separator';
+import Separator from '../Separator';
 import { faTimes, faCheck, faUser } from '@fortawesome/free-solid-svg-icons';
 import { TextField } from '@material-ui/core';
-import ProfileContext from '../../ProfileContext';
+import ProfileContext from '../ProfileContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const StyledSection = styled.section `
@@ -90,7 +90,7 @@ const CancelButton = styled(StyledButton) `
     height:2rem;
 `
 
-export default function InfosSection(props) {
+export default function InfosSection() {
     
     const profile = useContext(ProfileContext);
     const [valueState, setValueState] = useState({ ...profile })
@@ -151,7 +151,7 @@ export default function InfosSection(props) {
         <StyledSection>
             <GridForm>
                     <UsernameSeparator>
-                        <Separator icon={faUser} siwe={'lg'}/>
+                        <Separator icon={faUser} size={'lg'}/>
                     </UsernameSeparator>
                     <UsernameTextField
                         fullWidth

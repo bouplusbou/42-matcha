@@ -38,7 +38,13 @@ router.route(`/removeTag`)
 
 router.route(`/uploadPic`)
       .post(authenticate, (req, res) => { UserController.uploadPic(req, res); });
-      
+
+router.route(`/reportUser`)
+      .post(authenticate, (req, res) => { UserController.reportUser(req, res); })
+
+router.route(`/blockUser`)
+      .post(authenticate, (req, res) => { UserController.blockUser(req, res); });
+
 module.exports = router;
 
 

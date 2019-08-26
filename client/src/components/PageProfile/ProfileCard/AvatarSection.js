@@ -1,14 +1,13 @@
 import React, { Fragment, useState, useContext } from 'react';
 import styled from 'styled-components';
+import cloudinary from 'cloudinary-core';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFireAlt } from '@fortawesome/free-solid-svg-icons';
 import { Modal } from '@material-ui/core';
-import cloudinary from 'cloudinary-core';
-
 
 import ProfileContext from '../../ProfileContext';
-import PhotosModal from '../Components/PhotosModal';
+import PhotosModal from './Components/PhotosModal';
 
 const cloudinaryCore = new cloudinary.Cloudinary({cloud_name: 'matchacn'});
 
@@ -62,6 +61,7 @@ const ScoreIcon = styled(FontAwesomeIcon) `
 const ModalContentContainer = styled.div `
     height:100%;
 `
+
 export default function AvatarSection(props) {
     const [open, setOpen] = useState(false);
     const profile = useContext(ProfileContext);
@@ -89,11 +89,7 @@ export default function AvatarSection(props) {
                 </ScoreContainer>
             </StyledSection>
             <Modal open={open} onClose={CloseModal}>
-                <ModalContentContainer> 
-                    <PhotosModal 
-                        handleClose={CloseModal}
-                    />
-                </ModalContentContainer>
+                <PhotosModal handleClose={CloseModal}/>
             </Modal>
         </Fragment>
     )
