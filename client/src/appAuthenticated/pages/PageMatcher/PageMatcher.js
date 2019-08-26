@@ -137,10 +137,10 @@ export default function PageSearch() {
     return () => isSubscribed = false;
   }, [authToken, sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags]);
 
-  const handleLikeDislike = async choice => {
+  const handleLikeDislike = async type => {
     setIsLoading(true);
     const payload = {
-      choice: choice,
+      type: type,
       username: user.username,
     };
     axios.post(`/users/createRelationship?authToken=${authToken}`, payload);
