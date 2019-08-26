@@ -13,7 +13,7 @@ import InputLabel from '@material-ui/core/InputLabel';
 import FormHelperText from '@material-ui/core/FormHelperText';
 
 const Hero = styled.section`
-  background-color: #6F48BD;
+  background-color: ${props => props.theme.color.purple};
   height: 100vh;
 `;
 const LoginSection = styled.section`
@@ -24,14 +24,14 @@ const LoginSection = styled.section`
 const FormContainer = styled.section`
   flex-basis: 400px;
   padding: 50px;
-  background-color: white;
+  background-color: ${props => props.theme.color.white};
   border-radius: 20px;
   box-shadow: 0px 20px 20px rgba(0, 0, 0, 0.1);
   h1 {
     font-size: 2rem;
     text-align: center;
     font-family: Roboto;
-    color: #292929;
+    color: ${props => props.theme.color.textBlack};
   }
 `;
 const Form = styled.form`
@@ -44,22 +44,22 @@ const SubmitButton = styled.button`
   display: block;
   margin: 0 auto;
   margin-top: 40px;
-  background-color: #FF0041;
+  background-color: ${props => props.theme.color.red};
   width: 50%;
   text-align: center;
   border-radius: 100px;
-  color: white;
+  color: ${props => props.theme.color.white};
   font-family: Roboto;
   font-size: 1em;
 `;
 const Redirect = styled.section`
   margin-top: 100px;
-  color: #C6C6C6;
+  color: ${props => props.theme.color.textGrey};
   font-weight: 500;
   text-align: center;
   a {
     text-decoration: none;
-    color: #C6C6C6;
+    color: ${props => props.theme.color.textGrey};
     font-family: Roboto;
     font-style: normal;
     font-weight: 500;

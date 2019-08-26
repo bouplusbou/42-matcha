@@ -441,6 +441,29 @@ const createReportTicket = async (userUuid, targetUuid) => {
   } catch(error) { Log.error(error, `createReportTicket`, __filename) }
 }
 
+async function getUuidByUserId(userId) {
+  try {
+    const res = await session.run(`
+      MATCH (u:User {userId: $userId})
+      RETURN u.uuid AS uuid
+    `, { userId: userId });
+    session.close();
+    if (res.records[0] === undefined) return null;
+    const uuid = res.records[0].get('uuid');
+    return uuid;
+  } catch(err) { console.log(err) }
+}
+
+async function setlastConnection(userId) {
+  try {
+    await session.run(`
+      MATCH (u:User {userId: $userId})
+      SET u.lastConnection = DateTime({timezone: 'Europe/Paris'})
+    `, { userId: userId });
+    session.close();
+  } catch(err) { console.log(err) }
+}
+
 module.exports = {
   getUserByUsername,
   createRelationship,
@@ -466,6 +489,7 @@ module.exports = {
   uuidFromUsername,
   getBlockedList,
   createReportTicket,
-  getRelationWithUser
+  getRelationWithUser,
+  getUuidByUserId,
+  setlastConnection,
 }
- 

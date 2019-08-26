@@ -223,7 +223,7 @@ const userIdFromUuid = (req, res) => {
             try {
                   const userId = await UserModel.userIdFromUuid(decoded.uuid);
                   res.status(200).json({ userId });
-            } catch {
+            } catch(err) {
                   res.status(400).send('Error');
             }
       });

@@ -199,7 +199,7 @@ const createUserNode = async (gender, userId) => {
   user.confirmed = true;
   user.hash = crypto.randomBytes(20).toString('hex');
   user.birthDate = getRandomDate('birthDate');
-  user.lastConnection = getRandomDate('lastConnection');
+  user.lastConnection = null;
   user.orientation = orientationArr[Math.floor(Math.random() * orientationArr.length)];
   user.lookingFor = defineLookingFor([user.orientation, gender]);
   user.bio = faker.lorem.paragraph();

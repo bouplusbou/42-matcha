@@ -1,27 +1,31 @@
 import React, { useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-// import AppContext from '../../AppContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faComment } from '@fortawesome/free-solid-svg-icons';
-// import axios from 'axios';
+import AppContext from '../../AppContext';
+import NotificationDot from './NotificationDot';
 
 export default function ChatButton() {
-    // const appState = useContext(AppContext);
-    // const setUnseenNotificationsNb = appState.setUnseenNotificationsNb;
+    const {socket, unreadMessagesNb, setUnreadMessagesNb} = useContext(AppContext);
 
-    // useEffect(() => {
-    //     if (appState.socket !== null) {
-    //         appState.socket.on('visited', async username => {
-    //             console.log(`${username} visited your profile !`);
-    //             const authToken = localStorage.getItem('token');
-    //             const resNotif = await axios.get(`/notifications/unseenNotificationsNb?authToken=${authToken}`);
-    //             setUnseenNotificationsNb(resNotif.data.nb);
-    //         });
-    //     }
-    // }, [appState.socket, setUnseenNotificationsNb]);
+    useEffect(() => {
+        if (socket !== null) {
+            socket.on('setUnreadMessagesNb', async nb => {
+                setUnreadMessagesNb(nb);
+            });
+        }
+        return () => {
+            if (socket !== null) socket.off('setUnreadMessagesNb');
+        }
+    }, [socket, setUnreadMessagesNb]);
 
     return (
         <Link to="/chat" style={{textDecoration: 'none'}}>
+            {unreadMessagesNb !== 0 &&
+                <NotificationDot 
+                    nb={unreadMessagesNb}
+                />
+            }
             <FontAwesomeIcon  style={{fontSize: '25px', cursor: 'pointer', color: 'white'}} icon={faComment}/>
         </Link>
     );

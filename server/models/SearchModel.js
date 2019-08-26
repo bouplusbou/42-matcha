@@ -166,8 +166,23 @@ const suggestedUsers = async (uuid, { sortingChoice, filterAge, filterScore, fil
   } catch (error) { Log.error(error, `suggestedUsers`, __filename) }
 }
 
+const ownCityLatLng = async uuid => { 
+  try {
+    const res = await session.run(`
+      MATCH (n:User {uuid: $uuid})
+      RETURN n.city AS city, n.latLng AS latLng
+    `, { uuid });
+    session.close();
+    if (res.records[0] === undefined) return null;
+    const city = res.records[0].get('city');
+    const latLng = res.records[0].get('latLng');
+    return { city, latLng };
+  } catch (error) { Log.error(error, `ownCityLatLng`, __filename) }
+}
+
 module.exports = {
   searchUsers,
   suggestedUsers,
   filtersMinMax,
+  ownCityLatLng,
 }

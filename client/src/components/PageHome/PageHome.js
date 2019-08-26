@@ -11,9 +11,9 @@ const Body = styled.section`
 const Wrapper = styled.section`
   padding: 0 10vw;
   display: flex;
-  background-color: #6F48BD;
+  background-color: ${props => props.theme.color.purple};
   height: 100vh;
-  color: white;
+  color: ${props => props.theme.color.white};
   h1 {
     font-family: 'Arbutus Slab', serif;
     margin: 0;
@@ -39,11 +39,11 @@ const TextWrapper = styled.section`
   margin: 0;
   padding: 10vw;
   padding-right: 0;
-  background-color: #6F48BD;
+  background-color: ${props => props.theme.color.purple};
   flex: 1 1;
 `;
 const PhotoWrapper = styled.section`
-  background-color: #6F48BD;
+  background-color: ${props => props.theme.color.purple};
   flex: 1 2;
   @media (max-width: 1500px) {
     display: none;
@@ -58,13 +58,13 @@ const CTA = styled(Link)`
   display: block;
   margin: 0;
   margin-left: 8vw;
-  background-color: #FF0041;
+  background-color: ${props => props.theme.color.red};
   padding: 20px 0;
   width: 250px;
   height: 20px;
   text-align: center;
   border-radius: 100px;
-  color: white;
+  color: ${props => props.theme.color.white};
   box-shadow: 0px 20px 20px rgba(0, 0, 0, 0.23);
   font-family: 'Roboto', sans-serif;
   transition: box-shadow 0.5s ease-in-out;
@@ -75,15 +75,15 @@ const CTA = styled(Link)`
 `;
 const Footer = styled.section`
   flex-shrink: 0;
-  background-color: white;
+  background-color: ${props => props.theme.color.white};
 `;
 const Header = styled.header`
   display: flex;
   justify-content: space-between;
   align-items: center;
   height: 56px;
-  background-color: #6F48BD;
-  color: white;
+  background-color: ${props => props.theme.color.purple};
+  color: ${props => props.theme.color.white};
 `;
 const LoginButton = styled(Link)`
   display: flex;
@@ -102,8 +102,8 @@ const LoginButton = styled(Link)`
   transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
   &:hover {
       transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
-      background-color: white;
-      color: #6F48BD;
+      background-color: ${props => props.theme.color.white};
+      color: ${props => props.theme.color.purple};
   }
 `;
 

@@ -19,7 +19,7 @@ import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import setupSocket from '../../actions/socketActions';
 
 const Hero = styled.section`
-  background-color: #6F48BD;
+  background-color: ${props => props.theme.color.purple};
   height: 100vh;
 `;
 const LoginSection = styled.section`
@@ -30,14 +30,14 @@ const LoginSection = styled.section`
 const FormContainer = styled.section`
   flex-basis: 400px;
   padding: 50px;
-  background-color: white;
+  background-color: ${props => props.theme.color.white};
   border-radius: 20px;
   box-shadow: 0px 42px 60px rgba(0, 0, 0, 0.25);
   h1 {
     font-size: 2rem;
     text-align: center;
     font-family: Roboto;
-    color: #292929;
+    color: ${props => props.theme.color.textBlack};
   }
 `;
 const Form = styled.form`
@@ -45,7 +45,7 @@ const Form = styled.form`
   flex-direction: column;
 `;
 const ErrorBox = styled.section`
-  background-color: #FFECEC;
+  background-color: ${props => props.theme.color.ultraLightRed};
   color: red;
   padding: 5px;
   width: 60%;
@@ -64,22 +64,22 @@ const SubmitButton = styled.button`
   display: block;
   margin: 0 auto;
   margin-top: 40px;
-  background-color: #FF0041;
+  background-color: ${props => props.theme.color.red};
   width: 50%;
   text-align: center;
   border-radius: 100px;
-  color: white;
+  color: ${props => props.theme.color.white};
   font-family: Roboto;
   font-size: 1em;
 `;
 const Redirect = styled.section`
   margin-top: 100px;
-  color: #C6C6C6;
+  color: ${props => props.theme.color.textGrey};
   font-weight: 500;
   text-align: center;
   a {
     text-decoration: none;
-    color: #C6C6C6;
+    color: ${props => props.theme.color.textGrey};
     font-family: Roboto;
     font-style: normal;
     font-weight: 500;
@@ -87,7 +87,7 @@ const Redirect = styled.section`
   }
 `;
 const ResetButton = styled.span`
-  color: #C6C6C6;
+  color: ${props => props.theme.color.textGrey};
   font-family: Roboto;
   font-style: normal;
   font-weight: 500;
@@ -104,7 +104,7 @@ const ModalSection = styled.section`
 const ModalContainer = styled.section`
   flex-basis: 550px;
   padding: 50px;
-  background-color: white;
+  background-color: ${props => props.theme.color.white};
   border-radius: 20px;
   box-shadow: 0px 42px 60px rgba(0, 0, 0, 0.25);
   outline: none;
@@ -112,7 +112,7 @@ const ModalContainer = styled.section`
     font-size: 1.5rem;
     text-align: center;
     font-family: Roboto;
-    color: #292929;
+    color: ${props => props.theme.color.textBlack};
   }
 `;
 
@@ -148,9 +148,11 @@ export default function PageLogin(props) {
       await actionLogin(res.data.token);
       const resNotif = await axios.get(`/notifications/unseenNotificationsNb?authToken=${res.data.token}`);
       appState.setUnseenNotificationsNb(resNotif.data.nb);
+      const resMsg = await axios.get(`/chat/unreadMessagesNb?authToken=${res.data.token}`);
+      appState.setUnreadMessagesNb(resMsg.data.nb);
       appState.toggleConnected();
-      const userId = res.data.userId;
-      setupSocket(userId, appState.setSocket, appState.setConnectedUsers);
+      // const userId = res.data.userId;
+      setupSocket(res.data.token, appState.setSocket, appState.setConnectedUsers);
       props.history.push('/search');
     } catch(err) {
       setValues({ ...values, error: true, errorMsg: err.response.data.errorMsg});

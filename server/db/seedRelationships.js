@@ -116,7 +116,7 @@ const createNotification = async (type, fromId, toUuid) => {
         to: toUuid,
         status: "unseen"
     }
-    await session.run(`CREATE (n:Notification $notification) SET n.dateTime = DateTime()`, {notification: notification});
+    await session.run(`CREATE (n:Notification $notification) SET n.dateTime = DateTime({timezone: 'Europe/Paris'})`, {notification: notification});
 }
 
 const seedVisitedRel = async () => {
@@ -246,7 +246,7 @@ const seedLikedRel = async () => {
                     CREATE (m:Match {
                         userIds: $userIds,
                         matchId: $matchId,
-                        dateTime: DateTime()
+                        dateTime: DateTime({timezone: 'Europe/Paris'})
                     })
                     `, {
                         userIds: [userId, randomId],

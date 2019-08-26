@@ -12,4 +12,7 @@ router.route('/matcher')
 router.route('/filtersMinMax')
       .get(authenticate, (req, res) => { SearchController.filtersMinMax(req, res); });
 
+router.route('/ownCityLatLng')
+      .get(authenticate, (req, res) => { SearchController.ownCityLatLng(req, res); });
+
 module.exports = router;

@@ -24,7 +24,7 @@ const login = async (req, res) => {
         } else {
                 res.status(401).json({ errorMsg: 'wrong credentials' });
         }
-    } catch {
+    } catch(e) {
         res.status(401).json({ errorMsg: 'something went wrong' });
     }
 }

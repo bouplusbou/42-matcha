@@ -19,12 +19,12 @@ export default function UserCard({sortingChoice, handleSelectSorting}) {
         margin-top: 15px;
         box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
         border-radius: 15px;
-        background-color: white;
+        background-color: ${props => props.theme.color.white};
         padding: 10px 20px;
         text-align: right;
         p {
             cursor: pointer;
-            &:hover { color: #FF0041; }
+            &:hover { color: ${props => props.theme.color.lightRed}; }
         }
     `;
 

@@ -13,8 +13,8 @@ export default function HeaderWide() {
         justify-content: space-between;
         align-items: center;
         height: 56px;
-        background-color: #6F48BD;
-        color: white;
+        background-color: ${props => props.theme.color.purple};
+        color: ${props => props.theme.color.white};
         @media (min-width: 1080px) {
             display: none;
         }

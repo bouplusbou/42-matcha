@@ -5,6 +5,8 @@ import PageLogin from './PageLogin/PageLogin';
 import PageConfirmAccount from './PageConfirmAccount/PageConfirmAccount';
 import PageResetPassword from './PageResetPassword/PageResetPassword';
 import PageHome from './PageHome/PageHome';
+import Page404UnAuth from './Page404UnAuth/Page404UnAuth';
+
 
 const UnauthenticatedMain = () => (
   <main>
@@ -14,6 +16,7 @@ const UnauthenticatedMain = () => (
       <Route exact path='/resetPassword/:hash' component={PageResetPassword}/>
       <Route exact path='/login' component={PageLogin}/>
       <Route exact path='/signup' component={PageSignup}/>
+      <Route component={Page404UnAuth}/>
     </Switch>
   </main>
 );

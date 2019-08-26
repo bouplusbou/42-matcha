@@ -6,6 +6,7 @@ import PageNotifications from './PageNotifications/PageNotifications';
 import Profile from './PageProfile/PageProfile';
 import PageChat from './PageChat/PageChat';
 import ProfileEdit from './PageProfileEdit/PageProfileEdit';
+import Page404Auth from './Page404Auth/Page404Auth';
 
 const AuthenticatedApp = () => (
   <main>
@@ -17,6 +18,7 @@ const AuthenticatedApp = () => (
       <Route exact path='/profile' component={Profile}/>
       <Route exact path='/profile/edit' component={ProfileEdit}/>
       <Route exact path='/profile/:username' component={Profile}/>
+      <Route component={Page404Auth}/>
     </Switch>
   </main>
 );
