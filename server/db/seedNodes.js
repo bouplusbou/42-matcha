@@ -244,7 +244,7 @@ const setConstraints = async () => {
   log(`Constraint set for : seedId, uuid, email, username, hash.`)
 }
 
-const seedUserNodes = async (requestedNodes = 30) => {
+const seedUserNodes = async (requestedNodes = 300) => {
   log(`\n***** User nodes seeding *****`, `blue`);
   const usersByGender = Math.floor(requestedNodes / 3);
   let createdNodes = 0;

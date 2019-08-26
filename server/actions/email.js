@@ -14,12 +14,12 @@ const sendEmail = async (type, email, hash) => {
   });
 
   const message = {
-    'confirmation': `Please click below to confirm your Matcha account: http://localhost:3000/confirm/${hash}`,
-    'resetPassword': `Please click below to reset your password: http://localhost:3000/resetPassword/${hash}`,
+    'confirmUser': `Please follow this link to confirm your Matcha account: http://localhost:3000/confirm/${hash}`,
+    'resetPassword': `Please follow this link to reset your password: http://localhost:3000/resetPassword/${hash}`,
   };
 
   const subject = {
-    'confirmation': 'Matcha - Please confirm your account',
+    'confirmUser': 'Matcha - Please confirm your account',
     'resetPassword': 'Matcha - Password reset request',
   };
 
