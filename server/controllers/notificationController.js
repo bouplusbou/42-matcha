@@ -19,10 +19,9 @@ const createNotification = (req, res) => {
       const token = req.body.authToken || req.query.authToken;
       jwt.verify(token, config.jwtSecret, async (err, decoded) => {
             try {
-                  const {type, usernameVisited} = req.body;
-                  const uuidVisited = await UserModel.uuidFromUsername(usernameVisited);
-                  const userIdVisiter = await UserModel.userIdFromUuid(decoded.uuid);
-                  NotificationModel.createNotification(uuidVisited, type, userIdVisiter);
+                  const {type, targetUserId} = req.body;
+                  await NotificationModel.createNotification(decoded.uuid, type, targetUserId);
+                  res.send('OK');
             } catch(e) {
                   res.status(400).send('Error');
             }

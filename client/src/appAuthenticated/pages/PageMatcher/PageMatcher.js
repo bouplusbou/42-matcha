@@ -141,7 +141,7 @@ export default function PageSearch() {
     setIsLoading(true);
     const payload = {
       type: type,
-      username: user.username,
+      z: user.username,
     };
     axios.post(`/users/createRelationship?authToken=${authToken}`, payload);
     const filters = { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags }
