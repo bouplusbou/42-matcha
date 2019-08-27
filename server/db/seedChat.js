@@ -39,7 +39,7 @@ const seedChatMessage = async () => {
         ]
         const matchRes = await session.run(`
             MATCH (m:Match)
-            RETURN m
+            RETURN m AS match
         `)
         const matchs = []
         for (i = 0; i < matchRes.records.length; i++) {
@@ -58,8 +58,8 @@ const seedChatMessage = async () => {
                     })
                 `, {
                     matchId: matchs[i].matchId,
-                    from: matchs[i].seedIds[0],
-                    to: matchs[i].seedIds[1],
+                    from: matchs[i].userIds[0],
+                    to: matchs[i].userIds[1],
                     status: "unread",
                     message: messages[j]
                 })
@@ -74,8 +74,8 @@ const seedChatMessage = async () => {
                     })
                 `, {
                     matchId: matchs[i].matchId,
-                    from: matchs[i].seedIds[1],
-                    to: matchs[i].seedIds[0],
+                    from: matchs[i].userIds[1],
+                    to: matchs[i].userIds[0],
                     status: "unread",
                     message: messages[j]
                 })
@@ -90,6 +90,7 @@ const seedChatMessage = async () => {
         process.exit(0)
     } catch (error) {
       log(error, `red`);
+      console.log(error)
       log(`\nTerminating seeding process.`, `red`);
       process.exit(1);
     }

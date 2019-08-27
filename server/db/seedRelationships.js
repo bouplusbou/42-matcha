@@ -49,13 +49,13 @@ const deleteAllRel = async (relationship) => {
     }
 }
 
-const hasMatched = async(seedId, targetseedId) => {
+const hasMatched = async(userId, targetUserId) => {
     const res = await session.run(`
-        MATCH (u:User { seedId: $seedId })-[r:LIKED]-(t:User { seedId: $targetseedId })
+        MATCH (u:User { userId: $userId })-[r:LIKED]-(t:User { userId: $targetUserId })
         RETURN count(r)
     `, {
-        seedId: seedId,
-        targetseedId: targetseedId
+        userId: userId,
+        targetUserId: targetUserId
     })
     const matched = res.records[0].get(0).low;
     return matched === 2;
@@ -247,6 +247,7 @@ const seedLikedRel = async () => {
             const userId = res.records[0].get(`userId`);
             await createNotification("liked", targetUserId, userId);
             if (await hasMatched(userId, targetUserId)) {
+                console.log("MATCH DE SES MORTS")
                 await session.run(`CREATE CONSTRAINT ON (m:Match) ASSERT m.machId IS UNIQUE`);
                 await session.run(`
                     CREATE (m:Match {
