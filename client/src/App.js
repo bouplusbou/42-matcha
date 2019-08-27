@@ -2,6 +2,7 @@ import React, { useState, useEffect, Fragment } from 'react';
 import AuthenticatedMain from './appAuthenticated/AuthenticatedMain';
 import UnauthenticatedMain from './appUnauthenticated/UnauthenticatedMain';
 import Header from './components/Header/Header';
+import Chat from './components/Chat/Chat';
 import { AppProvider } from './contexts/AppContext';
 import { actionIsAuthenticated } from './actions/authActions';
 import setupSocket from './actions/socketActions';
@@ -73,6 +74,7 @@ function App() {
           <div>
             <Header />
             <AuthenticatedMain />
+            <Chat />
           </div> }
         </ThemeProvider> 
       </AppProvider>
