@@ -52,11 +52,9 @@ io.on('connection', async client => {
     client.broadcast.emit('isConnected', filteredUserIds);
     client.disconnect();
   });
-  
-  client.on('visit', async username => {
-    const userIdVisited = await UserModel.userIdFromUsername(username);
-    const usernameVisiter = await UserModel.usernameFromUserId(parseInt(client.userId, 10));
-    client.to(`${userIdVisited}-room`).emit('visited', usernameVisiter);
+
+  client.on('createNotification', async targetUserId => {
+    client.to(`${targetUserId}-room`).emit('receiveNotification');
   });
 
   client.on('setCurrentDiscussionMatchId', async matchId => {

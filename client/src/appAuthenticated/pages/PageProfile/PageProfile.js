@@ -41,21 +41,26 @@ export default function PageProfile(props) {
             })
         }
         fetchProfile();
-        if (profileState.username !== undefined) {
-            socket.emit('visit', props.match.params.username);
-            const data = {
-                type: 'visited',
-                usernameVisited: props.match.params.username,
-            }
-            axios.post(`/notifications?authToken=${authToken}`, data);
-            axios.post(`/users/createRelationship?authToken=${authToken}`, {
-                type: "visited",
-                tarderUserId: profileState.userId,
-            })
-            console.log("visit sent")
-        }
-    }, [socket, props.match.params.username])
+    }, [props.match.params.username])
     
+    useEffect(() => {
+        async function createRelNotif() {
+            if (profileState.userId !== undefined) {
+                const data = {
+                    type: 'visited',
+                    targetUserId: profileState.userId,
+                };
+                await axios.post(`/notifications?authToken=${authToken}`, data);
+                await axios.post(`/users/createRelationship?authToken=${authToken}`, {
+                    type: "visited",
+                    targetUserId: profileState.userId,
+                })
+                socket.emit('createNotification', profileState.userId);
+            }
+        }
+        createRelNotif();
+    }, [socket, profileState.userId])
+
 
     function uploadPicture(event) {
         event.preventDefault();

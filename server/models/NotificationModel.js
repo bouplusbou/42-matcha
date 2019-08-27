@@ -42,23 +42,24 @@ async function getNotifications(uuid) {
   } catch(err) { console.log(err) }
 }
 
-async function createNotification(uuid, type, userId) { 
+async function createNotification(uuid, type, targetUserId) { 
   try {
     await session.run(`
       MATCH (u:User {uuid: $uuid})
       CREATE (n:Notification {
         type: $type,
-        from: $userId,
-        to: u.userId,
+        from: u.userId,
+        to: $targetUserId,
         status: 'unseen',
         dateTime: DateTime({timezone: 'Europe/Paris'}) 
       })
       `, {
-      type: type,
-      userId: userId,
-      uuid: uuid,
+      type,
+      targetUserId,
+      uuid,
     });
     session.close();
+    return;
   } catch(err) { console.log(err) }
 }
 
