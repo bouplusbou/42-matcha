@@ -68,13 +68,13 @@ const LikeButton = (props) => {
         if (profile.liked) {
             const params = {data: {
                 type: "liked",
-                username: profile.username
+                targetUserId: profile.userId,
             }}
             axios.delete(`/users/deleteRelationship?authToken=${authToken}`, params); 
         } else {
             const params = {
-                type: "liked",
-                username: profile.username
+                type: "liked",                
+                targetUserId: profile.userId,
             }
             axios.post(`/users/createRelationship?authToken=${authToken}`, params);
         }

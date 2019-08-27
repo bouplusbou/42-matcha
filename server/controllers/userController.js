@@ -160,8 +160,7 @@ const removeTag = async (req, res) => {
 const createRelationship = async (req, res) => {
       try {
             const uuid = await getUuidFromToken(req, res);
-            const targetUser = await UserModel.getUserByUsername(req.body.username);
-            await UserModel.createRelationship(req.body.type, uuid, targetUser.uuid);
+            await UserModel.createRelationship(req.body.type, uuid, req.body.targetUserId);
             res.status(200).json({ message: `${req.body.type} relationship created.`})
       } catch (error) { Log.error(error, `createRelationship`, __filename) }
 }
@@ -169,8 +168,7 @@ const createRelationship = async (req, res) => {
 const deleteRelationship = async (req, res) => {
       try {
             const uuid = await getUuidFromToken(req, res);
-            const targetUser = await UserModel.getUserByUsername(req.body.username);
-            await UserModel.deleteRelationship(req.body.type, uuid, targetUser.uuid);
+            await UserModel.deleteRelationship(req.body.type, uuid, req.body.targetUserId);
             res.status(200).json({ message: `${req.body.type} relationship deleted.`})
       } catch (error) { Log.error(error, `deleteRelationship`, __filename) }
 }

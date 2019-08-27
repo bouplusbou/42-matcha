@@ -223,14 +223,14 @@ const getBlockedList = async uuid => {
   } catch(error) { Log.error(error, "getBlockedList", __filename) }
 }
 
-const createRelationship = async (type, userUuid, targetUuid) => {
+const createRelationship = async (type, userUuid, targetUserId) => {
   try {
     await session.run(`
-      MATCH (u:User {uuid: $userUuid}), (t:User {uuid: $targetUuid})
+      MATCH (u:User {uuid: $userUuid}), (t:User {userId: $targetUserId})
       CREATE (u)-[r:${type.toUpperCase()}]->(t)
     `, {
       userUuid: userUuid,
-      targetUuid: targetUuid,
+      targetUserId: targetUserId,
     })
     session.close();
   } catch(error) { Log.error(error, "addTag", __filename) }

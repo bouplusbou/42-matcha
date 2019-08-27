@@ -41,7 +41,7 @@ export default function PageProfile(props) {
             })
         }
         fetchProfile();
-        if (props.match.params.username !== undefined) {
+        if (profileState.username !== undefined) {
             socket.emit('visit', props.match.params.username);
             const data = {
                 type: 'visited',
@@ -50,7 +50,7 @@ export default function PageProfile(props) {
             axios.post(`/notifications?authToken=${authToken}`, data);
             axios.post(`/users/createRelationship?authToken=${authToken}`, {
                 type: "visited",
-                username: props.match.params.username,
+                tarderUserId: profileState.userId,
             })
             console.log("visit sent")
         }
