@@ -13,6 +13,7 @@ export default function Notifications() {
     useEffect(() => {
         if (appState.socket !== null) {
             appState.socket.on('receiveNotification', async () => {
+                // console.log('check your notif');
                 const authToken = localStorage.getItem('token');
                 const resNotif = await axios.get(`/notifications/unseenNotificationsNb?authToken=${authToken}`);
                 setUnseenNotificationsNb(resNotif.data.nb);
