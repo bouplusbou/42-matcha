@@ -55,11 +55,11 @@ const NoMore = styled.section`
 export default function PageSearch() {
   const [isLoading, setIsLoading] = useState(true);
   const [hasNoMore, setHasNoMore] = useState(false);
-  const [sortingChoice, setSortingChoice] = useState('Closest');
+  const [sortingChoice, setSortingChoice] = useState('Most famous');
   const [filterCity, setFilterCity] = useState(null);
   const [filterLatLng, setFilterLatLng] = useState(null);
   const [isOwnCity, setIsOwnCity] = useState(true);
-  const [filterDistance, setFilterDistance] = useState(20);
+  const [filterDistance, setFilterDistance] = useState(1000);
   const [filterTags, setFilterTags] = useState([]);
   const [filterAge, setFilterAge] = useState([18, 60]);
   const [rangeAge, setRangeAge] = useState([0, 100]);
