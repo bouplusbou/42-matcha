@@ -4,10 +4,10 @@ const session = driver.session();
 async function setAllAsRead(uuid) { 
   try {
     const res = await session.run(`
-    MATCH (n:Notification {to: $uuid})
-    WHERE n.status = 'unseen'
-    SET n.status = 'seen'
-    RETURN n
+      MATCH (n:Notification), (u:User {uuid: $uuid})
+      WHERE n.to = u.userId AND n.status = 'unseen'
+      SET n.status = 'seen'
+      RETURN n
     `, { 
       uuid: uuid,
     });
@@ -18,7 +18,8 @@ async function setAllAsRead(uuid) {
 async function getNotifications(uuid) { 
   try {
     const res = await session.run(`
-      MATCH (n:Notification {to: $uuid})
+      MATCH (n:Notification), (u:User {uuid: $uuid})
+      WHERE n.to = u.userId
       WITH n, n.from AS userId, n.type AS type, duration.inDays(n.dateTime, DateTime({timezone: 'Europe/Paris'})).days as days, n.status AS status
       MATCH (u:User {userId: userId})
       RETURN u.username AS username, type, days, status
@@ -29,8 +30,12 @@ async function getNotifications(uuid) {
       const username = record.get('username');
       const type = record.get('type');
       const days = record.get('days').low;
+      let duration = '';
+      if (days === 0) duration = 'today';
+      if (days === 1) duration = 'yesterday';
+      if (days > 1) duration = `${days} days ago`;
       const status = record.get('status');
-      return { username, type, days, status }
+      return { username, type, duration, status }
     });
     setAllAsRead(uuid);
     return notifications;
@@ -40,10 +45,11 @@ async function getNotifications(uuid) {
 async function createNotification(uuid, type, userId) { 
   try {
     await session.run(`
+      MATCH (u:User {uuid: $uuid})
       CREATE (n:Notification {
         type: $type,
         from: $userId,
-        to: $uuid,
+        to: u.userId,
         status: 'unseen',
         dateTime: DateTime({timezone: 'Europe/Paris'}) 
       })
@@ -59,9 +65,9 @@ async function createNotification(uuid, type, userId) {
 async function unseenNotificationsNb(uuid) { 
   try {
     const res = await session.run(`
-    MATCH (n:Notification {to: $uuid})
-    WHERE n.status = 'unseen'
-    RETURN COUNT(n) AS nb
+      MATCH (n:Notification), (u:User {uuid: $uuid})
+      WHERE n.to = u.userId AND n.status = 'unseen'
+      RETURN COUNT(n) AS nb
     `, { 
       uuid: uuid,
     });
