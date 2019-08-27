@@ -1,7 +1,7 @@
 const SearchModel = require('../models/SearchModel');
 const jwt = require('jsonwebtoken');
 const config = require('../middlewares/config');
-const sendEmail = require('../actions/email.js');
+const Log = require(`../tools/Log`);
 
 const getUuidFromToken = async (req, res) => {
       try {
