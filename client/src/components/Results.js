@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react';
+import { Link } from 'react-router-dom';
 import UserCard from './UserCard';
 import CircleButton from './CircleButton';
 import styled from 'styled-components'
@@ -42,11 +43,16 @@ export default function Results({ usersIndex, handleLikeDislike, user, hasNoMore
                     />
                 </NextButtonSection>
                     <CardSection>
-                        <UserCard 
-                            user={user}
-                            width={350}
-                            height={525}
-                        />
+                        <Link 
+                            to={`/profile/${user.username}`}
+                            style={{textDecoration: 'none'}}
+                        >
+                            <UserCard 
+                                user={user}
+                                width={350}
+                                height={525}
+                            />
+                        </Link>
                     </CardSection>
                 <LikeButtonSection>
                     <CircleButton
@@ -65,8 +71,3 @@ export default function Results({ usersIndex, handleLikeDislike, user, hasNoMore
         </Results>
     );
 }
-
-
-
-
-

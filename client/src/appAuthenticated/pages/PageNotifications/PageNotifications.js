@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye, faHeart, faBan, faFireAlt } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faHeart, faBan, faFireAlt, faHeartBroken } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import AppContext from '../../../contexts/AppContext';
 
@@ -86,6 +86,7 @@ export default function PageNotifications() {
           let icon = faEye;
           if (elem.type === 'liked') icon = faHeart;
           if (elem.type === 'blocked') icon = faBan;
+          if (elem.type === 'disliked') icon = faHeartBroken;
           if (elem.type === 'matched') icon = faFireAlt;
           return {...elem, icon}
         })

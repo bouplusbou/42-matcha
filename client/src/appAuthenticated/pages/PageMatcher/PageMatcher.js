@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import AppContext from '../../../contexts/AppContext';
 import styled from 'styled-components';
 import Sorting from '../../../components/Sorting';
 import Filtering from '../../../components/Filtering';
@@ -41,6 +42,8 @@ const ResultsSection = styled.section`
 `;
 
 export default function PageSearch() {
+  const { socket } = useContext(AppContext);
+
   const [isLoading, setIsLoading] = useState(true);
   const [hasNoMore, setHasNoMore] = useState(false);
   const [sortingChoice, setSortingChoice] = useState('Closest');
@@ -139,14 +142,16 @@ export default function PageSearch() {
 
   const handleLikeDislike = async type => {
     setIsLoading(true);
-    const payload = {
-      type: type,
-      username: user.username,
+    const data = {
+      type,
+      targetUserId: user.userId,
     };
-    axios.post(`/users/createRelationship?authToken=${authToken}`, payload);
+    await axios.post(`/users/createRelationship?authToken=${authToken}`, data);
+    await axios.post(`/notifications?authToken=${authToken}`, data);
     const filters = { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags }
     const res = await axios.post(`/search/matcher?authToken=${authToken}`, filters);
     res.data.usersArr.length === 0 ? setHasNoMore(true) : setUser(res.data.usersArr[0]);
+    socket.emit('createNotification', user.userId);
     setIsLoading(false);
   };
   const handleSelectSorting = e => { setSortingChoice(e.target.innerText); };

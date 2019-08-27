@@ -128,6 +128,7 @@ const suggestedUsers = async (uuid, { sortingChoice, filterAge, filterScore, fil
     RETURN u.username AS username, 
       age,
       u.gender AS gender,
+      u.userId AS userId,
       u.city AS city,
       u.score AS score,
       u.orientation AS orientation,
@@ -152,6 +153,7 @@ const suggestedUsers = async (uuid, { sortingChoice, filterAge, filterScore, fil
     const users = res.records.map(record => {
       const username = record.get('username');
       const gender = record.get('gender');
+      const userId = record.get('userId');
       const age = record.get('age');
       const city = record.get('city');
       const score = record.get('score');
@@ -160,7 +162,7 @@ const suggestedUsers = async (uuid, { sortingChoice, filterAge, filterScore, fil
       const photos = record.get('photos');
       const photo = photos[avatarIndex];
       const tags = record.get('tags');
-      return { username, gender, age, city, score, orientation, photo, tags }
+      return { username, gender, userId, age, city, score, orientation, photo, tags }
     });
     return users;
   } catch (error) { Log.error(error, `suggestedUsers`, __filename) }
