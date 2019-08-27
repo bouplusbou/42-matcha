@@ -236,15 +236,15 @@ const createRelationship = async (type, userUuid, targetUserId) => {
   } catch(error) { Log.error(error, "addTag", __filename) }
 }
 
-const deleteRelationship = async (type, userUuid, targetUuid) => {
+const deleteRelationship = async (type, userUuid, targetUserId) => {
   try {
     await session.run(`
-      MATCH (u:User {uuid: $userUuid}), (t:User {uuid: $targetUuid})
+      MATCH (u:User {uuid: $userUuid}), (t:User {userId: $targetUserId})
       MATCH (u)-[r:${type.toUpperCase()}]->(t)
       DELETE r
     `, {
       userUuid: userUuid,
-      targetUuid: targetUuid,
+      targetUserId: targetUserId,
     })
   } catch (error) { Log.error(error, "deleteRelationship", __filename) }
 }
