@@ -224,236 +224,204 @@ const CloseDiscussion = styled.div`
 `;
 
 export default function ChatComp() {
-    const {
-        discussions,
-        setDiscussions,
-        currentDiscussionInfo,
-        setCurrentDiscussionInfo,
-        currentDiscussionMessages,
-        setCurrentDiscussionMessages,
-        setUnreadMessagesNb,
-        socket,
-        connectedUsers,
-        unreadMessagesNb,
-    } = useContext(AppContext);
-    
-    const [inputValue, setInputValue] = useState('');
-    const [chatIsOpen, setChatIsOpen] = useState(false);
+  const {
+      discussions,
+      setDiscussions,
+      currentDiscussionInfo,
+      setCurrentDiscussionInfo,
+      currentDiscussionMessages,
+      setCurrentDiscussionMessages,
+      setUnreadMessagesNb,
+      socket,
+      connectedUsers,
+      unreadMessagesNb,
+  } = useContext(AppContext);
+  const [inputValue, setInputValue] = useState('');
+  const [chatIsOpen, setChatIsOpen] = useState(false);
+  const authToken = localStorage.getItem('token');
+  const refDiv = useRef(null);
+  const refElem = useRef(null);
+  const executeScroll = () => refDiv.current.scrollTo(0, refElem.current.offsetTop);
 
-    const authToken = localStorage.getItem('token');
-
-    const refDiv = useRef(null);
-    const refElem = useRef(null);
-    const executeScroll = () => {
-      refDiv.current.scrollTo(0, refElem.current.offsetTop)
+  useEffect(() => {
+    async function fetchData() {
+      const res = await axios.get(`/chat/discussions?authToken=${authToken}`);
+      setDiscussions(res.data.discussions);
     };
+    fetchData();
+  }, [authToken, setDiscussions]);
 
+  useEffect(() => {
+    return () => {
+      setCurrentDiscussionInfo(null);
+      setCurrentDiscussionMessages(null);  
+      if (socket !== null) socket.emit('setCurrentDiscussionMatchId', null);  
+    }
+  }, [setCurrentDiscussionInfo, setCurrentDiscussionMessages, socket]);
 
-    useEffect(() => {
-      if (socket !== null) {
-          console.log('set socket setUnreadMessagesNb');
-          socket.on('setUnreadMessagesNb', async nb => {
-              console.log(`setUnreadMessagesNb ${nb}`);
-              setUnreadMessagesNb(nb);
-          });
-      }
-      return () => {
-          if (socket !== null) socket.off('setUnreadMessagesNb');
-      }
+  useEffect(() => {
+    if (socket !== null) {
+      socket.on('reloadDiscussions', async () => {
+          const resAll = await axios.get(`/chat/discussions?authToken=${authToken}`);
+          setDiscussions(resAll.data.discussions);
+      });
+      return () => socket.off('reloadDiscussions');
+    }
+  }, [socket, authToken, setDiscussions]);
+
+  useEffect(() => {
+    if (socket !== null) {
+      socket.on('newMessageReceived', async matchId => {
+        if (currentDiscussionInfo !== null && matchId === currentDiscussionInfo.matchId) {
+          const resCurrent = await axios.post(`/chat/currentDiscussionMessages?authToken=${authToken}`, { matchId });
+          setCurrentDiscussionMessages(resCurrent.data.currentDiscussionMessages);
+          executeScroll();
+        } else {
+          const resAll = await axios.get(`/chat/discussions?authToken=${authToken}`);
+          setDiscussions(resAll.data.discussions);
+        }
+      });
+      return () => socket.off('newMessageReceived');
+    }
+  }, [authToken, setCurrentDiscussionMessages, socket, currentDiscussionInfo, setDiscussions]);
+
+  useEffect(() => {
+    if (socket !== null) {
+        socket.on('setUnreadMessagesNb', async nb => {
+            setUnreadMessagesNb(nb);
+        });
+    }
+    return () => {if (socket !== null) socket.off('setUnreadMessagesNb')};
   }, [socket, setUnreadMessagesNb]);
 
+  const loadCurrentDiscussion = async (matchId, youLastConnection, youUserId, youUsername, youAvatar) => {
+      if (socket !== null) socket.emit('setCurrentDiscussionMatchId', matchId);
+      const youIsOnline = false;
+      setCurrentDiscussionInfo({ matchId, youLastConnection, youUserId, youUsername, youAvatar, youIsOnline });
+      const resCurrent = await axios.post(`/chat/currentDiscussionMessages?authToken=${authToken}`, { matchId });
+      setCurrentDiscussionMessages(resCurrent.data.currentDiscussionMessages);
+      const resAll = await axios.get(`/chat/discussions?authToken=${authToken}`);
+      setDiscussions(resAll.data.discussions);
+      const resUnreadMsg = await axios.get(`/chat/unreadMessagesNb?authToken=${authToken}`);
+      setUnreadMessagesNb(resUnreadMsg.data.nb);
+      executeScroll();
+  };
 
-
-
-
-
-
-    useEffect(() => {
-      async function fetchData() {
-        const res = await axios.get(`/chat/discussions?authToken=${authToken}`);
-        setDiscussions(res.data.discussions);
-      };
-      fetchData();
-    }, [authToken, setDiscussions]);
-
-    useEffect(() => {
-      return () => {
-        setCurrentDiscussionInfo(null);
-        setCurrentDiscussionMessages(null);  
-        if (socket !== null) socket.emit('setCurrentDiscussionMatchId', null);  
-      }
-    }, [setCurrentDiscussionInfo, setCurrentDiscussionMessages, socket]);
-
-    useEffect(() => {
-      if (socket !== null) {
-        socket.on('reloadDiscussions', async () => {
-            const resAll = await axios.get(`/chat/discussions?authToken=${authToken}`);
-            setDiscussions(resAll.data.discussions);
-        });
-        return () => {
-            socket.off('reloadDiscussions');
-        }
-      }
-    }, [socket, authToken, setDiscussions]);
-
-    useEffect(() => {
-      if (socket !== null) {
-        socket.on('newMessageReceived', async matchId => {
-          console.log('newMessageReceived');
-          if (currentDiscussionInfo !== null && matchId === currentDiscussionInfo.matchId) {
-            const resCurrent = await axios.post(`/chat/currentDiscussionMessages?authToken=${authToken}`, { matchId });
-            setCurrentDiscussionMessages(resCurrent.data.currentDiscussionMessages);
-            executeScroll();
-          } else {
-            const resAll = await axios.get(`/chat/discussions?authToken=${authToken}`);
-            setDiscussions(resAll.data.discussions);
-          }
-        });
-        return () => {
-            socket.off('newMessageReceived');
-        }
-      }
-    }, [authToken, setCurrentDiscussionMessages, socket, currentDiscussionInfo, setDiscussions]);
-
-    const loadCurrentDiscussion = async (matchId, youLastConnection, youUserId, youUsername, youAvatar) => {
-        socket.emit('setCurrentDiscussionMatchId', matchId);
-        const youIsOnline = false;
-        setCurrentDiscussionInfo({ matchId, youLastConnection, youUserId, youUsername, youAvatar, youIsOnline });
-        const resCurrent = await axios.post(`/chat/currentDiscussionMessages?authToken=${authToken}`, { matchId });
-        setCurrentDiscussionMessages(resCurrent.data.currentDiscussionMessages);
-        const resAll = await axios.get(`/chat/discussions?authToken=${authToken}`);
-        setDiscussions(resAll.data.discussions);
-        const resUnreadMsg = await axios.get(`/chat/unreadMessagesNb?authToken=${authToken}`);
-        setUnreadMessagesNb(resUnreadMsg.data.nb);
-        executeScroll();
-    };
-
-    const handleChange = event => {
-        setInputValue(event.target.value);
-    };
-    
-    const handleSubmit = async event => {
-      event.preventDefault();
+  const handleChange = event => setInputValue(event.target.value);
+  
+  const handleSubmit = async event => {
+    event.preventDefault();
+    if (inputValue !== '') {
       try {
         const matchId = currentDiscussionInfo.matchId;
         const youUserId = currentDiscussionInfo.youUserId;
         const message = inputValue;
         await axios.post(`/chat?authToken=${authToken}`, { matchId, youUserId, message });
         setInputValue('');
-        socket.emit('newMessageSent', {message, youUserId, matchId});
+        if (socket !== null) socket.emit('newMessageSent', {message, youUserId, matchId});
       } catch(error) { console.log(error) }
-    };
-
-    const toggleChat = () => {
-      setChatIsOpen(prev => !prev);
-      setCurrentDiscussionInfo(null);
-      setCurrentDiscussionMessages(null);
     }
-    const resetCurrentDiscussion = () => {
-      setCurrentDiscussionInfo(null);
-      setCurrentDiscussionMessages(null);
-    }
+  };
 
-    return (
-        <Fragment>
-            { discussions !== null && chatIsOpen &&
-                <Chat>
-                    <ChatInfo>
-                        {currentDiscussionInfo === null ?
-                            <DiscussionsInfo>Discussions</DiscussionsInfo>
-                            :
-                            <Fragment>
-                              <Avatar cloudName='matchacn' publicId={currentDiscussionInfo.youAvatar}></Avatar>
-                              <Link to={`/profile/${currentDiscussionInfo.youUsername}`} style={{textDecoration: 'none'}}>
-                                  <ChatInfoUsername>{currentDiscussionInfo.youUsername}</ChatInfoUsername>
-                              </Link>
-                              {connectedUsers.includes(currentDiscussionInfo.youUserId) ? 
-                                  <OnlineDot></OnlineDot>
-                                  : 
-                                  <Fragment>
-                                  <OfflineDot></OfflineDot>
-                                  <LastConnection>{currentDiscussionInfo.youLastConnection === null ? 'never connected' : currentDiscussionInfo.youLastConnection}</LastConnection>
-                                  </Fragment>
-                              }
-                              <CloseDiscussion
-                                onClick={() => resetCurrentDiscussion()}
-                              >
-                                <FontAwesomeIcon  style={{fontSize: '20px', color: 'white'}} icon={faTimes}/>
-                              </CloseDiscussion>
-                            </Fragment>
-                        }
-                    </ChatInfo>
-                    {currentDiscussionMessages === null &&
-                        <DiscussionsContainer>
-                        <DiscussionsSection>
-                            {discussions.map((discussion, index) => 
-                            <Discussion
-                            key={index}
-                            onClick={() => loadCurrentDiscussion(discussion.matchId, discussion.youLastConnection, discussion.youUserId, discussion.youUsername, discussion.youAvatar)}
-                            >
-                            <Avatar cloudName='matchacn' publicId={discussion.youAvatar}></Avatar>
-                            <Username>{discussion.youUsername}</Username>
-                            { discussion.unreadNb > 0 &&
-                                <UnreadDot>
-                                    <p style={{fontWeight: 900, fontSize: '10px', color: 'white'}}>{discussion.unreadNb}</p>
-                                </UnreadDot>
-                            }
-                            <Date>{discussion.duration}</Date>
-                            </Discussion>
-                            )}
-                        </DiscussionsSection>
-                        </DiscussionsContainer>
-                    }
+  const resetCurrentDiscussion = () => {
+    setCurrentDiscussionInfo(null);
+    setCurrentDiscussionMessages(null);
+    if (socket !== null) socket.emit('setCurrentDiscussionMatchId', null);
+  }
 
-                    <ChatWindow>
-                        <MessagesSection
-                        ref={refDiv}
-                        >
-                        {currentDiscussionMessages && currentDiscussionMessages.map((msg, index) => {
-                            return msg.type === 'received' ?
-                            <ReceivedMessageBlock
-                                key={index}
-                            >
-                                <Avatar cloudName='matchacn' publicId={currentDiscussionInfo.youAvatar}></Avatar>
-                                <ReceivedMessage>{msg.message}</ReceivedMessage>
-                            </ReceivedMessageBlock>
-                            :
-                            <SentMessageBlock
-                            key={index}
-                            >
-                            <SentMessage>{msg.message}</SentMessage>
-                            </SentMessageBlock>
-                        })}
-                        <div style={{ float:"left", clear: "both" }} ref={refElem}></div>
-                        </MessagesSection>
-                        <Form noValidate autoComplete="off" onSubmit={handleSubmit}>
-                        <TextField
-                            placeholder="Type a message..."
-                            value={inputValue}
-                            onChange={handleChange}
-                        />
-                        <SendButton type='submit'>
-                            <FontAwesomeIcon icon={faPaperPlane}/>
-                        </SendButton>
-                        </Form>
-                    </ChatWindow> 
+  const toggleChat = () => {
+    setChatIsOpen(prev => !prev);
+    resetCurrentDiscussion();
+  }
 
-                </Chat>
-            }
-            <ChatButton
-              onClick={() => toggleChat()}
-            >
-                {unreadMessagesNb !== 0 &&
-                    <ChatNotificationDot 
-                        nb={unreadMessagesNb}
-                    />
-                }
-                {chatIsOpen ?
-                  <FontAwesomeIcon  style={{fontSize: '30px', color: 'white'}} icon={faTimes}/>
-                  :
-                  <FontAwesomeIcon  style={{fontSize: '30px', color: 'white'}} icon={faComment}/>
-                }
-            </ChatButton>
-        </Fragment>
-    );
+  return (
+    <Fragment>
+      {discussions !== null && chatIsOpen &&
+        <Chat>
+          <ChatInfo>
+          {currentDiscussionInfo === null ?
+            <DiscussionsInfo>Discussions</DiscussionsInfo>
+            :
+            <Fragment>
+              <Avatar cloudName='matchacn' publicId={currentDiscussionInfo.youAvatar}></Avatar>
+              <Link to={`/profile/${currentDiscussionInfo.youUsername}`} style={{textDecoration: 'none'}}>
+                <ChatInfoUsername>{currentDiscussionInfo.youUsername}</ChatInfoUsername>
+              </Link>
+              {connectedUsers.includes(currentDiscussionInfo.youUserId) ? 
+                <OnlineDot></OnlineDot>
+                : 
+                <Fragment>
+                <OfflineDot></OfflineDot>
+                <LastConnection>{currentDiscussionInfo.youLastConnection === null ? 
+                  'never connected' : currentDiscussionInfo.youLastConnection}
+                </LastConnection>
+                </Fragment>
+              }
+              <CloseDiscussion onClick={() => resetCurrentDiscussion()}>
+                <FontAwesomeIcon  style={{fontSize: '20px', color: 'white'}} icon={faTimes}/>
+              </CloseDiscussion>
+            </Fragment>
+          }
+          </ChatInfo>
+          {currentDiscussionMessages === null &&
+            <DiscussionsContainer>
+              <DiscussionsSection>
+              {discussions.map((discussion, index) => 
+                <Discussion
+                  key={index}
+                  onClick={() => loadCurrentDiscussion(discussion.matchId, discussion.youLastConnection, discussion.youUserId, discussion.youUsername, discussion.youAvatar)}
+                >
+                  <Avatar cloudName='matchacn' publicId={discussion.youAvatar}></Avatar>
+                  <Username>{discussion.youUsername}</Username>
+                  { discussion.unreadNb > 0 &&
+                    <UnreadDot>
+                      <p style={{fontWeight: 900, fontSize: '10px', color: 'white'}}>{discussion.unreadNb}</p>
+                    </UnreadDot>
+                  }
+                  <Date>{discussion.duration}</Date>
+                </Discussion>
+              )}
+              </DiscussionsSection>
+            </DiscussionsContainer>
+          }
+          <ChatWindow>
+            <MessagesSection ref={refDiv}>
+            {currentDiscussionMessages && currentDiscussionMessages.map((msg, index) => {
+              return msg.type === 'received' ?
+              <ReceivedMessageBlock key={index}>
+                <Avatar cloudName='matchacn' publicId={currentDiscussionInfo.youAvatar}></Avatar>
+                <ReceivedMessage>{msg.message}</ReceivedMessage>
+              </ReceivedMessageBlock>
+              :
+              <SentMessageBlock key={index}>
+              <SentMessage>{msg.message}</SentMessage>
+              </SentMessageBlock>
+            })}
+              <div style={{ float:"left", clear: "both" }} ref={refElem}></div>
+            </MessagesSection>
+            <Form noValidate autoComplete="off" onSubmit={handleSubmit}>
+            <TextField
+              placeholder="Type a message..."
+              value={inputValue}
+              onChange={handleChange}
+            />
+            <SendButton type='submit'>
+              <FontAwesomeIcon icon={faPaperPlane}/>
+            </SendButton>
+            </Form>
+          </ChatWindow> 
+        </Chat>
+      }
+      <ChatButton onClick={() => toggleChat()}>
+      {unreadMessagesNb !== 0 &&
+        <ChatNotificationDot nb={unreadMessagesNb}/>
+      }
+      {chatIsOpen ?
+        <FontAwesomeIcon  style={{fontSize: '30px', color: 'white'}} icon={faTimes}/>
+        :
+        <FontAwesomeIcon  style={{fontSize: '30px', color: 'white'}} icon={faComment}/>
+      }
+      </ChatButton>
+    </Fragment>
+  );
 }

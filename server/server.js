@@ -70,7 +70,6 @@ io.on('connection', async client => {
     }
     const youUuid = await UserModel.getUuidByUserId(data.youUserId);
     const nb = await ChatModel.getUnreadMessagesNb(youUuid);
-    console.log(nb);
     client.to(`${data.matchId}-room`).emit('setUnreadMessagesNb', nb);
     client.to(`${data.matchId}-room`).emit('reloadDiscussions');
     io.in(`${data.matchId}-room`).emit('newMessageReceived', data.matchId);
