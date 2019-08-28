@@ -76,7 +76,6 @@ export default function PageSearch() {
     let isSubscribed = true;
     setIsLoading(true);
     async function fetchData() {
-      const authToken = localStorage.getItem('token');
       const res = await axios.get(`/users/hasFullProfile?authToken=${authToken}`);
       const missingFields = [];
       if (res.data.fields.birthDate === null) missingFields.push('your birthdate');
@@ -91,9 +90,9 @@ export default function PageSearch() {
         }
       }
     }
-    fetchData();
+    if (authToken) fetchData();
     return () => isSubscribed = false;
-  }, []);
+  }, [authToken]);
 
   useEffect(() => {
     let isSubscribed = true;
@@ -104,7 +103,7 @@ export default function PageSearch() {
         setFilterLatLng(res.data.cityLatLng.latLng);
       }
     }
-    fetchData();
+    if (authToken) fetchData();
     return () => isSubscribed = false;
   }, [authToken]);
 
@@ -112,14 +111,14 @@ export default function PageSearch() {
     let isSubscribed = true;
     async function fetchData() {
       const res = await axios.get(`/search/filtersMinMax?authToken=${authToken}`);
-      if (isSubscribed) {
+      if (res.data && isSubscribed) {
         setFilterAge(res.data.age);
         setRangeAge(res.data.age);
         setFilterScore(res.data.score);
         setRangeScore(res.data.score);
       }
     }
-    fetchData();
+    if (authToken) fetchData();
     return () => isSubscribed = false;
   }, [authToken]);
 
@@ -127,11 +126,11 @@ export default function PageSearch() {
     let isSubscribed = true;
     async function fetchData() {
       const res = await axios.get(`/tags?authToken=${authToken}`);
-      if (isSubscribed) {
+      if (res.data && isSubscribed) {
         setAllTags(res.data.tags);
       }
     }
-    fetchData();
+    if (authToken) fetchData();
     return () => isSubscribed = false;
   }, [authToken]);
 
@@ -142,13 +141,13 @@ export default function PageSearch() {
     async function fetchData() {
       const filters = { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags, offset }
       const res = await axios.post(`/search?authToken=${authToken}`, filters);
-      if (isSubscribed) {
+      if (res.data && res.data.usersArr && isSubscribed) {
         if (res.data.usersArr.length !== 20) setHasNoMore(true);
         offset !== 0 ? setUsers( prev => [...prev, ...res.data.usersArr]) : setUsers(res.data.usersArr);
         setIsLoading(false);
       }
     }
-    fetchData();
+    if (authToken) fetchData();
     return () => isSubscribed = false;
   }, [authToken, sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags, offset]);
 
@@ -162,12 +161,16 @@ export default function PageSearch() {
     setOffset(0); 
   };
   const handleClickDeleteCity = async () => { 
-    setFilterLatLng(null);
-    setFilterCity(null);
-    const res = await axios.get(`/search/ownCityLatLng?authToken=${authToken}`);
-    setFilterCity(res.data.cityLatLng.city);
-    setFilterLatLng(res.data.cityLatLng.latLng);
-    setIsOwnCity(true);
+    if (authToken) {
+      setFilterLatLng(null);
+      setFilterCity(null);
+      const res = await axios.get(`/search/ownCityLatLng?authToken=${authToken}`);
+      if (res.data && res.data.cityLatLng) {
+        setFilterCity(res.data.cityLatLng.city);
+        setFilterLatLng(res.data.cityLatLng.latLng);
+        setIsOwnCity(true);
+      }
+    }
   };
   const handleDistanceChange = value => { setFilterDistance(value); setOffset(0); };
   const handleTagsChange = values => { 

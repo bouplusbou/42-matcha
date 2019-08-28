@@ -75,13 +75,13 @@ export default function PageNotifications() {
 
   const [notifications, setNotifications] = useState([]);
   const { setUnseenNotificationsNb } = useContext(AppContext);
+  const authToken = localStorage.getItem('token');
 
   useEffect(() => {
     let isSubscribed = true;
     async function fetchData() {
-      const authToken = localStorage.getItem('token');
       const res = await axios.get(`/notifications?authToken=${authToken}`);
-      if (isSubscribed) {
+      if (res.data && res.data.notifications && isSubscribed) {
         const resNotif = res.data.notifications.map(elem => {
           let icon = faEye;
           if (elem.type === 'liked') icon = faHeart;
@@ -94,9 +94,9 @@ export default function PageNotifications() {
         setUnseenNotificationsNb(0);
       }
     };
-    fetchData();
+    if (authToken) fetchData();
     return () => isSubscribed = false;
-  }, [setUnseenNotificationsNb]);
+  }, [authToken, setUnseenNotificationsNb]);
 
   return (
     <Hero>
