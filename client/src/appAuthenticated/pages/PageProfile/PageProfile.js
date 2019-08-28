@@ -9,6 +9,7 @@ import AppContext from '../../../contexts/AppContext';
 import Container from "../../../components/Container";
 import ProfileCard from './ProfileCard/ProfileCard';
 import UserList from './UserList/UserList';
+import { Redirect } from 'react-router-dom';
 
 const authToken = localStorage.getItem('token');
 
@@ -30,17 +31,25 @@ export default function PageProfile(props) {
     const { socket } = useContext(AppContext);
 
     const [profileState, setProfileState] = useState({});
+    const [redirectState, setRedirectState] = useState(false);
     
     useEffect(() => {
+        let isSubscribed = true;
         async function fetchProfile() {
             const username = props.match.params.username ? `/${props.match.params.username}` : "";
             const profile = await axios.get(`/users${username}?authToken=${authToken}`)
-            setProfileState({
-                uploadPicture: uploadPicture,
-                ...profile.data.profile,
-            })
+            if (profile.data.profile.inSearch === false || profile.data.profile.blockedBy) {
+                setRedirectState(true)
+            } 
+            if (isSubscribed) {
+                setProfileState({
+                    uploadPicture: uploadPicture,
+                    ...profile.data.profile,
+                })
+            }
         }
         fetchProfile();
+        return () => isSubscribed = false;
     }, [props.match.params.username])
     
     useEffect(() => {
@@ -104,6 +113,7 @@ export default function PageProfile(props) {
                     }
                 </GridContainer>
             </Container>
+            {redirectState && <Redirect to='/search'/>}
         </ProfileProvider>
     )
 }

@@ -32,11 +32,13 @@ export default function PageProfileEdit() {
     }
 
     useEffect(() => {
+        let isSubscribed = true;
         async function fetchProfile() {
             const profile = await axios.get(`/users?authToken=${authToken}`)
-            setProfileState({ ...profile.data.profile });
+            if (isSubscribed) setProfileState({ ...profile.data.profile });
         }
         fetchProfile();
+        return () => isSubscribed = false;
     }, [])
     
 

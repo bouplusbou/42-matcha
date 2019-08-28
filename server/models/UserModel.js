@@ -225,28 +225,64 @@ const getBlockedList = async uuid => {
 
 const createRelationship = async (type, userUuid, targetUserId) => {
   try {
-    await session.run(`
+    res = await session.run(`
       MATCH (u:User {uuid: $userUuid}), (t:User {userId: $targetUserId})
       CREATE (u)-[r:${type.toUpperCase()}]->(t)
+      RETURN 
+      exists((t)-[:LIKED]->(u)) AS match,
+      u.userId AS userId
     `, {
       userUuid: userUuid,
       targetUserId: targetUserId,
     })
     session.close();
-  } catch(error) { Log.error(error, "addTag", __filename) }
+    if (type === "liked" && res.records[0].get('match')) {
+      createMatch(res.records[0].get(`userId`), targetUserId)
+    }
+  } catch(error) { Log.error(error, "createRelationship", __filename) }
 }
 
-const deleteRelationship = async (type, userUuid, targetUserId) => {
+const deleteRelationship = async (type, userId, targetUserId) => {
   try {
-    await session.run(`
-      MATCH (u:User {uuid: $userUuid}), (t:User {userId: $targetUserId})
+    const res = await session.run(`
+      MATCH (u:User {userId: $userId}), (t:User {userId: $targetUserId})
       MATCH (u)-[r:${type.toUpperCase()}]->(t)
+      OPTIONAL MATCH (m:Match {userIds: $userIds})
       DELETE r
+      RETURN count(m) AS match
     `, {
-      userUuid: userUuid,
+      userId: userId,
       targetUserId: targetUserId,
+      userIds: [userId, targetUserId]
     })
+    if (type === "liked" && res.records[0].get(`match`)) {
+      deleteMatch(userId, targetUserId);
+    }
   } catch (error) { Log.error(error, "deleteRelationship", __filename) }
+}
+
+const createMatch = async (userId1, userId2) => {
+  const res = await session.run(`
+  CREATE (m:Match {
+      userIds: $userIds,
+      matchId: $matchId,
+      dateTime: DateTime({timezone: 'Europe/Paris'})
+  })
+  RETURN m.matchId
+  `, {
+      userIds: [userId1, userId2],
+      matchId: uuidv1(),
+  })
+  session.close();
+}
+
+const deleteMatch = async (userId1, userId2) => {
+  await session.run(`
+  MATCH (m:Match { userIds: $userIds })
+  DELETE m
+  `, {
+      userIds: [userId1, userId2],
+  })
 }
 
 async function updateRelationship(uuid, { choice, username }) { 
@@ -495,4 +531,6 @@ module.exports = {
   getRelationWithUser,
   getUuidByUserId,
   setlastConnection,
+  createMatch,
+  deleteMatch
 }

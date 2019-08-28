@@ -33,6 +33,10 @@ const getUserCount = async () => {
 
 const deleteAllRel = async (relationship) => {
     log(`Deleting all "${relationship}" relationships and notifications...`);
+    await session.run(`
+        MATCH (n:Notification)
+        DELETE n
+    `)
     const relResult = await session.run(`
         MATCH ()-[r:${relationship}]->()
         DELETE r

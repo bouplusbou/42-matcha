@@ -89,6 +89,7 @@ const getProfile = async (req, res) => {
             const uuid = await getUuidFromToken(req, res);
             if (uuid) {
                   const reqUser = await UserModel.getUserByUsername(req.params.username);
+                  const user = await UserModel.getProfileByUuid(uuid);
                   const profile = await UserModel.getProfileByUuid(reqUser.uuid);
                   profile.account = false;
                   if (uuid === reqUser.uuid) {
@@ -96,13 +97,16 @@ const getProfile = async (req, res) => {
                         profile.likedHistoric = await UserModel.getHistoric(uuid, "LIKED");
                         profile.blockedList = await UserModel.getBlockedList(uuid);
                         profile.account = true;
+                        profile.inSearch = true;
                   } else {
                         const ret = await UserModel.getRelationWithUser(uuid, reqUser.uuid)
                         profile.liked = ret.liked;
                         profile.likedBy = ret.likedBy;
                         profile.blocked = ret.blocked;
                         profile.blockedBy = ret.blockedBy;
+                        profile.inSearch = user.lookingFor.includes(profile.gender) ? true : false;
                   }
+                  console.log(profile);
                   res.json({profile: profile})
             }
       } catch (error) { Log.error(error, `getProfile`, __filename) }
@@ -168,7 +172,8 @@ const createRelationship = async (req, res) => {
 const deleteRelationship = async (req, res) => {
       try {
             const uuid = await getUuidFromToken(req, res);
-            await UserModel.deleteRelationship(req.body.type, uuid, req.body.targetUserId);
+            const profile = await UserModel.getProfileByUuid(uuid);
+            await UserModel.deleteRelationship(req.body.type, profile.userId, req.body.targetUserId);
             res.status(200).json({ message: `${req.body.type} relationship deleted.`})
       } catch (error) { Log.error(error, `deleteRelationship`, __filename) }
 }

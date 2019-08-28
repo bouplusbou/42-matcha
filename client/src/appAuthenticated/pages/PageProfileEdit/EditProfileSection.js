@@ -160,12 +160,14 @@ export default function InfosSection(props) {
     const [tagsList, setTagsList] = useState([]);
     const Tags = valueState.tags && valueState.tags.map((tag, index) => <TagChip deletable={true} tag={tag} key={index} index={index} onDelete={deleteTag}/>)
     useEffect(() => {
+        let isSubscribed = true;
         const fetchTagData = async () => {
             const tags = await axios.get(`/tags?authToken=${authToken}`);
             const filteredTags = valueState.tags && tags.data.tags.filter(tag => !valueState.tags.includes(tag.label));
-            if (filteredTags) setTagsList([...filteredTags]);
+            if (filteredTags && isSubscribed) setTagsList([...filteredTags]);
         }
         fetchTagData();
+        return () => isSubscribed = false;
     }, [valueState.tags]);
     
     async function fetchTagsList() {
