@@ -29,7 +29,6 @@ const GridContainer = styled.div `
 
 export default function PageProfile(props) {
     const { socket } = useContext(AppContext);
-
     const [profileState, setProfileState] = useState({});
     const [redirectState, setRedirectState] = useState(false);
     
@@ -54,7 +53,7 @@ export default function PageProfile(props) {
     
     useEffect(() => {
         async function createRelNotif() {
-            if (profileState.userId !== undefined) {
+            if (profileState.userId  && !profileState.account) {
                 const data = {
                     type: 'visited',
                     targetUserId: profileState.userId,

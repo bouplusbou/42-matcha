@@ -89,8 +89,6 @@ export default function PageSignup(props) {
     usernameHelper: null,
   });
 
-
-
   const valueIsOk = (name, value) => {
     const regex = {
       email: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
@@ -172,9 +170,7 @@ export default function PageSignup(props) {
       } else {
         valueError(emptyFields);
       }
-    } catch(error) {
-      console.log(error);
-    }
+    } catch(error) {console.log(error);}
   }
 
   return (
@@ -193,7 +189,6 @@ export default function PageSignup(props) {
               helperText={values.emailHelper}
               margin="normal"
             />
-
             <TextField
               id="standard-firstName"
               label="First Name"
@@ -204,7 +199,6 @@ export default function PageSignup(props) {
               helperText={values.firstNameHelper}
               margin="normal"
             />
-
             <TextField
               id="standard-lastName"
               label="Last Name"
@@ -215,7 +209,6 @@ export default function PageSignup(props) {
               helperText={values.lastNameHelper}
               margin="normal"
             />
-
             <TextField
               id="standard-username"
               label="Username"
@@ -226,7 +219,6 @@ export default function PageSignup(props) {
               helperText={values.usernameHelper}
               margin="normal"
             />
-
             <FormControl required={true}>
               <InputLabel htmlFor="adornment-password">Password</InputLabel>
               <Input

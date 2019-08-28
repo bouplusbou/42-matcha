@@ -145,17 +145,18 @@ export default function PageLogin(props) {
       event.preventDefault();
       const credentials = {username: values.username, password: values.password};
       const res = await axios.post(`/auth`, credentials);
-      await actionLogin(res.data.token);
+      if (res.data.token) await actionLogin(res.data.token);
       const resNotif = await axios.get(`/notifications/unseenNotificationsNb?authToken=${res.data.token}`);
-      appState.setUnseenNotificationsNb(resNotif.data.nb);
+      if (resNotif.data) appState.setUnseenNotificationsNb(resNotif.data.nb);
       const resMsg = await axios.get(`/chat/unreadMessagesNb?authToken=${res.data.token}`);
-      appState.setUnreadMessagesNb(resMsg.data.nb);
-      appState.toggleConnected();
-      // const userId = res.data.userId;
-      setupSocket(res.data.token, appState.setSocket, appState.setConnectedUsers);
-      props.history.push('/search');
+      if (resMsg.data) {
+        appState.setUnreadMessagesNb(resMsg.data.nb);
+        appState.toggleConnected();
+        setupSocket(res.data.token, appState.setSocket, appState.setConnectedUsers);
+        props.history.push('/search');
+      }
     } catch(err) {
-      if (err.response !== undefined) {
+      if (err.response && err.response.data) {
         setValues({ ...values, error: true, errorMsg: err.response.data.errorMsg});
       }
     }

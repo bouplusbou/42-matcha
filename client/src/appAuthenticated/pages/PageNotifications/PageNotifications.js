@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faHeart, faBan, faFireAlt, faHeartBroken } from '@fortawesome/free-solid-svg-icons';
@@ -70,18 +71,28 @@ const Duration = styled.p`
   justify-self: end;
   margin-left: 10px;
 `;
- 
+const NotificationMessage = styled.p`
+  a {
+    text-decoration: none;
+    color: ${props => props.theme.color.purple};
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: 500;
+    text-decoration: none;
+  }
+`;
+
 export default function PageNotifications() {
 
   const [notifications, setNotifications] = useState([]);
   const { setUnseenNotificationsNb } = useContext(AppContext);
+  const authToken = localStorage.getItem('token');
 
   useEffect(() => {
     let isSubscribed = true;
     async function fetchData() {
-      const authToken = localStorage.getItem('token');
       const res = await axios.get(`/notifications?authToken=${authToken}`);
-      if (isSubscribed) {
+      if (res.data && res.data.notifications && isSubscribed) {
         const resNotif = res.data.notifications.map(elem => {
           let icon = faEye;
           if (elem.type === 'liked') icon = faHeart;
@@ -94,9 +105,9 @@ export default function PageNotifications() {
         setUnseenNotificationsNb(0);
       }
     };
-    fetchData();
+    if (authToken) fetchData();
     return () => isSubscribed = false;
-  }, [setUnseenNotificationsNb]);
+  }, [authToken, setUnseenNotificationsNb]);
 
   return (
     <Hero>
@@ -110,7 +121,7 @@ export default function PageNotifications() {
                     style={{marginLeft: '10px', fontSize: '25px', color: 'white'}} 
                     icon={notification.icon}
                   />
-                  <p>{notification.username} {notification.type} your profile</p>
+                  <NotificationMessage> <Link to={`/profile/${notification.username}`}>{notification.username}</Link> {notification.type} your profile</NotificationMessage>
                   <Duration>{notification.duration}</Duration>
                   {notification.status === 'unseen' && 
                     <Dot></Dot>

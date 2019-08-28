@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -27,44 +27,20 @@ const NavList = styled.ul`
 
 export default function Navlist() {
 
-    const [underline, setUnderline] = useState({
-        search: false,
-        matcher: false,
-        profile: false,
-    });
-
-    const handleClickUnderline = type => {
-        if (type === 'search') setUnderline({
-            search: true,
-            matcher: false,
-            profile: false,
-        });
-        if (type === 'matcher') setUnderline({
-            search: false,
-            matcher: true,
-            profile: false,
-        });
-        if (type === 'profile') setUnderline({
-            search: false,
-            matcher: false,
-            profile: true,
-        });
-    };
-
     return (
         <NavList>
-            <li style={underline.search ? {boxShadow: '0px 2.5px 0px #FFFFFF'} : {boxShadow: 'none'}}>
-                <Link to="/search" onClick={() => handleClickUnderline('search')}>
+            <li>
+                <Link to="/search">
                     Search
                 </Link>
             </li>
-            <li style={underline.matcher ? {boxShadow: '0px 2.5px 0px #FFFFFF'} : {boxShadow: 'none'}}>
-                <Link onClick={() => handleClickUnderline('matcher')} to="/matcher">
+            <li>
+                <Link  to="/matcher">
                     Matcher
                 </Link>
             </li>
-            <li style={underline.profile ? {boxShadow: '0px 2.5px 0px #FFFFFF'} : {boxShadow: 'none'}}>
-                <Link onClick={() => handleClickUnderline('profile')} to="/profile">
+            <li>
+                <Link  to="/profile">
                     Profile
                 </Link>
             </li>

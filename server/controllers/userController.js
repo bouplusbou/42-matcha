@@ -106,7 +106,6 @@ const getProfile = async (req, res) => {
                         profile.blockedBy = ret.blockedBy;
                         profile.inSearch = user.lookingFor.includes(profile.gender) ? true : false;
                   }
-                  console.log(profile);
                   res.json({profile: profile})
             }
       } catch (error) { Log.error(error, `getProfile`, __filename) }

@@ -1,34 +1,34 @@
 import React, { Fragment } from 'react';
 import { Link } from 'react-router-dom';
-import UserCard from './UserCard';
-import CircleButton from './CircleButton';
+import UserCard from '../../../components/UserCard';
+import CircleButton from '../../../components/CircleButton';
 import styled from 'styled-components'
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { faHeart } from '@fortawesome/free-solid-svg-icons';
 
-export default function Results({ usersIndex, handleLikeDislike, user, hasNoMore }) {
-    
-    const Results = styled.section`
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    `;
-    const NextButtonSection = styled.section`
-        z-index: 9;
-        @media (max-width: 1080px) {
-            transform: translate(60px);
-        }
-    `;
-    const CardSection = styled.section`
-        z-index: 0;
-    `;
-    const LikeButtonSection = styled.section`
-        z-index: 9;
-        @media (max-width: 1080px) {
-            transform: translate(-60px);
-        }
-    `;
+const Results = styled.section`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+`;
+const NextButtonSection = styled.section`
+    z-index: 9;
+    @media (max-width: 1080px) {
+        transform: translate(60px);
+    }
+`;
+const CardSection = styled.section`
+    z-index: 0;
+`;
+const LikeButtonSection = styled.section`
+    z-index: 9;
+    @media (max-width: 1080px) {
+        transform: translate(-60px);
+    }
+`;
 
+export default function ResultsComp({ usersIndex, handleLikeDislike, user, hasNoMore }) {
+    
     return (
         <Results>
         {!hasNoMore &&
@@ -58,7 +58,7 @@ export default function Results({ usersIndex, handleLikeDislike, user, hasNoMore
                     <CircleButton
                         choice={'liked'}
                         handleLikeDislike={handleLikeDislike}
-                        circle_color={'#FF6F62'}
+                        circle_color={'#FF0041'}
                         icon_color={'white'}
                         fa_icon={faHeart}
                     />

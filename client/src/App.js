@@ -18,15 +18,15 @@ function App() {
   const [unreadMessagesNb, setUnreadMessagesNb] = useState(0);
   const [discussions, setDiscussions] = useState(null);
   const [currentDiscussionInfo, setCurrentDiscussionInfo] = useState(null);
-  const [currentDiscussionMessages, setCurrentDiscussionMessages] = useState(null);
-  
+  const [currentDiscussionMessages, setCurrentDiscussionMessages] = useState(null);  
+  const authToken = localStorage.getItem('token');
+
   useEffect(() => {
     let isSubscribed = true;
     async function fetchData() {
       try {
         const userId = await actionIsAuthenticated(localStorage.getItem('token'));
         if (userId !== null) {
-          const authToken = localStorage.getItem('token');
           const resNotif = await axios.get(`/notifications/unseenNotificationsNb?authToken=${authToken}`);
           if (isSubscribed) setUnseenNotificationsNb(resNotif.data.nb);
           const resMsg = await axios.get(`/chat/unreadMessagesNb?authToken=${authToken}`);
@@ -42,9 +42,9 @@ function App() {
         if (isSubscribed) setConnected(false)
       }
     };
-    fetchData();
+    if (authToken) fetchData();
     return () => isSubscribed = false;
-  }, []);
+  }, [authToken]);
 
   const appState = {
     connected,

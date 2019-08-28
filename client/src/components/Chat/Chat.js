@@ -233,7 +233,7 @@ const NoDiscussionYet = styled.aside`
   justify-content: center;
   align-items: center;
 `;
-const NoDiscussionYetMsg = styled.p`
+const NoDiscussionYetMsg = styled.section`
   color: ${props => props.theme.color.white};
   font-family: Roboto;
   font-weight: 500;
@@ -271,7 +271,7 @@ export default function ChatComp() {
       const res = await axios.get(`/chat/discussions?authToken=${authToken}`);
       setDiscussions(res.data.discussions);
     };
-    fetchData();
+    if (authToken) fetchData();
   }, [authToken, setDiscussions]);
 
   useEffect(() => {
@@ -283,7 +283,7 @@ export default function ChatComp() {
   }, [setCurrentDiscussionInfo, setCurrentDiscussionMessages, socket]);
 
   useEffect(() => {
-    if (socket !== null) {
+    if (socket !== null && authToken) {
       socket.on('reloadDiscussions', async () => {
           const resAll = await axios.get(`/chat/discussions?authToken=${authToken}`);
           setDiscussions(resAll.data.discussions);
@@ -293,7 +293,7 @@ export default function ChatComp() {
   }, [socket, authToken, setDiscussions]);
 
   useEffect(() => {
-    if (socket !== null) {
+    if (socket !== null && authToken) {
       socket.on('newMessageReceived', async matchId => {
         if (currentDiscussionInfo !== null && matchId === currentDiscussionInfo.matchId) {
           const resCurrent = await axios.post(`/chat/currentDiscussionMessages?authToken=${authToken}`, { matchId });
@@ -318,6 +318,7 @@ export default function ChatComp() {
   }, [socket, setUnreadMessagesNb]);
 
   const loadCurrentDiscussion = async (matchId, youLastConnection, youUserId, youUsername, youAvatar) => {
+    if (authToken) {
       if (socket !== null) socket.emit('setCurrentDiscussionMatchId', matchId);
       const youIsOnline = false;
       setCurrentDiscussionInfo({ matchId, youLastConnection, youUserId, youUsername, youAvatar, youIsOnline });
@@ -328,13 +329,14 @@ export default function ChatComp() {
       const resUnreadMsg = await axios.get(`/chat/unreadMessagesNb?authToken=${authToken}`);
       setUnreadMessagesNb(resUnreadMsg.data.nb);
       executeScroll();
+    }
   };
 
   const handleChange = event => setInputValue(event.target.value);
   
   const handleSubmit = async event => {
     event.preventDefault();
-    if (inputValue !== '') {
+    if (inputValue !== '' && authToken) {
       try {
         const matchId = currentDiscussionInfo.matchId;
         const youUserId = currentDiscussionInfo.youUserId;
@@ -439,7 +441,7 @@ export default function ChatComp() {
         <NoDiscussionYet>
           <NoDiscussionYetMsg>
             <h1>Wanna talk ?</h1> 
-            👉 First... get a match !
+            <p><span aria-label="Check-this" role="img" >👉</span> First... get a match !</p>
           </NoDiscussionYetMsg>
         </NoDiscussionYet>
       }

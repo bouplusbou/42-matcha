@@ -17,7 +17,7 @@ const StyledSection = styled.section `
     align-items:center;
     justify-content:center;
     flex-direction:column;
-`
+`;
 
 const Tags = styled.div `
     display:flex;
@@ -25,7 +25,7 @@ const Tags = styled.div `
     margin-top:auto;
     flex-wrap:wrap;
     width:100%;
-`
+`;
 
 const Biography = styled.div `
     margin-bottom:0.75rem;
@@ -35,7 +35,7 @@ const Biography = styled.div `
     font-weight:300;
     overflow-wrap: break-word;
     hyphens:auto;
-`
+`;
 
 const Infos = styled.div `
     display:flex;
@@ -44,7 +44,7 @@ const Infos = styled.div `
     justify-content:center;
     align-items:center;
     color: ${props => props.theme.color.lightRed};
-`
+`;
 
 export default function InfosSection() {
 
@@ -77,16 +77,16 @@ export default function InfosSection() {
             justify-content:center;
             align-items:center;
             :not(:first-child) { border-left:1px solid #a275f0; }
-        `
+        `;
     
         const StyledIcon = styled(FontAwesomeIcon) `
             margin-right:1rem;
-        `
+        `;
     
         const StyledSpan = styled.span `
             font-size:1.25rem;
             font-weight:bold;
-        `
+        `;
     
         return (
             <StyledCase>

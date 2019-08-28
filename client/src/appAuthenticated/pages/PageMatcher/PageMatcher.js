@@ -3,10 +3,9 @@ import AppContext from '../../../contexts/AppContext';
 import styled from 'styled-components';
 import Sorting from '../../../components/Sorting';
 import Filtering from '../../../components/Filtering';
-import Results from '../../../components/Results';
+import Results from './Results';
 import IncompleteProfile from '../../../components/IncompleteProfile';
 import axios from 'axios';
-
 
 const SearchSection = styled.section`
   margin: 3vw 10vw;
@@ -41,9 +40,8 @@ const ResultsSection = styled.section`
   grid-area: results;
 `;
 
-export default function PageSearch() {
+export default function PageMatcher() {
   const { socket } = useContext(AppContext);
-
   const [isLoading, setIsLoading] = useState(true);
   const [hasNoMore, setHasNoMore] = useState(false);
   const [sortingChoice, setSortingChoice] = useState('Closest');
@@ -60,7 +58,6 @@ export default function PageSearch() {
   const [missingProfileFields, setMissingProfileFields] = useState(false);
   const [allTags, setAllTags] = useState(null);
   const [user, setUser] = useState(['init user']);
-
   const authToken = localStorage.getItem('token');
 
   useEffect(() => {
@@ -69,19 +66,21 @@ export default function PageSearch() {
     async function fetchData() {
       const res = await axios.get(`/users/hasFullProfile?authToken=${authToken}`);
       const missingFields = [];
-      if (res.data.fields.birthDate === null) missingFields.push('your birthdate');
-      if (res.data.fields.gender === null) missingFields.push('your gender');
-      if (res.data.fields.orientation === null) missingFields.push('your sexual orientation');
-      if (res.data.fields.lookingFor === null) missingFields.push('who you are looking for');
-      if (missingFields.length !== 0) {
-        if (isSubscribed) {
-          setMissingProfileFields(missingFields);
-          setHasFullProfile(false);
-          setIsLoading(false);
+      if (res.data && res.data.fields) {
+        if (res.data.fields.birthDate === null) missingFields.push('your birthdate');
+        if (res.data.fields.gender === null) missingFields.push('your gender');
+        if (res.data.fields.orientation === null) missingFields.push('your sexual orientation');
+        if (res.data.fields.lookingFor === null) missingFields.push('who you are looking for');
+        if (missingFields.length !== 0) {
+          if (isSubscribed) {
+            setMissingProfileFields(missingFields);
+            setHasFullProfile(false);
+            setIsLoading(false);
+          }
         }
       }
     }
-    fetchData();
+    if (authToken) fetchData();
     return () => isSubscribed = false;
   }, [authToken]);
 
@@ -89,12 +88,12 @@ export default function PageSearch() {
     let isSubscribed = true;
     async function fetchData() {
       const res = await axios.get(`/search/ownCityLatLng?authToken=${authToken}`);
-      if (isSubscribed) {
+      if (isSubscribed && res.data && res.data.cityLatLng) {
         setFilterCity(res.data.cityLatLng.city);
         setFilterLatLng(res.data.cityLatLng.latLng);
       }
     }
-    fetchData();
+    if (authToken) fetchData();
     return () => isSubscribed = false;
   }, [authToken]);
 
@@ -102,14 +101,14 @@ export default function PageSearch() {
     let isSubscribed = true;
     async function fetchData() {
       const res = await axios.get(`/search/filtersMinMax?authToken=${authToken}`);
-      if (isSubscribed) {
+      if (isSubscribed && res.data) {
         setFilterAge(res.data.age);
         setRangeAge(res.data.age);
         setFilterScore(res.data.score);
         setRangeScore(res.data.score);
       }
     }
-    fetchData();
+    if (authToken) fetchData();
     return () => isSubscribed = false;
   }, [authToken]);
 
@@ -118,9 +117,9 @@ export default function PageSearch() {
     async function fetchData() {
       const authToken = localStorage.getItem('token');
       const res = await axios.get(`/tags?authToken=${authToken}`);
-      if (isSubscribed) setAllTags(res.data.tags);
+      if (isSubscribed && res.data) setAllTags(res.data.tags);
     }
-    fetchData();
+    if (authToken) fetchData();
     return () => isSubscribed = false;
   }, [authToken]);
 
@@ -131,49 +130,53 @@ export default function PageSearch() {
     async function fetchData() {
       const filters = { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags }
       const res = await axios.post(`/search/matcher?authToken=${authToken}`, filters);
-      if (isSubscribed) {
+      if (isSubscribed && res.data && res.data.usersArr) {
         res.data.usersArr.length === 0 ? setHasNoMore(true) : setUser(res.data.usersArr[0]);
         setIsLoading(false);
       }
     }
-    fetchData();
+    if (authToken) fetchData();
     return () => isSubscribed = false;
   }, [authToken, sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags]);
 
   const handleLikeDislike = async type => {
-    setIsLoading(true);
-    const data = {
-      type,
-      targetUserId: user.userId,
-    };
-    await axios.post(`/users/createRelationship?authToken=${authToken}`, data);
-    await axios.post(`/notifications?authToken=${authToken}`, data);
-    const filters = { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags }
-    const res = await axios.post(`/search/matcher?authToken=${authToken}`, filters);
-    res.data.usersArr.length === 0 ? setHasNoMore(true) : setUser(res.data.usersArr[0]);
-    socket.emit('createNotification', user.userId);
-    setIsLoading(false);
+    if (authToken) {
+      setIsLoading(true);
+      const data = {
+        type,
+        targetUserId: user.userId,
+      };
+      await axios.post(`/users/createRelationship?authToken=${authToken}`, data);
+      await axios.post(`/notifications?authToken=${authToken}`, data);
+      const filters = { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags }
+      const res = await axios.post(`/search/matcher?authToken=${authToken}`, filters);
+      if (res.data && res.data.usersArr) res.data.usersArr.length === 0 ? setHasNoMore(true) : setUser(res.data.usersArr[0]);
+      if (socket) socket.emit('createNotification', user.userId);
+      setIsLoading(false);
+    }
   };
-  const handleSelectSorting = e => { setSortingChoice(e.target.innerText); };
-  const handleAgeChange = values => { setFilterAge(values); };
-  const handleScoreChange = values => { setFilterScore(values); };
+  const handleSelectSorting = e => setSortingChoice(e.target.innerText);
+  const handleAgeChange = values => setFilterAge(values);
+  const handleScoreChange = values => setFilterScore(values);
   const handleLatlngChange = ({ suggestion }) => { 
     setIsOwnCity(false);
     setFilterLatLng([suggestion.latlng.lat, suggestion.latlng.lng]);
     setFilterCity(suggestion.name);
   };
   const handleClickDeleteCity = async () => { 
-    setFilterLatLng(null);
-    setFilterCity(null);
-    const res = await axios.get(`/search/ownCityLatLng?authToken=${authToken}`);
-    setFilterCity(res.data.cityLatLng.city);
-    setFilterLatLng(res.data.cityLatLng.latLng);
-    setIsOwnCity(true);
+    if (authToken) {
+      setFilterLatLng(null);
+      setFilterCity(null);
+      const res = await axios.get(`/search/ownCityLatLng?authToken=${authToken}`);
+      if (res.data && res.data.cityLatLng) {
+        setFilterCity(res.data.cityLatLng.city);
+        setFilterLatLng(res.data.cityLatLng.latLng);
+        setIsOwnCity(true);
+      }
+    }
   };
-  const handleDistanceChange = value => { setFilterDistance(value); };
-  const handleTagsChange = values => { 
-    values !== null ? setFilterTags(values) : setFilterTags([]);
-  };
+  const handleDistanceChange = value => setFilterDistance(value);
+  const handleTagsChange = values => {values !== null ? setFilterTags(values) : setFilterTags([]);};
   
   return (
     <SearchSection>
