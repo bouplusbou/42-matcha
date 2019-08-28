@@ -29,7 +29,6 @@ const GridContainer = styled.div `
 
 export default function PageProfile(props) {
     const { socket } = useContext(AppContext);
-
     const [profileState, setProfileState] = useState({});
     const [redirectState, setRedirectState] = useState(false);
     

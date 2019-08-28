@@ -3,11 +3,13 @@ import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart } from '@fortawesome/free-solid-svg-icons';
 import ProfileContext from '../contexts/ProfileContext';
+import AppContext from '../contexts/AppContext';
 import axios from 'axios';
 
 const authToken = localStorage.getItem(`token`)
 
 const LikeButton = (props) => {
+    const { socket } = useContext(AppContext);
     const profile = useContext(ProfileContext);
     const StyledButton = styled.button `
         height:${props => props.small ? "3.25rem" : "4.5rem"};
@@ -18,7 +20,7 @@ const LikeButton = (props) => {
         :hover {
             cursor:pointer;
         }
-    `
+    `;
 
     const LikeButton = styled(StyledButton) `
         color: ${props => props.theme.color.purple};
@@ -28,7 +30,7 @@ const LikeButton = (props) => {
             background-color:${props => props.theme.color.purple};
             border-color:${props => props.theme.color.purple};
         }
-    `
+    `;
 
     const CancelLikeButton = styled(StyledButton) `
         color:white;
@@ -39,7 +41,7 @@ const LikeButton = (props) => {
             background-color:white;
             border-color:${props => props.theme.color.purple};
         }
-    `
+    `;
 
     const MatchButton = styled(StyledButton) `
         color:${props => props.theme.color.red};
@@ -51,7 +53,7 @@ const LikeButton = (props) => {
             background-color:${props => props.theme.color.red};
             border-color:${props => props.theme.color.purple};
         }
-    `
+    `;
 
     const CancelMatchButton = styled(StyledButton) `
         color:white;
@@ -64,6 +66,17 @@ const LikeButton = (props) => {
         }
     `
 
+    const createNotif = async type => {
+        if (profile.userId) {
+            const data = {
+                type,
+                targetUserId: profile.userId,
+            };
+            await axios.post(`/notifications?authToken=${authToken}`, data);
+            socket.emit('createNotification', profile.userId);
+        }
+    };
+    
     const handleClick = event => {
         if (profile.liked) {
             const params = {data: {
@@ -71,12 +84,15 @@ const LikeButton = (props) => {
                 targetUserId: profile.userId,
             }}
             axios.delete(`/users/deleteRelationship?authToken=${authToken}`, params); 
+            createNotif('liked');
         } else {
+            console.log('unlike');
             const params = {
                 type: "liked",                
                 targetUserId: profile.userId,
             }
             axios.post(`/users/createRelationship?authToken=${authToken}`, params);
+            createNotif('unliked');
         }
     }
 
