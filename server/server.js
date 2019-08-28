@@ -37,7 +37,7 @@ io.on('connection', async client => {
   }
   const userIds = Object.keys(io.sockets.sockets).map(elem => io.sockets.sockets[elem].userId);
 
-  client.broadcast.emit('isConnected', userIds);
+  io.emit('isConnected', userIds);
 
 	client.on('disconnect', () => {
     UserModel.setlastConnection(client.userId);

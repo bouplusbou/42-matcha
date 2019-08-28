@@ -8,7 +8,7 @@ export default function setupSocket(token, setSocket, setConnectedUsers) {
     });
     
     socket.on('isConnected', userIds => {
-        // console.log(`The back sent new connectedUsers: ${userIds}`);
+        console.log(`The back sent new connectedUsers: ${userIds}`);
         setConnectedUsers(userIds);
     });
     
