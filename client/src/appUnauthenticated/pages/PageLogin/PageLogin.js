@@ -155,7 +155,9 @@ export default function PageLogin(props) {
       setupSocket(res.data.token, appState.setSocket, appState.setConnectedUsers);
       props.history.push('/search');
     } catch(err) {
-      setValues({ ...values, error: true, errorMsg: err.response.data.errorMsg});
+      if (err.response !== undefined) {
+        setValues({ ...values, error: true, errorMsg: err.response.data.errorMsg});
+      }
     }
   };
 

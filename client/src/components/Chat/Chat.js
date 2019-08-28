@@ -2,8 +2,8 @@ import React, { Fragment, useContext, useEffect, useRef, useState } from 'react'
 import AppContext from '../../contexts/AppContext';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faComment } from '@fortawesome/free-solid-svg-icons';
-import NotificationDot from '../Header/NotificationDot';
+import { faComment, faTimes } from '@fortawesome/free-solid-svg-icons';
+import ChatNotificationDot from './ChatNotificationDot';
 import { Image } from 'cloudinary-react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
@@ -42,6 +42,7 @@ const ChatInfo = styled.section`
   display: flex;
   align-items: center;
   padding: 0 10px;
+  position: relative;
 `;
 const DiscussionsInfo = styled.p`
   color: ${props => props.theme.color.white};
@@ -69,6 +70,7 @@ const Discussion = styled.div`
   margin-bottom: 20px;
   border-radius: 10px;
   position: relative;
+  cursor: pointer;
 `;
 const Avatar = styled(Image)`
   background-color: lightgrey;
@@ -203,7 +205,7 @@ const LastConnection = styled.p`
   font-family: Roboto;
   font-size: 0.7em;
   font-weight: 500;
-  color: ${props => props.theme.color.textGrey};
+  color: ${props => props.theme.color.lightPurple};
 `;
 const ChatInfoUsername = styled.p`
   font-family: Roboto;
@@ -213,6 +215,12 @@ const ChatInfoUsername = styled.p`
   &:hover {
     color: ${props => props.theme.color.lightPurple};
   }
+`;
+const CloseDiscussion = styled.div`
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  cursor: pointer;
 `;
 
 export default function ChatComp() {
@@ -230,6 +238,7 @@ export default function ChatComp() {
     } = useContext(AppContext);
     
     const [inputValue, setInputValue] = useState('');
+    const [chatIsOpen, setChatIsOpen] = useState(false);
 
     const authToken = localStorage.getItem('token');
 
@@ -251,37 +260,39 @@ export default function ChatComp() {
       return () => {
         setCurrentDiscussionInfo(null);
         setCurrentDiscussionMessages(null);  
-        socket.emit('setCurrentDiscussionMatchId', null);  
+        if (socket !== null) socket.emit('setCurrentDiscussionMatchId', null);  
       }
     }, [setCurrentDiscussionInfo, setCurrentDiscussionMessages, socket]);
 
     useEffect(() => {
-      socket.on('reloadDiscussions', async () => {
-          const resAll = await axios.get(`/chat/discussions?authToken=${authToken}`);
-          setDiscussions(resAll.data.discussions);
-      });
-      return () => {
-          socket.off('reloadDiscussions');
+      if (socket !== null) {
+        socket.on('reloadDiscussions', async () => {
+            const resAll = await axios.get(`/chat/discussions?authToken=${authToken}`);
+            setDiscussions(resAll.data.discussions);
+        });
+        return () => {
+            socket.off('reloadDiscussions');
+        }
       }
     }, [socket, authToken, setDiscussions]);
 
     useEffect(() => {
-      socket.on('newMessageReceived', async matchId => {
-        if (currentDiscussionInfo !== null && matchId === currentDiscussionInfo.matchId) {
-          const resCurrent = await axios.post(`/chat/currentDiscussionMessages?authToken=${authToken}`, { matchId });
-          setCurrentDiscussionMessages(resCurrent.data.currentDiscussionMessages);
-          executeScroll();
-        } else {
-          const resAll = await axios.get(`/chat/discussions?authToken=${authToken}`);
-          setDiscussions(resAll.data.discussions);
+      if (socket !== null) {
+        socket.on('newMessageReceived', async matchId => {
+          if (currentDiscussionInfo !== null && matchId === currentDiscussionInfo.matchId) {
+            const resCurrent = await axios.post(`/chat/currentDiscussionMessages?authToken=${authToken}`, { matchId });
+            setCurrentDiscussionMessages(resCurrent.data.currentDiscussionMessages);
+            executeScroll();
+          } else {
+            const resAll = await axios.get(`/chat/discussions?authToken=${authToken}`);
+            setDiscussions(resAll.data.discussions);
+          }
+        });
+        return () => {
+            socket.off('newMessageReceived');
         }
-      });
-      return () => {
-          socket.off('newMessageReceived');
       }
     }, [authToken, setCurrentDiscussionMessages, socket, currentDiscussionInfo, setDiscussions]);
-
-
 
     const loadCurrentDiscussion = async (matchId, youLastConnection, youUserId, youUsername, youAvatar) => {
         socket.emit('setCurrentDiscussionMatchId', matchId);
@@ -298,42 +309,57 @@ export default function ChatComp() {
 
     const handleChange = event => {
         setInputValue(event.target.value);
-      };
+    };
     
-      const handleSubmit = async event => {
-        event.preventDefault();
-        try {
-          const matchId = currentDiscussionInfo.matchId;
-          const youUserId = currentDiscussionInfo.youUserId;
-          const message = inputValue;
-          await axios.post(`/chat?authToken=${authToken}`, { matchId, youUserId, message });
-          setInputValue('');
-          socket.emit('newMessageSent', {message, youUserId, matchId});
-        } catch(error) { console.log(error) }
-      };
+    const handleSubmit = async event => {
+      event.preventDefault();
+      try {
+        const matchId = currentDiscussionInfo.matchId;
+        const youUserId = currentDiscussionInfo.youUserId;
+        const message = inputValue;
+        await axios.post(`/chat?authToken=${authToken}`, { matchId, youUserId, message });
+        setInputValue('');
+        socket.emit('newMessageSent', {message, youUserId, matchId});
+      } catch(error) { console.log(error) }
+    };
+
+    const toggleChat = () => {
+      setChatIsOpen(prev => !prev);
+      setCurrentDiscussionInfo(null);
+      setCurrentDiscussionMessages(null);
+    }
+    const resetCurrentDiscussion = () => {
+      setCurrentDiscussionInfo(null);
+      setCurrentDiscussionMessages(null);
+    }
 
     return (
         <Fragment>
-            { discussions !== null &&
+            { discussions !== null && chatIsOpen &&
                 <Chat>
                     <ChatInfo>
                         {currentDiscussionInfo === null ?
                             <DiscussionsInfo>Discussions</DiscussionsInfo>
                             :
-                            <ChatInfo>
-                            <Avatar cloudName='matchacn' publicId={currentDiscussionInfo.youAvatar}></Avatar>
-                            <Link to={`/profile/${currentDiscussionInfo.youUsername}`} style={{textDecoration: 'none'}}>
-                                <ChatInfoUsername>{currentDiscussionInfo.youUsername}</ChatInfoUsername>
-                            </Link>
-                            {connectedUsers.includes(currentDiscussionInfo.youUserId) ? 
-                                <OnlineDot></OnlineDot>
-                                : 
-                                <Fragment>
-                                <OfflineDot></OfflineDot>
-                                <LastConnection>{currentDiscussionInfo.youLastConnection === null ? 'never connected' : currentDiscussionInfo.youLastConnection}</LastConnection>
-                                </Fragment>
-                            }
-                            </ChatInfo>
+                            <Fragment>
+                              <Avatar cloudName='matchacn' publicId={currentDiscussionInfo.youAvatar}></Avatar>
+                              <Link to={`/profile/${currentDiscussionInfo.youUsername}`} style={{textDecoration: 'none'}}>
+                                  <ChatInfoUsername>{currentDiscussionInfo.youUsername}</ChatInfoUsername>
+                              </Link>
+                              {connectedUsers.includes(currentDiscussionInfo.youUserId) ? 
+                                  <OnlineDot></OnlineDot>
+                                  : 
+                                  <Fragment>
+                                  <OfflineDot></OfflineDot>
+                                  <LastConnection>{currentDiscussionInfo.youLastConnection === null ? 'never connected' : currentDiscussionInfo.youLastConnection}</LastConnection>
+                                  </Fragment>
+                              }
+                              <CloseDiscussion
+                                onClick={() => resetCurrentDiscussion()}
+                              >
+                                <FontAwesomeIcon  style={{fontSize: '20px', color: 'white'}} icon={faTimes}/>
+                              </CloseDiscussion>
+                            </Fragment>
                         }
                     </ChatInfo>
                     {currentDiscussionMessages === null &&
@@ -393,13 +419,19 @@ export default function ChatComp() {
 
                 </Chat>
             }
-            <ChatButton>
+            <ChatButton
+              onClick={() => toggleChat()}
+            >
                 {unreadMessagesNb !== 0 &&
-                    <NotificationDot 
+                    <ChatNotificationDot 
                         nb={unreadMessagesNb}
                     />
                 }
-                <FontAwesomeIcon  style={{fontSize: '30px', color: 'white'}} icon={faComment}/>
+                {chatIsOpen ?
+                  <FontAwesomeIcon  style={{fontSize: '30px', color: 'white'}} icon={faTimes}/>
+                  :
+                  <FontAwesomeIcon  style={{fontSize: '30px', color: 'white'}} icon={faComment}/>
+                }
             </ChatButton>
         </Fragment>
     );

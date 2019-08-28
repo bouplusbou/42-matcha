@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import AppContext from '../../contexts/AppContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell } from '@fortawesome/free-solid-svg-icons';
-import NotificationDot from './NotificationDot';
+import NotificationDot from '../NotificationDot';
 import axios from 'axios';
 
 export default function Notifications() {

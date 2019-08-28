@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faComment } from '@fortawesome/free-solid-svg-icons';
 import AppContext from '../../contexts/AppContext';
-import NotificationDot from './NotificationDot';
+import ChatNotificationDot from './ChatNotificationDot';
 
 export default function ChatButton() {
     const {socket, unreadMessagesNb, setUnreadMessagesNb} = useContext(AppContext);
@@ -22,7 +22,7 @@ export default function ChatButton() {
     return (
         <Link to="/chat" style={{textDecoration: 'none'}}>
             {unreadMessagesNb !== 0 &&
-                <NotificationDot 
+                <ChatNotificationDot 
                     nb={unreadMessagesNb}
                 />
             }

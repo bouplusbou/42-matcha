@@ -13,7 +13,6 @@ const AuthenticatedApp = () => (
     <Switch>
       <Route exact path='/search' component={PageSearch}/>
       <Route exact path='/notifications' component={PageNotifications}/>
-      <Route exact path='/chat' component={PageChat}/>
       <Route exact path='/matcher' component={PageMatcher}/>
       <Route exact path='/profile' component={Profile}/>
       <Route exact path='/profile/edit' component={ProfileEdit}/>
