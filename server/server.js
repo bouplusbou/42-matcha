@@ -26,7 +26,6 @@ io.use(async (client, next) => {
 });
 
 io.on('connection', async client => { 
-  // console.log(`client.join(${client.userId}-room)`);
   client.join(`${client.userId}-room`);
 
   const matchIds = await ChatModel.getMatchIdsByUserId(client.userId);
@@ -71,6 +70,7 @@ io.on('connection', async client => {
     }
     const youUuid = await UserModel.getUuidByUserId(data.youUserId);
     const nb = await ChatModel.getUnreadMessagesNb(youUuid);
+    console.log(nb);
     client.to(`${data.matchId}-room`).emit('setUnreadMessagesNb', nb);
     client.to(`${data.matchId}-room`).emit('reloadDiscussions');
     io.in(`${data.matchId}-room`).emit('newMessageReceived', data.matchId);

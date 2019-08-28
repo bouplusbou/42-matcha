@@ -6,18 +6,7 @@ import AppContext from '../../contexts/AppContext';
 import ChatNotificationDot from './ChatNotificationDot';
 
 export default function ChatButton() {
-    const {socket, unreadMessagesNb, setUnreadMessagesNb} = useContext(AppContext);
-
-    useEffect(() => {
-        if (socket !== null) {
-            socket.on('setUnreadMessagesNb', async nb => {
-                setUnreadMessagesNb(nb);
-            });
-        }
-        return () => {
-            if (socket !== null) socket.off('setUnreadMessagesNb');
-        }
-    }, [socket, setUnreadMessagesNb]);
+    const { unreadMessagesNb } = useContext(AppContext);
 
     return (
         <Link to="/chat" style={{textDecoration: 'none'}}>

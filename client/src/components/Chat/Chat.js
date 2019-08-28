@@ -248,6 +248,26 @@ export default function ChatComp() {
       refDiv.current.scrollTo(0, refElem.current.offsetTop)
     };
 
+
+    useEffect(() => {
+      if (socket !== null) {
+          console.log('set socket setUnreadMessagesNb');
+          socket.on('setUnreadMessagesNb', async nb => {
+              console.log(`setUnreadMessagesNb ${nb}`);
+              setUnreadMessagesNb(nb);
+          });
+      }
+      return () => {
+          if (socket !== null) socket.off('setUnreadMessagesNb');
+      }
+  }, [socket, setUnreadMessagesNb]);
+
+
+
+
+
+
+
     useEffect(() => {
       async function fetchData() {
         const res = await axios.get(`/chat/discussions?authToken=${authToken}`);
@@ -279,6 +299,7 @@ export default function ChatComp() {
     useEffect(() => {
       if (socket !== null) {
         socket.on('newMessageReceived', async matchId => {
+          console.log('newMessageReceived');
           if (currentDiscussionInfo !== null && matchId === currentDiscussionInfo.matchId) {
             const resCurrent = await axios.post(`/chat/currentDiscussionMessages?authToken=${authToken}`, { matchId });
             setCurrentDiscussionMessages(resCurrent.data.currentDiscussionMessages);
