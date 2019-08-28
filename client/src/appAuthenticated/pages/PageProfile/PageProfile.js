@@ -53,7 +53,7 @@ export default function PageProfile(props) {
     
     useEffect(() => {
         async function createRelNotif() {
-            if (profileState.userId !== undefined) {
+            if (profileState.userId  && !profileState.account) {
                 const data = {
                     type: 'visited',
                     targetUserId: profileState.userId,

@@ -82,11 +82,6 @@ const NotificationMessage = styled.p`
   }
 `;
 
-
-
-
-
-
 export default function PageNotifications() {
 
   const [notifications, setNotifications] = useState([]);
