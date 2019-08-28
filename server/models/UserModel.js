@@ -466,7 +466,6 @@ async function uuidFromUsername(username) { // refacto possible avec getUserByUs
 
 const createReportTicket = async (userUuid, targetUuid) => {
   try {
-    console.log(targetUuid);
     await session.run(`
       CREATE (r:Report {
         from: $from,

@@ -233,7 +233,7 @@ const NoDiscussionYet = styled.aside`
   justify-content: center;
   align-items: center;
 `;
-const NoDiscussionYetMsg = styled.p`
+const NoDiscussionYetMsg = styled.section`
   color: ${props => props.theme.color.white};
   font-family: Roboto;
   font-weight: 500;
@@ -441,7 +441,7 @@ export default function ChatComp() {
         <NoDiscussionYet>
           <NoDiscussionYetMsg>
             <h1>Wanna talk ?</h1> 
-            👉 First... get a match !
+            <p><span aria-label="Check-this" role="img" >👉</span> First... get a match !</p>
           </NoDiscussionYetMsg>
         </NoDiscussionYet>
       }
