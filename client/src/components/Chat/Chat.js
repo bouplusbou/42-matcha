@@ -95,14 +95,11 @@ const Date = styled.p`
   font-weight: 500;
   font-size: 0.8em;
 `;
-
-
 const ChatWindow = styled.section`
   height: 600px;
   display: grid;
   grid-template-rows: 8fr 2fr;
   background-color: ${props => props.theme.color.white};
-  /* border-radius: 20px; */
 `;
 const MessagesSection = styled.div`
   overflow: hidden;
@@ -177,7 +174,6 @@ const SendButton = styled.button`
       transform: scale(0.99);
   }
 `;
-
 const UnreadDot = styled.div`
     width: 25px;
     height: 25px;
@@ -222,19 +218,46 @@ const CloseDiscussion = styled.div`
   right: 20px;
   cursor: pointer;
 `;
+const NoDiscussionYet = styled.aside`
+  background-color: ${props => props.theme.color.purple};
+  height: 200px;
+  width: 350px;
+  position: fixed;
+  bottom: 120px;
+  right: 30px;
+  border-radius: 20px;
+  z-index: 999999;
+  overflow: hidden;
+  box-shadow: 0 15px 25px -10px rgba(0,0,0,.25);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+const NoDiscussionYetMsg = styled.p`
+  color: ${props => props.theme.color.white};
+  font-family: Roboto;
+  font-weight: 500;
+  margin-top: 0;
+  text-align: center;
+  h1 {
+    font-family: Roboto;
+    font-weight: 900;
+    font-size: 1.5em;
+  }
+`;
 
 export default function ChatComp() {
   const {
-      discussions,
-      setDiscussions,
-      currentDiscussionInfo,
-      setCurrentDiscussionInfo,
-      currentDiscussionMessages,
-      setCurrentDiscussionMessages,
-      setUnreadMessagesNb,
-      socket,
-      connectedUsers,
-      unreadMessagesNb,
+    discussions,
+    setDiscussions,
+    currentDiscussionInfo,
+    setCurrentDiscussionInfo,
+    currentDiscussionMessages,
+    setCurrentDiscussionMessages,
+    setUnreadMessagesNb,
+    socket,
+    connectedUsers,
+    unreadMessagesNb,
   } = useContext(AppContext);
   const [inputValue, setInputValue] = useState('');
   const [chatIsOpen, setChatIsOpen] = useState(false);
@@ -290,8 +313,8 @@ export default function ChatComp() {
         socket.on('setUnreadMessagesNb', async nb => {
             setUnreadMessagesNb(nb);
         });
+        return () => socket.off('setUnreadMessagesNb');
     }
-    return () => {if (socket !== null) socket.off('setUnreadMessagesNb')};
   }, [socket, setUnreadMessagesNb]);
 
   const loadCurrentDiscussion = async (matchId, youLastConnection, youUserId, youUsername, youAvatar) => {
@@ -411,6 +434,14 @@ export default function ChatComp() {
             </Form>
           </ChatWindow> 
         </Chat>
+      }
+      {discussions === null && chatIsOpen &&
+        <NoDiscussionYet>
+          <NoDiscussionYetMsg>
+            <h1>Wanna talk ?</h1> 
+            👉 First... get a match !
+          </NoDiscussionYetMsg>
+        </NoDiscussionYet>
       }
       <ChatButton onClick={() => toggleChat()}>
       {unreadMessagesNb !== 0 &&
