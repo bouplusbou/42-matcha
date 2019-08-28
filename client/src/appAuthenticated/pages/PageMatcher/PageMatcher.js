@@ -3,7 +3,7 @@ import AppContext from '../../../contexts/AppContext';
 import styled from 'styled-components';
 import Sorting from '../../../components/Sorting';
 import Filtering from '../../../components/Filtering';
-import Results from '../../../components/Results';
+import Results from './Results';
 import IncompleteProfile from '../../../components/IncompleteProfile';
 import axios from 'axios';
 
@@ -151,7 +151,7 @@ export default function PageMatcher() {
       const filters = { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags }
       const res = await axios.post(`/search/matcher?authToken=${authToken}`, filters);
       if (res.data && res.data.usersArr) res.data.usersArr.length === 0 ? setHasNoMore(true) : setUser(res.data.usersArr[0]);
-      socket.emit('createNotification', user.userId);
+      if (socket) socket.emit('createNotification', user.userId);
       setIsLoading(false);
     }
   };
