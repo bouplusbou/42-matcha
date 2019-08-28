@@ -4,7 +4,6 @@ import Logo from '../../components/Logo';
 import NavList from './NavList';
 import LogoutButton from './LogoutButton';
 import Notifications from './Notifications';
-import ChatButton from './ChatButton';
 
 const HeaderWide = styled.section`
     position: relative;
@@ -27,9 +26,6 @@ const LogoutSection = styled.section`
 const NotifSection = styled.section`
     position: relative;
 `;
-const ChatSection = styled.section`
-    position: relative;
-`;
  
 export default function () {
 
@@ -39,9 +35,6 @@ export default function () {
             <NavSection>
                 <NavList />
             </NavSection>
-            <ChatSection>
-                <ChatButton />
-            </ChatSection>
             <NotifSection>
                 <Notifications />
             </NotifSection>

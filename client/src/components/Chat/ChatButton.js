@@ -3,26 +3,15 @@ import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faComment } from '@fortawesome/free-solid-svg-icons';
 import AppContext from '../../contexts/AppContext';
-import NotificationDot from './NotificationDot';
+import ChatNotificationDot from './ChatNotificationDot';
 
 export default function ChatButton() {
-    const {socket, unreadMessagesNb, setUnreadMessagesNb} = useContext(AppContext);
-
-    useEffect(() => {
-        if (socket !== null) {
-            socket.on('setUnreadMessagesNb', async nb => {
-                setUnreadMessagesNb(nb);
-            });
-        }
-        return () => {
-            if (socket !== null) socket.off('setUnreadMessagesNb');
-        }
-    }, [socket, setUnreadMessagesNb]);
+    const { unreadMessagesNb } = useContext(AppContext);
 
     return (
         <Link to="/chat" style={{textDecoration: 'none'}}>
             {unreadMessagesNb !== 0 &&
-                <NotificationDot 
+                <ChatNotificationDot 
                     nb={unreadMessagesNb}
                 />
             }

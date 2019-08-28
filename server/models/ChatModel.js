@@ -10,10 +10,11 @@ async function getDiscussions(uuid) {
       WITH me, youUsername, youPhotos, youAvatarIndex, youUserId, matchId, l.year AS year, l.month AS month, l.day AS day, l.hour AS hour, l.minute AS minute
       OPTIONAL MATCH (msg:Message)
       WHERE msg.matchId = matchId AND msg.status = 'unread' AND msg.to = me.userId
+      WITH me, youUsername, youPhotos, youAvatarIndex, youUserId, matchId, year, month, day, hour, minute, COUNT(msg) AS unreadNb
       OPTIONAL MATCH (msg2:Message)
       WHERE msg2.matchId = matchId 
-      RETURN youUsername, youPhotos, youAvatarIndex, youUserId, matchId, COUNT(msg) AS unreadNb, duration.inDays(date(max(msg2.dateTime)), DateTime({timezone: 'Europe/Paris'})).days AS days, year+'-'+month+'-'+day+' '+hour+':'+minute AS youLastConnection
-    `, { uuid: uuid });
+      RETURN youUsername, youPhotos, youAvatarIndex, youUserId, matchId, unreadNb, duration.inDays(date(max(msg2.dateTime)), DateTime({timezone: 'Europe/Paris'})).days AS days, year+'-'+month+'-'+day+' '+hour+':'+minute AS youLastConnection
+      `, { uuid: uuid });
     session.close();
     if (res.records[0] === undefined) return null;
     const discussions = res.records.map(record => {

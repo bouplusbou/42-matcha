@@ -26,7 +26,6 @@ io.use(async (client, next) => {
 });
 
 io.on('connection', async client => { 
-  // console.log(`client.join(${client.userId}-room)`);
   client.join(`${client.userId}-room`);
 
   const matchIds = await ChatModel.getMatchIdsByUserId(client.userId);
@@ -37,7 +36,7 @@ io.on('connection', async client => {
   }
   const userIds = Object.keys(io.sockets.sockets).map(elem => io.sockets.sockets[elem].userId);
 
-  client.broadcast.emit('isConnected', userIds);
+  io.emit('isConnected', userIds);
 
 	client.on('disconnect', () => {
     UserModel.setlastConnection(client.userId);

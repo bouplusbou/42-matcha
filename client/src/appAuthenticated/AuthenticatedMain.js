@@ -4,7 +4,6 @@ import PageSearch from './pages/PageSearch/PageSearch';
 import PageMatcher from './pages/PageMatcher/PageMatcher';
 import PageNotifications from './pages/PageNotifications/PageNotifications';
 import Profile from './pages/PageProfile/PageProfile';
-import PageChat from './pages/PageChat/PageChat';
 import ProfileEdit from './pages/PageProfileEdit/PageProfileEdit';
 import Page404Auth from './pages/Page404Auth/Page404Auth';
 
@@ -13,7 +12,6 @@ const AuthenticatedApp = () => (
     <Switch>
       <Route exact path='/search' component={PageSearch}/>
       <Route exact path='/notifications' component={PageNotifications}/>
-      <Route exact path='/chat' component={PageChat}/>
       <Route exact path='/matcher' component={PageMatcher}/>
       <Route exact path='/profile' component={Profile}/>
       <Route exact path='/profile/edit' component={ProfileEdit}/>
