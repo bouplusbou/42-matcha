@@ -7,7 +7,6 @@ import UsernameRow from './UsernameRow';
 import TagChip from '../../../../../components/TagChip';
 import axios from 'axios';
 
-const authToken = localStorage.getItem('token');
 
 const StyledSection = styled.section `
     display:flex;
@@ -47,10 +46,12 @@ const Infos = styled.div `
 `;
 
 export default function InfosSection() {
+const authToken = localStorage.getItem('token');
+
 
     const profile = useContext(ProfileContext);
     const infosList = [
-        { info: `${profile.age} years old`, icon: faCalendarAlt },
+        { info: profile.age !== null ? `${profile.age} years old` : "", icon: faCalendarAlt },
         { info: profile.city, icon: faMapMarkedAlt },
         { info: profile.lookingFor, icon: faSearch }
     ]
@@ -109,7 +110,7 @@ export default function InfosSection() {
                 )}
             </Infos>
             <Biography>
-                <span>"{profile.bio}"</span>
+                {profile.bio && <span>"{profile.bio}"</span>}
             </Biography>
             <Tags>
                 {profile.tags.map((tag, index)=> <TagChip tag={tag} key={index}/>)}

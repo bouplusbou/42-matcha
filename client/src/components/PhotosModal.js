@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import { Image } from 'cloudinary-react';
@@ -6,7 +6,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight, faArrowLeft, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import ProfileContext from '../contexts/ProfileContext';
 
-const authToken = localStorage.getItem('token');
 
 const ModalContainer = styled.div `
     display:flex;
@@ -61,21 +60,13 @@ const ThumbnailContainer = styled.div `
 
 
 export default function PhotosModal(props) {
+const authToken = localStorage.getItem('token');
     
     const profile = useContext(ProfileContext);
     const [currentIndexState, setCurrentIndexState] = useState(profile.avatarIndex);
-    const [photosState, setPhotosState] = useState([...profile.photos]);
-    const maxIndex = photosState.length - 1;
+    const [photosState] = useState([...profile.photos]);
+    let maxIndex = photosState.length - 1;
 
-    const handleKeyDown = (event) => {
-        if (event.key === "ArrowRight")
-            handlePrevious();
-        if (event.key === "ArrowRight")
-            handleNext();
-    }
-    useEffect(() => {
-        document.addEventListener("keydown", handleKeyDown, false);
-    })
 
     const Thumbnail = styled(Image) `
         object-fit:cover;
@@ -97,16 +88,12 @@ export default function PhotosModal(props) {
             filteredPhotos.splice(currentIndexState, 1);
             const editedValues = {
                 avatarIndex: profile.avatarIndex === currentIndexState ?
-                    0 :
-                    (profile.avatarIndex > currentIndexState ? profile.avatarIndex -1 : profile.avatarIndex),
+                0 :
+                (profile.avatarIndex > currentIndexState ? profile.avatarIndex -1 : profile.avatarIndex),
                 photos: filteredPhotos,
             }
             await axios.post(`/users/updateProfile?authToken=${authToken}`, editedValues)
-            profile.fetchData();
-            if (filteredPhotos.length === 0) {
-                props.handleClose();
-            }
-            setPhotosState([...filteredPhotos]);
+            profile.setRefresh(p => (!p));
         }
     }
 
@@ -115,7 +102,7 @@ export default function PhotosModal(props) {
         if (confirm) {
             const editedValues = { avatarIndex: currentIndexState }
             await axios.post(`/users/updateProfile?authToken=${authToken}`, editedValues)
-            profile.fetchData();
+            profile.setRefresh(p => (!p))
         }
     }
     const handlePrevious = () => {

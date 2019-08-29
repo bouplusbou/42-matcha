@@ -5,6 +5,7 @@ import Sorting from '../../../components/Sorting';
 import Filtering from '../../../components/Filtering';
 import Results from './Results';
 import IncompleteProfile from '../../../components/IncompleteProfile';
+import Spinner from '../../../components/Spinner';
 import axios from 'axios';
 
 const SearchSection = styled.section`
@@ -54,7 +55,7 @@ export default function PageMatcher() {
   const [rangeAge, setRangeAge] = useState([0, 100]);
   const [filterScore, setFilterScore] = useState([0, 100000]);
   const [rangeScore, setRangeScore] = useState([0, 100000]);
-  const [hasFullProfile, setHasFullProfile] = useState(true);
+  const [hasFullProfile, setHasFullProfile] = useState(false);
   const [missingProfileFields, setMissingProfileFields] = useState(false);
   const [allTags, setAllTags] = useState(null);
   const [user, setUser] = useState(['init user']);
@@ -77,6 +78,8 @@ export default function PageMatcher() {
             setHasFullProfile(false);
             setIsLoading(false);
           }
+        } else {
+          setHasFullProfile(true);
         }
       }
     }
@@ -86,16 +89,18 @@ export default function PageMatcher() {
 
   useEffect(() => {
     let isSubscribed = true;
-    async function fetchData() {
-      const res = await axios.get(`/search/ownCityLatLng?authToken=${authToken}`);
-      if (isSubscribed && res.data && res.data.cityLatLng) {
-        setFilterCity(res.data.cityLatLng.city);
-        setFilterLatLng(res.data.cityLatLng.latLng);
+    if (hasFullProfile) {
+      async function fetchData() {
+        const res = await axios.get(`/search/ownCityLatLng?authToken=${authToken}`);
+        if (isSubscribed && res.data && res.data.cityLatLng) {
+          setFilterCity(res.data.cityLatLng.city);
+          setFilterLatLng(res.data.cityLatLng.latLng);
+        }
       }
+      if (authToken) fetchData();
     }
-    if (authToken) fetchData();
     return () => isSubscribed = false;
-  }, [authToken]);
+  }, [authToken, hasFullProfile]);
 
   useEffect(() => {
     let isSubscribed = true;
@@ -125,19 +130,21 @@ export default function PageMatcher() {
 
   useEffect(() => {
     let isSubscribed = true;
-    setIsLoading(true);
-    setHasNoMore(false);
-    async function fetchData() {
-      const filters = { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags }
-      const res = await axios.post(`/search/matcher?authToken=${authToken}`, filters);
-      if (isSubscribed && res.data && res.data.usersArr) {
-        res.data.usersArr.length === 0 ? setHasNoMore(true) : setUser(res.data.usersArr[0]);
-        setIsLoading(false);
+    if (hasFullProfile) {
+      setIsLoading(true);
+      setHasNoMore(false);
+      async function fetchData() {
+        const filters = { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags }
+        const res = await axios.post(`/search/matcher?authToken=${authToken}`, filters);
+        if (isSubscribed && res.data && res.data.usersArr) {
+          res.data.usersArr.length === 0 ? setHasNoMore(true) : setUser(res.data.usersArr[0]);
+          setIsLoading(false);
+        }
       }
+      if (authToken) fetchData();
     }
-    if (authToken) fetchData();
     return () => isSubscribed = false;
-  }, [authToken, sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags]);
+  }, [authToken, hasFullProfile, sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags]);
 
   const handleLikeDislike = async type => {
     if (authToken) {
@@ -205,20 +212,23 @@ export default function PageMatcher() {
           handleSelectSorting={handleSelectSorting}
         />
       </SortingSection>
-      <ResultsSection>
-        {!isLoading && !hasFullProfile &&
-          <IncompleteProfile 
-            missingProfileFields={missingProfileFields}
-          />
-        }
-        {!isLoading && hasFullProfile &&
-          <Results 
-            handleLikeDislike={handleLikeDislike}
-            user={user}
-            hasNoMore={hasNoMore}
-          />
-        }
-      </ResultsSection>
+      {isLoading && <Spinner />}
+      {!isLoading &&
+        <ResultsSection>
+          {!hasFullProfile &&
+            <IncompleteProfile 
+              missingProfileFields={missingProfileFields}
+            />
+          }
+          {hasFullProfile &&
+            <Results 
+              handleLikeDislike={handleLikeDislike}
+              user={user}
+              hasNoMore={hasNoMore}
+            />
+          }
+        </ResultsSection>
+      }
     </SearchSection>
   );
 }

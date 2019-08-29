@@ -6,7 +6,6 @@ import LikeButton from '../../../../components/LikeButton';
 import { ProfileProvider } from '../../../../contexts/ProfileContext';
 import Axios from 'axios';
 
-const authToken = localStorage.getItem(`token`);
 
 const StyledDiv = styled.div `
     display:flex;
@@ -50,8 +49,10 @@ const Age = styled.span `
 `
 
 export default function UserListItem(props) {
+    const authToken = localStorage.getItem(`token`);
     
     const [profileState, setProfileState] = useState({});
+    const [refresh, setRefresh] = useState(false);
 
     useEffect(() => {
         async function fetchProfile(edit) {
@@ -61,18 +62,18 @@ export default function UserListItem(props) {
                 ...profile.data.profile,
             })
         }
-        fetchProfile();
-    }, [props.username])
+        if (authToken) fetchProfile();
+    }, [authToken, props.username, refresh])
 
     return (
-        <ProfileProvider value={{...profileState}}>
+        <ProfileProvider value={{...profileState, setRefresh}}>
             <StyledDiv>
                 <ProfilePhoto cloudName='matchacn' publicId={props.photos[props.avatarIndex]}/>
                 <InfosContainer to={`/profile/${props.username}`}>
                     <Username color={props.color}>{props.username}</Username>
                     <Age>{props.age}, {props.city}</Age>
                 </InfosContainer>
-                <LikeButton size={"2rem"} small/>
+                <LikeButton size={"2rem"} small listItem/>
             </StyledDiv>
         </ProfileProvider>
     )

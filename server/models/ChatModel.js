@@ -25,7 +25,7 @@ async function getDiscussions(uuid) {
       const youAvatarIndex = record.get('youAvatarIndex');
       const matchId = record.get('matchId');
       const unreadNb = record.get('unreadNb').low;
-      const days = record.get('days').low;
+      const days = record.get('days') === null ? 0 : record.get('days').low;
       let duration = '';
       if (days === 0) duration = 'today';
       if (days === 1) duration = 'yesterday';

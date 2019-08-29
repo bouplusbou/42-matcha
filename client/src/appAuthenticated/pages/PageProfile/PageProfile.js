@@ -11,7 +11,6 @@ import ProfileCard from './ProfileCard/ProfileCard';
 import UserList from './UserList/UserList';
 import { Redirect } from 'react-router-dom';
 
-const authToken = localStorage.getItem('token');
 
 const GridContainer = styled.div `
     display:grid;
@@ -28,28 +27,31 @@ const GridContainer = styled.div `
 `
 
 export default function PageProfile(props) {
+    const authToken = localStorage.getItem('token');
+
     const { socket } = useContext(AppContext);
-    const [profileState, setProfileState] = useState({});
+    const [profileState, setProfileState] = useState({uplopadPicture: uploadPicture});
     const [redirectState, setRedirectState] = useState(false);
+    const [isLoadingState, setIsLoading] = useState(true);
+    const [refresh, setRefresh] = useState(false);
     
     useEffect(() => {
         let isSubscribed = true;
         async function fetchProfile() {
+            setIsLoading(true);
             const username = props.match.params.username ? `/${props.match.params.username}` : "";
             const profile = await axios.get(`/users${username}?authToken=${authToken}`)
             if (profile.data.profile.inSearch === false || profile.data.profile.blockedBy) {
                 setRedirectState(true)
             } 
             if (isSubscribed) {
-                setProfileState({
-                    uploadPicture: uploadPicture,
-                    ...profile.data.profile,
-                })
+                setProfileState(prev => ({...prev, ...profile.data.profile}))
             }
+            setIsLoading(false);
         }
-        fetchProfile();
+        if (authToken) fetchProfile();
         return () => isSubscribed = false;
-    }, [props.match.params.username])
+    }, [authToken, props.match.params.username, refresh])
     
     useEffect(() => {
         async function createRelNotif() {
@@ -66,30 +68,28 @@ export default function PageProfile(props) {
                 socket.emit('createNotification', profileState.userId);
             }
         }
-        createRelNotif();
-    }, [socket, profileState.userId])
+        if (authToken) createRelNotif();
+    }, [authToken, socket, profileState.userId, profileState.account])
 
-
-    function uploadPicture(event) {
+    async function uploadPicture(event) {
         event.preventDefault();
         const file = event.target.files[0];
-        if (file.size < 1000000) {
+        if (file.size && file.size < 1000000) {
             const reader = new FileReader();
             reader.readAsDataURL(file);
-            reader.onload = () => {
+            reader.onload = async () => {
                 const image  = reader.result;
-                axios.post(`/users/uploadPic?authToken=${authToken}`, { image })
+                await axios.post(`/users/uploadPic?authToken=${authToken}`, { image })
+                setRefresh(p => (!p));
             }
-        } else {
-            console.log(`Picture is too big`);
         }
     }
 
     return (
-        <ProfileProvider value={{...profileState}}>
+        <ProfileProvider value={{...profileState, uploadPicture: uploadPicture, setRefresh}}>
             <Container>
                 <GridContainer>
-                    {profileState.username && <ProfileCard/>}
+                    <ProfileCard isLoading={isLoadingState}/>
                     {profileState.account &&
                         <Fragment>
                             {profileState.likedHistoric &&

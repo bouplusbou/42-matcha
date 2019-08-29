@@ -1,10 +1,11 @@
-import React, { useContext, Fragment } from 'react';
+import React, { useContext, Fragment, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMars, faVenus, faTransgender, faCog, faPlus, faCircle, faDotCircle } from '@fortawesome/free-solid-svg-icons';
 import Tooltip from '@material-ui/core/Tooltip';
 import ProfileContext from '../../../../../contexts/ProfileContext';
+import AppContext from '../../../../../contexts/AppContext';
 import LikeButton from '../../../../../components/LikeButton';
 
 const StyledRow = styled.div `
@@ -48,22 +49,7 @@ const EditButton = styled(FontAwesomeIcon) `
     color:${props => props.theme.color.purple};
 `
 
-const ConnectedIcon = (props) => {
-    const StyledIcon = styled(FontAwesomeIcon) `
-        color: ${props => props.connected ? "#1af033" : "#9c9c9c"};
-        margin-right:0.75rem;
-    `
-    
-    return (
-        <Tooltip title={props.connected ? "Online" : "ma bite"}>
-            <StyledIcon
-            connected={props.connected}
-            icon={props.connected ? faCircle : faDotCircle}
-            size={props.size}
-            />
-        </Tooltip>
-    )
-}
+
 
 const GenderIcon = (props) => {
     const icons = {
@@ -82,8 +68,31 @@ const GenderIcon = (props) => {
 
 
 export default function UsernameRow(props) {
-    const profile = useContext(ProfileContext)
+    const profile = useContext(ProfileContext);
+    const { connectedUsers } = useContext(AppContext);
+    const [connected, setConnected] = useState();
+
+    useEffect(() => {
+        setConnected(connectedUsers.includes(profile.userId).toString());
+    }, [connectedUsers, profile.userId])
+
+    const ConnectedIcon = (props) => {
+        const StyledIcon = styled(FontAwesomeIcon) `
+            color: ${props => props.connected === 'true' ? "#1af033" : "#9c9c9c"};
+            margin-right:0.75rem;
+        `
         
+        return (
+            <Tooltip title={props.connected === 'true' ? "Online" : props.lastConnection.toString()}>
+                <StyledIcon
+                    connected={props.connected}
+                    icon={props.connected === 'true' ? faCircle : faDotCircle}
+                    size={props.size}
+                />
+            </Tooltip>
+        )
+    }
+
     const PhotoUploadButton = () => {
         return(
             <Fragment>
@@ -106,12 +115,12 @@ export default function UsernameRow(props) {
             <NamesContainer>
                 <UsernameContainer>
                     <ConnectedIcon 
-                        connected={profile.connected} 
+                        connected={connected} 
                         lastConnection={profile.lastConnection}
                         size={"xs"}
                         />
                     <Username>{profile.username}</Username>
-                    <GenderIcon gender={profile.gender} size={"3x"}/>
+                    {profile.gender && <GenderIcon gender={profile.gender} size={"3x"}/>}
                 </UsernameContainer>
                 <StyledNames>{profile.firstName} {profile.lastName}</StyledNames>
             </NamesContainer>

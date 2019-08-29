@@ -22,7 +22,7 @@ const Chat = styled.section`
     overflow: hidden;
     box-shadow: 0 15px 25px -10px rgba(0,0,0,.25);
 `;
-const ChatButton = styled.section`
+const ChatButton = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
@@ -35,11 +35,12 @@ const ChatButton = styled.section`
     z-index: 999999;
     border-radius: 100%;
     cursor: pointer;
+    box-shadow: 0 15px 25px -10px rgba(0,0,0,.25);
 `;
 const ChatInfo = styled.section`
   background-color: ${props => props.theme.color.purple};
   height: 100px;
-  display: flex;
+  display: flex; 
   align-items: center;
   padding: 0 10px;
   position: relative;
@@ -411,7 +412,7 @@ export default function ChatComp() {
           }
           <ChatWindow>
             <MessagesSection ref={refDiv}>
-            {currentDiscussionMessages && currentDiscussionMessages.map((msg, index) => {
+            {currentDiscussionMessages && currentDiscussionMessages !== 'no msg yet' && currentDiscussionMessages.map((msg, index) => {
               return msg.type === 'received' ?
               <ReceivedMessageBlock key={index}>
                 <Avatar cloudName='matchacn' publicId={currentDiscussionInfo.youAvatar}></Avatar>
