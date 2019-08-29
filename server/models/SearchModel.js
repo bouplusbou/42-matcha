@@ -7,7 +7,7 @@ const searchUsers = async (uuid, { sortingChoice, filterAge, filterScore, filter
     'Closest': 'ORDER BY dist_city',
     'Farthest': 'ORDER BY dist_city DESC',
     'Youngest': 'ORDER BY age',
-    'Oldest': 'ORDER BY age',
+    'Oldest': 'ORDER BY age DESC',
     'Most famous': 'ORDER BY score DESC',
     'Least famous': 'ORDER BY score',
   };
