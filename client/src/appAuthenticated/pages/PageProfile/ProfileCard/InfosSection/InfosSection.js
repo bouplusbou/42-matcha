@@ -51,7 +51,7 @@ const authToken = localStorage.getItem('token');
 
     const profile = useContext(ProfileContext);
     const infosList = [
-        { info: `${profile.age} years old`, icon: faCalendarAlt },
+        { info: profile.age !== null ? `${profile.age} years old` : "", icon: faCalendarAlt },
         { info: profile.city, icon: faMapMarkedAlt },
         { info: profile.lookingFor, icon: faSearch }
     ]
@@ -110,7 +110,7 @@ const authToken = localStorage.getItem('token');
                 )}
             </Infos>
             <Biography>
-                <span>"{profile.bio}"</span>
+                {profile.bio && <span>"{profile.bio}"</span>}
             </Biography>
             <Tags>
                 {profile.tags.map((tag, index)=> <TagChip tag={tag} key={index}/>)}

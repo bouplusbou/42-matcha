@@ -26,7 +26,10 @@ const createUser = async (email, firstName, lastName, username, password, city, 
         fame: $fame,
         city: $city,
         latLng: $latLng,
-        photos: $photos
+        photos: $photos,
+        avatarIndex: 0,
+        bio: "",
+        score: 0.0
         })
     `, {
       uuid: uuid,
@@ -86,7 +89,7 @@ const updateProfile = async (uuid, editedValues) => {
     if (editedValues.newPassword)
       editedValues.password = await bcrypt.hash(editedValues.newPassword, 10);
     if (editedValues.photos && editedValues.photos.length === 0)
-      editedValues.photos = ["https://www.cloudraxak.com/wp-content/uploads/2017/03/profile-pic-placeholder.png"];
+      editedValues.photos = ["https://res.cloudinary.com/matchacn/image/upload/v1566436361/profilePlaceholder.png"];
     let cypher = "MATCH (u:User {uuid: $uuid})\n";
     for (var key in editedValues) { cypher += `SET u.${key} = $${key}\n` }
     await session.run(cypher, {
@@ -124,8 +127,10 @@ const getProfileByUuid = async uuid => {
     const res = await session.run(`
     MATCH (u:User {uuid: $uuid})
     OPTIONAL MATCH (u)-[:TAGGED]->(t:Tag)
+    WITH u, t, u.lastConnection.year AS year, u.lastConnection.month AS month, u.lastConnection.day AS day, u.lastConnection.hour AS hour, u.lastConnection.minute AS minute
     RETURN
     u,
+    year+'-'+month+'-'+day+' '+hour+':'+minute AS lastConnection,
     duration.between(date(u.birthDate),date()).years AS age,
     collect(t.tag) AS tags
     `, {uuid: uuid});
@@ -134,10 +139,11 @@ const getProfileByUuid = async uuid => {
     delete user['password'];
     delete user['hash'];
     delete user[`uuid`];
-    const age = res.records[0].get(`age`).low;
+    const age = res.records[0].get(`age`) ? res.records[0].get(`age`).low : null;
     const tags = res.records[0].get(`tags`);
+    const lastConnection = res.records[0].get(`lastConnection`);
     return {
-      ...user, age, tags
+      ...user, age, tags, lastConnection
     }
   } catch(error) { Log.error(error, "getProfile", __filename) }
 }

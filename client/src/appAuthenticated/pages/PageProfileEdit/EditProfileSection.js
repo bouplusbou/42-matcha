@@ -188,7 +188,7 @@ const authToken = localStorage.getItem('token');
             setErrorState({ ...newErrorState });
         }
         if (name === "bio") {
-            if (valueState.bio.length < 300 && value.length < 300) {
+            if (valueState.bio.length < 300 && value.length < 300 && value.search('\n') === -1) {
                 setValueState({ ...valueState, bio: value })
                 setEditedValueState({ ...editedValuesState, bio: value })
             } else {
