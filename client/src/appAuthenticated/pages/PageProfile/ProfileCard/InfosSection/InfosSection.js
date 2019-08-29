@@ -7,7 +7,6 @@ import UsernameRow from './UsernameRow';
 import TagChip from '../../../../../components/TagChip';
 import axios from 'axios';
 
-const authToken = localStorage.getItem('token');
 
 const StyledSection = styled.section `
     display:flex;
@@ -47,6 +46,8 @@ const Infos = styled.div `
 `;
 
 export default function InfosSection() {
+const authToken = localStorage.getItem('token');
+
 
     const profile = useContext(ProfileContext);
     const infosList = [

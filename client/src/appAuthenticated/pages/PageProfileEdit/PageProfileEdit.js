@@ -8,7 +8,6 @@ import EditProfileSection from './EditProfileSection'
 import EditAccountSection from './EditAccountSection'
 import BlockedList from "./BlockedList";
 
-const authToken = localStorage.getItem('token');
 
 const EditCard = styled.div`
         display:flex;
@@ -22,6 +21,7 @@ const EditCard = styled.div`
 `
 
 export default function PageProfileEdit() {
+    const authToken = localStorage.getItem('token');
 
     const [profileState, setProfileState] = useState({});
     const [editState, setEditState] = useState({ tab: "profile" });
@@ -37,10 +37,9 @@ export default function PageProfileEdit() {
             const profile = await axios.get(`/users?authToken=${authToken}`)
             if (isSubscribed) setProfileState({ ...profile.data.profile });
         }
-        fetchProfile();
+        if (authToken) fetchProfile();
         return () => isSubscribed = false;
-    }, [])
-    
+    }, [authToken])
 
     const switchTab = event => {
         const selectedTab = event.target.id;

@@ -7,7 +7,6 @@ import ProfileContext from '../../../contexts/ProfileContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Image } from 'cloudinary-react';
 
-const authToken = localStorage.getItem('token');
 
 const StyledSection = styled.section `
     padding:1rem;
@@ -73,6 +72,8 @@ const StyledButton = styled(FontAwesomeIcon) `
 
 
 export default function BlockedList() {
+const authToken = localStorage.getItem('token');
+
     const profile = useContext(ProfileContext);
     
     

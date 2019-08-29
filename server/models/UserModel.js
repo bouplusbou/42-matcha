@@ -502,6 +502,22 @@ async function setlastConnection(userId) {
   } catch(err) { console.log(err) }
 }
 
+async function addPicture(uuid, publicId) {
+  try {
+    const res = await session.run(`
+    MATCH (u:User {uuid: $uuid})
+    RETURN u.photos
+    `, {uuid: uuid})
+    const photos = res.records[0].get(0)
+    photos.push(publicId.toString());
+    console.log(photos);
+    await session.run(`
+      MATCH (u:User {uuid: $uuid})
+      SET u.photos = $photos
+    `, { uuid, publicId, photos })
+  } catch(err) { console.log(err) }
+}
+
 module.exports = {
   getUserByUsername,
   createRelationship,
@@ -531,5 +547,6 @@ module.exports = {
   getUuidByUserId,
   setlastConnection,
   createMatch,
-  deleteMatch
+  deleteMatch,
+  addPicture
 }

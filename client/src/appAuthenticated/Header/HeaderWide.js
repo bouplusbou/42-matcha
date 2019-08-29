@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import Logo from '../../components/Logo';
+import Logo from './Logo';
 import NavList from './NavList';
 import LogoutButton from './LogoutButton';
 import Notifications from './Notifications';

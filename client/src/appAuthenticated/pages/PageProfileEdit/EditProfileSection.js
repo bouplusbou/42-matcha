@@ -10,7 +10,6 @@ import CreatableSelect from 'react-select/creatable';
 import axios from 'axios';
 import AlgoliaPlaces from 'algolia-places-react';
 import { Redirect } from 'react-router-dom';
-const authToken = localStorage.getItem('token');
 
 const StyledSection = styled.section `
     display:flex;
@@ -145,6 +144,8 @@ const StyledCreatableSelect = styled(CreatableSelect) `
 `
 
 export default function InfosSection(props) {
+const authToken = localStorage.getItem('token');
+
     
     const profile = useContext(ProfileContext);
     const [valueState, setValueState] = useState({
@@ -166,9 +167,9 @@ export default function InfosSection(props) {
             const filteredTags = valueState.tags && tags.data.tags.filter(tag => !valueState.tags.includes(tag.label));
             if (filteredTags && isSubscribed) setTagsList([...filteredTags]);
         }
-        fetchTagData();
+        if (authToken) fetchTagData();
         return () => isSubscribed = false;
-    }, [valueState.tags]);
+    }, [authToken, valueState.tags]);
     
     async function fetchTagsList() {
         const tags = await axios.get(`/tags?authToken=${authToken}`);

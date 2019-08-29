@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, Fragment } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart } from '@fortawesome/free-solid-svg-icons';
@@ -6,12 +6,7 @@ import ProfileContext from '../contexts/ProfileContext';
 import AppContext from '../contexts/AppContext';
 import axios from 'axios';
 
-const authToken = localStorage.getItem(`token`)
-
-const LikeButton = (props) => {
-    const { socket } = useContext(AppContext);
-    const profile = useContext(ProfileContext);
-    const StyledButton = styled.button `
+const StyledButton = styled.button `
         height:${props => props.small ? "3.25rem" : "4.5rem"};
         width:${props => props.small ? "3.25rem" : "4.5rem"};
         padding:0;
@@ -22,7 +17,7 @@ const LikeButton = (props) => {
         }
     `;
 
-    const LikeButton = styled(StyledButton) `
+    const StyledLikeButton = styled(StyledButton) `
         color: ${props => props.theme.color.purple};
         box-shadow: 0px 0px 20px ${props => props.theme.color.purple};
         :hover {
@@ -51,7 +46,7 @@ const LikeButton = (props) => {
         :hover {
             color: white;
             background-color:${props => props.theme.color.red};
-            border-color:${props => props.theme.color.purple};
+            border-color:${props => props.theme.color.red};
         }
     `;
 
@@ -65,6 +60,17 @@ const LikeButton = (props) => {
             border-color:${props => props.theme.color.purple};
         }
     `
+
+    const StyledStatus = styled.span `
+        color:${props => props.theme.color.textGrey};
+        margin-right:1rem;
+    `
+
+const LikeButton = (props) => {
+    const authToken = localStorage.getItem(`token`)
+
+    const { socket } = useContext(AppContext);
+    const profile = useContext(ProfileContext);
 
     const createNotif = async type => {
         if (profile.userId) {
@@ -94,31 +100,44 @@ const LikeButton = (props) => {
             axios.post(`/users/createRelationship?authToken=${authToken}`, params);
             createNotif('unliked');
         }
+        profile.setRefresh(p => (!p));
     }
 
     if (profile.liked && profile.likedBy)
         return (
-            <CancelMatchButton onClick={handleClick} small={props.small}>
-                <FontAwesomeIcon icon={faHeart} size={props.small ? "lg" : "2x"}/>
-            </CancelMatchButton>
+            <Fragment>
+                {!props.listItem && <StyledStatus>You matched with {profile.username}</StyledStatus>}
+                <CancelMatchButton onClick={handleClick} small={props.small}>
+                    <FontAwesomeIcon icon={faHeart} size={props.small ? "lg" : "2x"}/>
+                </CancelMatchButton>
+            </Fragment>
         )
     if (!profile.liked && !profile.likedBy)
         return (
-            <LikeButton onClick={handleClick} small={props.small}>
-                <FontAwesomeIcon icon={faHeart} size={props.small ? "lg" : "2x"}/>
-            </LikeButton>
+            <Fragment>
+                {!props.listItem && <StyledStatus>Do you like {profile.username} ? </StyledStatus>}
+                <StyledLikeButton onClick={handleClick} small={props.small}>
+                    <FontAwesomeIcon icon={faHeart} size={props.small ? "lg" : "2x"}/>
+                </StyledLikeButton>
+            </Fragment>
         )
     if (profile.liked && !profile.likedBy)
         return (
-            <CancelLikeButton onClick={handleClick} small={props.small}>
-                <FontAwesomeIcon icon={faHeart} size={props.small ? "lg" : "2x"}/>
-            </CancelLikeButton>
+            <Fragment>
+                {!props.listItem && <StyledStatus>You like {profile.username}</StyledStatus>}
+                <CancelLikeButton onClick={handleClick} small={props.small}>
+                    <FontAwesomeIcon icon={faHeart} size={props.small ? "lg" : "2x"}/>
+                </CancelLikeButton>
+            </Fragment>
         )
     if (!profile.liked && profile.likedBy)
         return (
-            <MatchButton onClick={handleClick} small={props.small}>
-                <FontAwesomeIcon icon={faHeart} size={props.small ? "lg" : "2x"}/>
-            </MatchButton>
+            <Fragment>
+                {!props.listItem && <StyledStatus>{profile.username} likes you !</StyledStatus>}
+                <MatchButton onClick={handleClick} small={props.small}>
+                    <FontAwesomeIcon icon={faHeart} size={props.small ? "lg" : "2x"}/>
+                </MatchButton>
+            </Fragment>
         )
 }
 

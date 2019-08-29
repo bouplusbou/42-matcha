@@ -412,7 +412,7 @@ export default function ChatComp() {
           }
           <ChatWindow>
             <MessagesSection ref={refDiv}>
-            {currentDiscussionMessages && currentDiscussionMessages.map((msg, index) => {
+            {currentDiscussionMessages && currentDiscussionMessages !== 'no msg yet' && currentDiscussionMessages.map((msg, index) => {
               return msg.type === 'received' ?
               <ReceivedMessageBlock key={index}>
                 <Avatar cloudName='matchacn' publicId={currentDiscussionInfo.youAvatar}></Avatar>

@@ -179,7 +179,11 @@ const deleteRelationship = async (req, res) => {
 
 const uploadPic = async (req, res) => {
       try {
+            const uuid = await getUuidFromToken(req, res);
+            const publicId = Date.now();
             await cloudinary.uploader.upload(req.body.image, { public_id: Date.now() })
+            await UserModel.addPicture(uuid, publicId);
+            res.status(200).json({ message: `Picture uploaded.` })
       } catch (error) { Log.error(error, `uploadPic`, __filename) }
 }
 

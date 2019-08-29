@@ -19,7 +19,8 @@ const getCurrentDiscussionMessages = async (req, res) => {
       jwt.verify(token, config.jwtSecret, async (err, decoded) => {
             try {
                   const { matchId } = req.body;
-                  const currentDiscussionMessages = await ChatModel.getCurrentDiscussionMessages(decoded.uuid, matchId);
+                  let currentDiscussionMessages = await ChatModel.getCurrentDiscussionMessages(decoded.uuid, matchId);
+                  currentDiscussionMessages = currentDiscussionMessages === null ? 'no msg yet' : currentDiscussionMessages;
                   res.status(200).json({ currentDiscussionMessages });
             } catch(e) {
                   res.status(400).send('Error');

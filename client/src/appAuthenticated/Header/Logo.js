@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { Image } from 'cloudinary-react';
 
 const Logo = styled.section`
     margin-left: 10vw;
@@ -9,7 +10,7 @@ export default function HeaderWide() {
 
     return (
         <Logo>
-            <img src={'./logo_color.svg'} width="35px" height="35px" alt=""/>
+            <Image cloudName='matchacn' publicId="MainLogo" width="35px" height="35px" alt=""/>
         </Logo>
     );
 }
