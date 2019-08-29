@@ -238,12 +238,12 @@ const createUsersByGender = async (gender, count, currentMaxId) => {
 
 const setConstraints = async () => {
   log(`Setting up constraints...`);
-  await session.run(`DROP CONSTRAINT ON (u:User) ASSERT u.seedId IS UNIQUE`);
-  await session.run(`DROP CONSTRAINT ON (u:User) ASSERT u.uuid IS UNIQUE`);
-  await session.run(`DROP CONSTRAINT ON (u:User) ASSERT u.userId IS UNIQUE`);
-  await session.run(`DROP CONSTRAINT ON (u:User) ASSERT u.email IS UNIQUE`);
-  await session.run(`DROP CONSTRAINT ON (u:User) ASSERT u.username IS UNIQUE`);
-  await session.run(`DROP CONSTRAINT ON (u:User) ASSERT u.hash IS UNIQUE`);
+  // await session.run(`DROP CONSTRAINT ON (u:User) ASSERT u.seedId IS UNIQUE`);
+  // await session.run(`DROP CONSTRAINT ON (u:User) ASSERT u.uuid IS UNIQUE`);
+  // await session.run(`DROP CONSTRAINT ON (u:User) ASSERT u.userId IS UNIQUE`);
+  // await session.run(`DROP CONSTRAINT ON (u:User) ASSERT u.email IS UNIQUE`);
+  // await session.run(`DROP CONSTRAINT ON (u:User) ASSERT u.username IS UNIQUE`);
+  // await session.run(`DROP CONSTRAINT ON (u:User) ASSERT u.hash IS UNIQUE`);
   await session.run(`CREATE CONSTRAINT ON (u:User) ASSERT u.seedId IS UNIQUE`);
   await session.run(`CREATE CONSTRAINT ON (u:User) ASSERT u.uuid IS UNIQUE`);
   await session.run(`CREATE CONSTRAINT ON (u:User) ASSERT u.userId IS UNIQUE`);
