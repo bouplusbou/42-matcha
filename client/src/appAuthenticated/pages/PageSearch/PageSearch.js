@@ -5,6 +5,7 @@ import Sorting from '../../../components/Sorting';
 import Filtering from '../../../components/Filtering';
 import MoreButton from '../../../components/MoreButton';
 import IncompleteProfile from '../../../components/IncompleteProfile';
+import Spinner from '../../../components/Spinner';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 
@@ -69,7 +70,7 @@ export default function PageSearch() {
   const [users, setUsers] = useState([]);
   const [offset, setOffset] = useState(0);
   const authToken = localStorage.getItem('token');
-  const [hasFullProfile, setHasFullProfile] = useState(true);
+  const [hasFullProfile, setHasFullProfile] = useState(false);
   const [missingProfileFields, setMissingProfileFields] = useState(false);
 
   useEffect(() => {
@@ -88,6 +89,8 @@ export default function PageSearch() {
           setHasFullProfile(false);
           setIsLoading(false);
         }
+      } else {
+        if (isSubscribed) setHasFullProfile(true);
       }
     }
     if (authToken) fetchData();
@@ -96,16 +99,18 @@ export default function PageSearch() {
 
   useEffect(() => {
     let isSubscribed = true;
-    async function fetchData() {
-      const res = await axios.get(`/search/ownCityLatLng?authToken=${authToken}`);
-      if (isSubscribed) {
-        setFilterCity(res.data.cityLatLng.city);
-        setFilterLatLng(res.data.cityLatLng.latLng);
+    if (hasFullProfile) {
+      async function fetchData() {
+        const res = await axios.get(`/search/ownCityLatLng?authToken=${authToken}`);
+        if (isSubscribed) {
+          setFilterCity(res.data.cityLatLng.city);
+          setFilterLatLng(res.data.cityLatLng.latLng);
+        }
       }
+      if (authToken) fetchData();
     }
-    if (authToken) fetchData();
     return () => isSubscribed = false;
-  }, [authToken]);
+  }, [authToken, hasFullProfile]);
 
   useEffect(() => {
     let isSubscribed = true;
@@ -120,36 +125,36 @@ export default function PageSearch() {
     }
     if (authToken) fetchData();
     return () => isSubscribed = false;
-  }, [authToken]);
+  }, [authToken, hasFullProfile]);
 
   useEffect(() => {
     let isSubscribed = true;
     async function fetchData() {
       const res = await axios.get(`/tags?authToken=${authToken}`);
-      if (res.data && isSubscribed) {
-        setAllTags(res.data.tags);
-      }
+      if (res.data && isSubscribed) setAllTags(res.data.tags);
     }
     if (authToken) fetchData();
     return () => isSubscribed = false;
-  }, [authToken]);
+  }, [authToken, hasFullProfile]);
 
   useEffect(() => {
-    setIsLoading(true);
-    setHasNoMore(false);
     let isSubscribed = true;
-    async function fetchData() {
-      const filters = { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags, offset }
-      const res = await axios.post(`/search?authToken=${authToken}`, filters);
-      if (res.data && res.data.usersArr && isSubscribed) {
-        if (res.data.usersArr.length !== 20) setHasNoMore(true);
-        offset !== 0 ? setUsers( prev => [...prev, ...res.data.usersArr]) : setUsers(res.data.usersArr);
-        setIsLoading(false);
+    if (hasFullProfile) {
+      setIsLoading(true);
+      setHasNoMore(false);
+      async function fetchData() {
+        const filters = { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags, offset }
+        const res = await axios.post(`/search?authToken=${authToken}`, filters);
+        if (res.data && res.data.usersArr && isSubscribed) {
+          if (res.data.usersArr.length !== 20) setHasNoMore(true);
+          offset !== 0 ? setUsers( prev => [...prev, ...res.data.usersArr]) : setUsers(res.data.usersArr);
+          setIsLoading(false);
+        }
       }
+      if (authToken) fetchData();
     }
-    if (authToken) fetchData();
     return () => isSubscribed = false;
-  }, [authToken, sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags, offset]);
+  }, [authToken, hasFullProfile, sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags, offset]);
 
   const handleSelectSorting = e => { setSortingChoice(e.target.innerText); setOffset(0); };
   const handleAgeChange = values => { setFilterAge(values); setOffset(0); };
@@ -206,40 +211,43 @@ export default function PageSearch() {
           handleSelectSorting={handleSelectSorting}
         />
       </SortingSection>
-      <ResultsSection>
-      {!isLoading && !hasFullProfile &&
-          <IncompleteProfile 
-            missingProfileFields={missingProfileFields}
+      {isLoading && <Spinner />}
+      {!isLoading && 
+        <ResultsSection>
+        {!hasFullProfile &&
+            <IncompleteProfile 
+              missingProfileFields={missingProfileFields}
+            />
+        }
+        {hasFullProfile && users.length !== 0 &&
+          <UserCards>
+            {users.map( (user, index) => 
+              <Link 
+                key={index}
+                to={`/profile/${user.username}`}
+                style={{textDecoration: 'none'}}
+              >
+                <UserCard 
+                  user={user}
+                  width={250}
+                  height={375}
+                />
+              </Link>
+            )}
+          </UserCards>
+        }
+        {hasFullProfile && !hasNoMore && 
+          <MoreButton
+            handleClickMoreButton={handleClickMoreButton}
           />
+        }
+        {hasFullProfile && users.length === 0 && 
+          <NoMore>
+            <p>No more suggestion...</p>
+          </NoMore>
+        }
+        </ResultsSection>
       }
-      {hasFullProfile && users.length !== 0 &&
-        <UserCards>
-          {users.map( (user, index) => 
-            <Link 
-              key={index}
-              to={`/profile/${user.username}`}
-              style={{textDecoration: 'none'}}
-            >
-              <UserCard 
-                user={user}
-                width={250}
-                height={375}
-              />
-            </Link>
-          )}
-        </UserCards>
-      }
-      {!isLoading && hasFullProfile && !hasNoMore && 
-        <MoreButton
-          handleClickMoreButton={handleClickMoreButton}
-        />
-      }
-      {!isLoading && hasFullProfile && users.length === 0 && 
-        <NoMore>
-          <p>No more suggestion...</p>
-        </NoMore>
-      }
-      </ResultsSection>
     </SearchSection>
   );
 }

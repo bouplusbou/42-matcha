@@ -67,8 +67,7 @@ export default function PageProfile(props) {
             }
         }
         createRelNotif();
-    }, [socket, profileState.userId])
-
+    }, [socket, profileState.userId, profileState.account])
 
     function uploadPicture(event) {
         event.preventDefault();
