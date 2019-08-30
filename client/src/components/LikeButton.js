@@ -90,14 +90,14 @@ const LikeButton = (props) => {
                 targetUserId: profile.userId,
             }}
             axios.delete(`/users/deleteRelationship?authToken=${authToken}`, params); 
-            createNotif('liked');
+            createNotif('unliked');
         } else {
             const params = {
                 type: "liked",                
                 targetUserId: profile.userId,
             }
             axios.post(`/users/createRelationship?authToken=${authToken}`, params);
-            createNotif('unliked');
+            createNotif('liked');
         }
         profile.setRefresh(p => (!p));
     }
