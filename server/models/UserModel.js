@@ -231,6 +231,10 @@ const getBlockedList = async uuid => {
 
 const createRelationship = async (type, userUuid, targetUserId) => {
   try {
+    // let points = 0;
+    // if (type === 'liked') points = +500.0;
+    // if (type === 'unliked') points = -500.0;
+    // if (type === 'disliked') points = -100.0;
     res = await session.run(`
       MATCH (u:User {uuid: $userUuid}), (t:User {userId: $targetUserId})
       CREATE (u)-[r:${type.toUpperCase()}]->(t)
@@ -238,15 +242,15 @@ const createRelationship = async (type, userUuid, targetUserId) => {
       exists((t)-[:LIKED]->(u)) AS match,
       u.userId AS userId
     `, {
-      userUuid: userUuid,
-      targetUserId: targetUserId,
+      userUuid,
+      targetUserId,
     })
     session.close();
     if (type === "liked" && res.records[0].get('match')) {
       createMatch(res.records[0].get(`userId`), targetUserId)
       return 'matched';
     } else {
-      return 'liked';
+      return type;
     }
   } catch(error) { Log.error(error, "createRelationship", __filename) }
 }
