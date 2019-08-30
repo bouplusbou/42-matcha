@@ -46,8 +46,8 @@ export default function PageProfile(props) {
             } 
             if (isSubscribed) {
                 setProfileState(prev => ({...prev, ...profile.data.profile}))
+                setIsLoading(false);
             }
-            setIsLoading(false);
         }
         if (authToken) fetchProfile();
         return () => isSubscribed = false;

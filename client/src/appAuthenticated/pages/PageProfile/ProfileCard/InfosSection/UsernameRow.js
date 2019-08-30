@@ -73,7 +73,9 @@ export default function UsernameRow(props) {
     const [connected, setConnected] = useState();
 
     useEffect(() => {
-        setConnected(connectedUsers.includes(profile.userId).toString());
+        let isSubscribed = true;
+        if (isSubscribed) setConnected(connectedUsers.includes(profile.userId).toString());
+        return () => isSubscribed = false;
     }, [connectedUsers, profile.userId])
 
     const ConnectedIcon = (props) => {

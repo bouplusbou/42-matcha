@@ -55,14 +55,16 @@ export default function UserListItem(props) {
     const [refresh, setRefresh] = useState(false);
 
     useEffect(() => {
+        let isSubscribed = true;
         async function fetchProfile(edit) {
             const username = `/${props.username}`;
             const profile = await Axios.get(`/users${username}?authToken=${authToken}`)
-            setProfileState({
+            if (isSubscribed) setProfileState({
                 ...profile.data.profile,
             })
         }
         if (authToken) fetchProfile();
+        return () => isSubscribed = false;
     }, [authToken, props.username, refresh])
 
     return (
