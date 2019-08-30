@@ -16,7 +16,6 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import Modal from '@material-ui/core/Modal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import setupSocket from '../../../actions/socketActions';
 
 const Hero = styled.section`
   background-color: ${props => props.theme.color.purple};
@@ -152,7 +151,6 @@ export default function PageLogin(props) {
       if (resMsg.data) {
         appState.setUnreadMessagesNb(resMsg.data.nb);
         appState.toggleConnected();
-        setupSocket(res.data.token, appState.setSocket, appState.setConnectedUsers);
         props.history.push('/search');
       }
     } catch(err) {

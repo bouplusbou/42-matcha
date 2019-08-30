@@ -20,6 +20,7 @@ io.use(async (client, next) => {
   jwt.verify(token, config.jwtSecret, async (err, decoded) => {
     client.uuid = decoded.uuid;
     const userId = await UserModel.userIdFromUuid(decoded.uuid);
+    client.uuid = 'coucou';
     client.userId = userId;
     return next();
   });
@@ -35,8 +36,7 @@ io.on('connection', async client => {
     });
   }
   const userIds = Object.keys(io.sockets.sockets).map(elem => io.sockets.sockets[elem].userId);
-
-  // rajouter une condition pour ne pas trigger aussi quand deco
+  
   io.emit('isConnected', userIds);
 
 	client.on('disconnect', () => {
