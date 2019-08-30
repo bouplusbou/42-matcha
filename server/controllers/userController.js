@@ -163,8 +163,8 @@ const removeTag = async (req, res) => {
 const createRelationship = async (req, res) => {
       try {
             const uuid = await getUuidFromToken(req, res);
-            await UserModel.createRelationship(req.body.type, uuid, req.body.targetUserId);
-            res.status(200).json({ message: `${req.body.type} relationship created.`})
+            const type = await UserModel.createRelationship(req.body.type, uuid, req.body.targetUserId);
+            res.status(200).json({ type })
       } catch (error) { Log.error(error, `createRelationship`, __filename) }
 }
 

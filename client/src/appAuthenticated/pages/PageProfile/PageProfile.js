@@ -65,7 +65,7 @@ export default function PageProfile(props) {
                     type: "visited",
                     targetUserId: profileState.userId,
                 })
-                socket.emit('createNotification', profileState.userId);
+                socket.emit('createNotification', data);
             }
         }
         if (authToken) createRelNotif();

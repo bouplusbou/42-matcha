@@ -79,11 +79,11 @@ const LikeButton = (props) => {
                 targetUserId: profile.userId,
             };
             await axios.post(`/notifications?authToken=${authToken}`, data);
-            socket.emit('createNotification', profile.userId);
+            socket.emit('createNotification', data);
         }
     };
     
-    const handleClick = event => {
+    const handleClick = async event => {
         if (profile.liked) {
             const params = {data: {
                 type: "liked",
@@ -96,8 +96,8 @@ const LikeButton = (props) => {
                 type: "liked",                
                 targetUserId: profile.userId,
             }
-            axios.post(`/users/createRelationship?authToken=${authToken}`, params);
-            createNotif('liked');
+            const res = await axios.post(`/users/createRelationship?authToken=${authToken}`, params);
+            createNotif(res.data.type);
         }
         profile.setRefresh(p => (!p));
     }
