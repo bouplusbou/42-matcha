@@ -79,7 +79,7 @@ export default function PageMatcher() {
             setIsLoading(false);
           }
         } else {
-          setHasFullProfile(true);
+          if (isSubscribed) setHasFullProfile(true);
         }
       }
     }
