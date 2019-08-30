@@ -268,6 +268,7 @@ const deleteRelationship = async (type, userId, targetUserId) => {
 }
 
 const createMatch = async (userId1, userId2) => {
+  console.log(userId1, userId2);
   const res = await session.run(`
   CREATE (m:Match {
       userIds: $userIds,

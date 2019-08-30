@@ -20,7 +20,6 @@ io.use(async (client, next) => {
   jwt.verify(token, config.jwtSecret, async (err, decoded) => {
     client.uuid = decoded.uuid;
     const userId = await UserModel.userIdFromUuid(decoded.uuid);
-    client.uuid = 'coucou';
     client.userId = userId;
     return next();
   });
@@ -55,6 +54,8 @@ io.on('connection', async client => {
 
   client.on('createNotification', async targetUserId => {
     client.to(`${targetUserId}-room`).emit('receiveNotification');
+    io.to(`${targetUserId}-room`).emit('reloadDiscussions');
+    io.to(`${client.userId}-room`).emit('reloadDiscussions');
   });
 
   client.on('setCurrentDiscussionMatchId', async matchId => {

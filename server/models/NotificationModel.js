@@ -43,7 +43,6 @@ async function getNotifications(uuid) {
 }
 
 async function createNotification(uuid, type, targetUserId) { 
-  console.log(uuid, type, targetUserId);
   try {
     await session.run(`
       MATCH (u:User {uuid: $uuid})
