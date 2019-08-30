@@ -251,7 +251,6 @@ const seedLikedRel = async () => {
             const userId = res.records[0].get(`userId`);
             await createNotification("liked", targetUserId, userId);
             if (await hasMatched(userId, targetUserId)) {
-                console.log("MATCH DE SES MORTS")
                 await session.run(`CREATE CONSTRAINT ON (m:Match) ASSERT m.machId IS UNIQUE`);
                 await session.run(`
                     CREATE (m:Match {

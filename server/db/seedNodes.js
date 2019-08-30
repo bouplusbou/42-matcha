@@ -195,8 +195,8 @@ const createUserNode = async (gender, seedId) => {
   user.uuid = uuidv1();
   user.userId = uuidv1();
   user.lastName = faker.name.lastName();
-  user.email = `${user.firstName}.${user.lastName}@`+ emailProvider[Math.floor(Math.random() * emailProvider.length)];
-  user.username = `${user.firstName}${user.lastName.slice(0,1)}`;
+  user.username = `${user.firstName}${user.lastName.slice(0,1)}${seedId}`;
+  user.email = `${user.username}@gmail.com`;
   user.confirmed = true;
   user.hash = crypto.randomBytes(20).toString('hex');
   user.birthDate = getRandomDate('birthDate');
@@ -238,18 +238,12 @@ const createUsersByGender = async (gender, count, currentMaxId) => {
 
 const setConstraints = async () => {
   log(`Setting up constraints...`);
-  // await session.run(`DROP CONSTRAINT ON (u:User) ASSERT u.seedId IS UNIQUE`);
-  // await session.run(`DROP CONSTRAINT ON (u:User) ASSERT u.uuid IS UNIQUE`);
-  // await session.run(`DROP CONSTRAINT ON (u:User) ASSERT u.userId IS UNIQUE`);
-  // await session.run(`DROP CONSTRAINT ON (u:User) ASSERT u.email IS UNIQUE`);
-  // await session.run(`DROP CONSTRAINT ON (u:User) ASSERT u.username IS UNIQUE`);
-  // await session.run(`DROP CONSTRAINT ON (u:User) ASSERT u.hash IS UNIQUE`);
   await session.run(`CREATE CONSTRAINT ON (u:User) ASSERT u.seedId IS UNIQUE`);
   await session.run(`CREATE CONSTRAINT ON (u:User) ASSERT u.uuid IS UNIQUE`);
   await session.run(`CREATE CONSTRAINT ON (u:User) ASSERT u.userId IS UNIQUE`);
   await session.run(`CREATE CONSTRAINT ON (u:User) ASSERT u.email IS UNIQUE`);
   await session.run(`CREATE CONSTRAINT ON (u:User) ASSERT u.hash IS UNIQUE`);
-  // await session.run(`CREATE CONSTRAINT ON (u:User) ASSERT u.username IS UNIQUE`);
+  await session.run(`CREATE CONSTRAINT ON (u:User) ASSERT u.username IS UNIQUE`);
   log(`Constraint set for : seedId, uuid, email, username, hash.`)
 }
 
