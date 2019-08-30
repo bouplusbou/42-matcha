@@ -14,7 +14,7 @@ export default function Notifications() {
     useEffect(() => {
         if (socket !== null && authToken) {
             socket.on('receiveNotification', async () => {
-                console.log('check your notif !');
+                // console.log('check your notif !');
                 const resNotif = await axios.get(`/notifications/unseenNotificationsNb?authToken=${authToken}`);
                 setUnseenNotificationsNb(resNotif.data.nb);
             });
