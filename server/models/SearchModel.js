@@ -20,6 +20,8 @@ const searchUsers = async (uuid, { sortingChoice, filterAge, filterScore, filter
     MATCH (u)-[:TAGGED]->(t:Tag)
     MATCH (u)-[:TAGGED]->(t2:Tag)
     WHERE NOT (me = u) 
+    AND NOT (me)-[:BLOCKED]->(u)
+    AND NOT (me)<-[:BLOCKED]-(u)
     AND u.gender IN me.lookingFor
     AND me.gender IN u.lookingFor
     AND ( $scoreMin <= u.score <= $scoreMax)
@@ -112,6 +114,8 @@ const suggestedUsers = async (uuid, { sortingChoice, filterAge, filterScore, fil
     WHERE NOT (me = u) 
     AND NOT (me)-[:DISLIKED]->(u)
     AND NOT (me)-[:LIKED]->(u)
+    AND NOT (me)-[:BLOCKED]->(u)
+    AND NOT (me)<-[:BLOCKED]-(u)
     AND u.gender IN me.lookingFor
     AND me.gender IN u.lookingFor
     AND ( $scoreMin <= u.score <= $scoreMax)

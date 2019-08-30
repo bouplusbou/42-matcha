@@ -158,7 +158,7 @@ export default function PageMatcher() {
       const filters = { sortingChoice, filterAge, filterScore, filterLatLng, filterDistance, filterTags }
       const res = await axios.post(`/search/matcher?authToken=${authToken}`, filters);
       if (res.data && res.data.usersArr) res.data.usersArr.length === 0 ? setHasNoMore(true) : setUser(res.data.usersArr[0]);
-      if (socket) socket.emit('createNotification', user.userId);
+      if (socket) socket.emit('createNotification', data);
       setIsLoading(false);
     }
   };

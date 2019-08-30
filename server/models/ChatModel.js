@@ -14,6 +14,7 @@ async function getDiscussions(uuid) {
       OPTIONAL MATCH (msg2:Message)
       WHERE msg2.matchId = matchId 
       RETURN youUsername, youPhotos, youAvatarIndex, youUserId, matchId, unreadNb, duration.inDays(date(max(msg2.dateTime)), DateTime({timezone: 'Europe/Paris'})).days AS days, year+'-'+month+'-'+day+' '+hour+':'+minute AS youLastConnection
+      ORDER BY days ASC
       `, { uuid: uuid });
     session.close();
     if (res.records[0] === undefined) return null;
@@ -120,6 +121,20 @@ async function getMatchIdsByUserId(userId) {
   } catch(err) { console.log(err) }
 }
 
+async function getMatchIdByTwoUserIds(userId1, userId2) { 
+  try {
+    const res = await session.run(`
+      MATCH (m:Match)
+      WHERE $userId1 IN m.userIds AND $userId2 IN m.userIds
+      RETURN m.matchId AS matchId
+    `, { userId1, userId2 });
+    session.close();
+    if (res.records[0] === undefined) return null;
+    const matchId = res.records[0].get('matchId');
+    return matchId;
+  } catch(err) { console.log(err) }
+}
+
 async function setAllAsReadByMatchIdAndUserId(matchId, userId) { 
   try {
     const res = await session.run(`
@@ -138,5 +153,6 @@ module.exports = {
   createMessage,
   getUnreadMessagesNb,
   getMatchIdsByUserId,
+  getMatchIdByTwoUserIds,
   setAllAsReadByMatchIdAndUserId,
 }

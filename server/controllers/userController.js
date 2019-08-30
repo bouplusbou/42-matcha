@@ -163,8 +163,8 @@ const removeTag = async (req, res) => {
 const createRelationship = async (req, res) => {
       try {
             const uuid = await getUuidFromToken(req, res);
-            await UserModel.createRelationship(req.body.type, uuid, req.body.targetUserId);
-            res.status(200).json({ message: `${req.body.type} relationship created.`})
+            const type = await UserModel.createRelationship(req.body.type, uuid, req.body.targetUserId);
+            res.status(200).json({ type })
       } catch (error) { Log.error(error, `createRelationship`, __filename) }
 }
 
@@ -236,14 +236,14 @@ const userIdFromUuid = (req, res) => {
 
 const reportUser = async (req, res) => {
       const uuid = await getUuidFromToken(req, res);
-      const target = await UserModel.getUserByUsername(req.body.targetUsername);
-      await UserModel.createReportTicket(uuid, target.uuid);
+      const { targetUserId } = req.body;
+      await UserModel.createReportTicket(uuid, targetUserId);
 }
 
 const blockUser = async (req, res) => {
       const uuid = await getUuidFromToken(req, res);
-      const target = await UserModel.getUserByUsername(req.body.targetUsername);
-      await UserModel.createRelationship("blocked", uuid, target.uuid);
+      const { targetUserId } = req.body;
+      await UserModel.createRelationship("blocked", uuid, targetUserId);
 }
 
 module.exports = {

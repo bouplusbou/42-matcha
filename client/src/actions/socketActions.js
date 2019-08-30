@@ -11,6 +11,10 @@ export default function setupSocket(token, setSocket, setConnectedUsers) {
         // console.log(`The back sent new connectedUsers: ${userIds}`);
         setConnectedUsers(userIds);
     });
+
+    socket.on('makeItJoinMatchId', matchId => {
+        socket.emit('joinMatchId', matchId);
+    });
     
     socket.on('disconnect', () => {
         // console.log('The server has disconnected!');

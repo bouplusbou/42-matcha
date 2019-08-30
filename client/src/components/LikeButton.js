@@ -79,26 +79,25 @@ const LikeButton = (props) => {
                 targetUserId: profile.userId,
             };
             await axios.post(`/notifications?authToken=${authToken}`, data);
-            socket.emit('createNotification', profile.userId);
+            socket.emit('createNotification', data);
         }
     };
     
-    const handleClick = event => {
+    const handleClick = async event => {
         if (profile.liked) {
             const params = {data: {
                 type: "liked",
                 targetUserId: profile.userId,
             }}
             axios.delete(`/users/deleteRelationship?authToken=${authToken}`, params); 
-            createNotif('liked');
+            createNotif('unliked');
         } else {
-            console.log('unlike');
             const params = {
                 type: "liked",                
                 targetUserId: profile.userId,
             }
-            axios.post(`/users/createRelationship?authToken=${authToken}`, params);
-            createNotif('unliked');
+            const res = await axios.post(`/users/createRelationship?authToken=${authToken}`, params);
+            createNotif(res.data.type);
         }
         profile.setRefresh(p => (!p));
     }

@@ -225,12 +225,16 @@ const getBlockedList = async uuid => {
           ...user,
       })
     }
-    return historic
+    return historic;
   } catch(error) { Log.error(error, "getBlockedList", __filename) }
 }
 
 const createRelationship = async (type, userUuid, targetUserId) => {
   try {
+    // let points = 0;
+    // if (type === 'liked') points = +500.0;
+    // if (type === 'unliked') points = -500.0;
+    // if (type === 'disliked') points = -100.0;
     res = await session.run(`
       MATCH (u:User {uuid: $userUuid}), (t:User {userId: $targetUserId})
       CREATE (u)-[r:${type.toUpperCase()}]->(t)
@@ -238,12 +242,15 @@ const createRelationship = async (type, userUuid, targetUserId) => {
       exists((t)-[:LIKED]->(u)) AS match,
       u.userId AS userId
     `, {
-      userUuid: userUuid,
-      targetUserId: targetUserId,
+      userUuid,
+      targetUserId,
     })
     session.close();
     if (type === "liked" && res.records[0].get('match')) {
       createMatch(res.records[0].get(`userId`), targetUserId)
+      return 'matched';
+    } else {
+      return type;
     }
   } catch(error) { Log.error(error, "createRelationship", __filename) }
 }
@@ -470,17 +477,18 @@ async function uuidFromUsername(username) { // refacto possible avec getUserByUs
   } catch(err) { console.log(err) }
 }
 
-const createReportTicket = async (userUuid, targetUuid) => {
+const createReportTicket = async (userUuid, targetUserId) => {
   try {
     await session.run(`
+      MATCH (u:User {uuid: $userUuid})
       CREATE (r:Report {
-        from: $from,
+        from: u.userId,
         to: $to,
         dateTime: DateTime()
       })
     `, {
-      from: userUuid,
-      to: targetUuid
+      userUuid,
+      to: targetUserId
     })
   } catch(error) { Log.error(error, `createReportTicket`, __filename) }
 }
@@ -516,7 +524,7 @@ async function addPicture(uuid, publicId) {
     `, {uuid: uuid})
     const photos = res.records[0].get(0)
     photos.push(publicId.toString());
-    console.log(photos);
+    // console.log(photos);
     await session.run(`
       MATCH (u:User {uuid: $uuid})
       SET u.photos = $photos

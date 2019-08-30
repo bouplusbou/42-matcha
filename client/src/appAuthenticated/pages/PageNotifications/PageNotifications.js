@@ -97,6 +97,7 @@ export default function PageNotifications() {
           let icon = faEye;
           if (elem.type === 'liked') icon = faHeart;
           if (elem.type === 'blocked') icon = faBan;
+          if (elem.type === 'unliked') icon = faHeartBroken;
           if (elem.type === 'disliked') icon = faHeartBroken;
           if (elem.type === 'matched') icon = faFireAlt;
           return {...elem, icon}

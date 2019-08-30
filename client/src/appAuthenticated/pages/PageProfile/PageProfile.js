@@ -41,13 +41,13 @@ export default function PageProfile(props) {
             setIsLoading(true);
             const username = props.match.params.username ? `/${props.match.params.username}` : "";
             const profile = await axios.get(`/users${username}?authToken=${authToken}`)
-            if (profile.data.profile.inSearch === false || profile.data.profile.blockedBy) {
+            if ((profile.data.profile.inSearch === false || profile.data.profile.blockedBy) && isSubscribed) {
                 setRedirectState(true)
             } 
             if (isSubscribed) {
                 setProfileState(prev => ({...prev, ...profile.data.profile}))
+                setIsLoading(false);
             }
-            setIsLoading(false);
         }
         if (authToken) fetchProfile();
         return () => isSubscribed = false;
@@ -65,7 +65,7 @@ export default function PageProfile(props) {
                     type: "visited",
                     targetUserId: profileState.userId,
                 })
-                socket.emit('createNotification', profileState.userId);
+                socket.emit('createNotification', data);
             }
         }
         if (authToken) createRelNotif();

@@ -20,7 +20,6 @@ io.use(async (client, next) => {
   jwt.verify(token, config.jwtSecret, async (err, decoded) => {
     client.uuid = decoded.uuid;
     const userId = await UserModel.userIdFromUuid(decoded.uuid);
-    client.uuid = 'coucou';
     client.userId = userId;
     return next();
   });
@@ -35,8 +34,8 @@ io.on('connection', async client => {
       client.join(`${matchId}-room`);
     });
   }
+
   const userIds = Object.keys(io.sockets.sockets).map(elem => io.sockets.sockets[elem].userId);
-  
   io.emit('isConnected', userIds);
 
 	client.on('disconnect', () => {
@@ -53,12 +52,23 @@ io.on('connection', async client => {
     client.disconnect();
   });
 
-  client.on('createNotification', async targetUserId => {
-    client.to(`${targetUserId}-room`).emit('receiveNotification');
+  client.on('createNotification', async data => {
+    client.to(`${data.targetUserId}-room`).emit('receiveNotification');
+    io.to(`${data.targetUserId}-room`).emit('reloadDiscussions');
+    io.to(`${client.userId}-room`).emit('reloadDiscussions');
+    if (data.type === 'matched') {
+      const matchId = await ChatModel.getMatchIdByTwoUserIds(client.userId, data.targetUserId);
+      io.to(`${data.targetUserId}-room`).emit('makeItJoinMatchId', matchId);
+      io.to(`${client.userId}-room`).emit('makeItJoinMatchId', matchId); 
+    }
   });
 
   client.on('setCurrentDiscussionMatchId', async matchId => {
     client.currentDiscussionMatchId = matchId;
+  });
+
+  client.on('joinMatchId', async matchId => {
+    client.join(`${matchId}-room`);
   });
 
   client.on('newMessageSent', async data => {
