@@ -231,19 +231,21 @@ const getBlockedList = async uuid => {
 
 const createRelationship = async (type, userUuid, targetUserId) => {
   try {
-    // let points = 0;
-    // if (type === 'liked') points = +500.0;
-    // if (type === 'unliked') points = -500.0;
-    // if (type === 'disliked') points = -100.0;
+    let points = 0;
+    if (type === 'liked') points = +100.0;
+    if (type === 'disliked') points = -10.0;
     res = await session.run(`
       MATCH (u:User {uuid: $userUuid}), (t:User {userId: $targetUserId})
       CREATE (u)-[r:${type.toUpperCase()}]->(t)
+      WITH u, r, t, (CASE WHEN t.score + $points < 0 THEN 0.0 ELSE t.score + $points END) AS newScore
+      SET t.score = newScore
       RETURN 
       exists((t)-[:LIKED]->(u)) AS match,
       u.userId AS userId
     `, {
       userUuid,
       targetUserId,
+      points,
     })
     session.close();
     if (type === "liked" && res.records[0].get('match')) {
@@ -257,15 +259,20 @@ const createRelationship = async (type, userUuid, targetUserId) => {
 
 const deleteRelationship = async (type, userId, targetUserId) => {
   try {
+    let points = 0;
+    if (type === 'liked') points = -100.0;
     const res = await session.run(`
       MATCH (u:User {userId: $userId}), (t:User {userId: $targetUserId})
       MATCH (u)-[r:${type.toUpperCase()}]->(t)
       OPTIONAL MATCH (m:Match {userIds: $userIds})
+      WITH r, m, t, (CASE WHEN t.score + $points < 0 THEN 0.0 ELSE t.score + $points END) AS newScore
+      SET t.score = newScore
       DELETE r
       RETURN count(m) AS match
     `, {
-      userId: userId,
-      targetUserId: targetUserId,
+      userId,
+      targetUserId,
+      points,
       userIds: [userId, targetUserId]
     })
     if (type === "liked" && res.records[0].get(`match`)) {
@@ -276,6 +283,9 @@ const deleteRelationship = async (type, userId, targetUserId) => {
 
 const createMatch = async (userId1, userId2) => {
   const res = await session.run(`
+  MATCH (u1:User {userId: $userId1}), (u2:User {userId: $userId2})
+  SET u1.score = u1.score + 500
+  SET u2.score = u2.score + 500
   CREATE (m:Match {
       userIds: $userIds,
       matchId: $matchId,
@@ -285,6 +295,8 @@ const createMatch = async (userId1, userId2) => {
   `, {
       userIds: [userId1, userId2],
       matchId: uuidv1(),
+      userId1,
+      userId2,
   })
   session.close();
 }
