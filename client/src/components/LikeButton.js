@@ -92,7 +92,6 @@ const LikeButton = (props) => {
             axios.delete(`/users/deleteRelationship?authToken=${authToken}`, params); 
             createNotif('liked');
         } else {
-            console.log('unlike');
             const params = {
                 type: "liked",                
                 targetUserId: profile.userId,

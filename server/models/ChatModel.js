@@ -14,6 +14,7 @@ async function getDiscussions(uuid) {
       OPTIONAL MATCH (msg2:Message)
       WHERE msg2.matchId = matchId 
       RETURN youUsername, youPhotos, youAvatarIndex, youUserId, matchId, unreadNb, duration.inDays(date(max(msg2.dateTime)), DateTime({timezone: 'Europe/Paris'})).days AS days, year+'-'+month+'-'+day+' '+hour+':'+minute AS youLastConnection
+      ORDER BY days ASC
       `, { uuid: uuid });
     session.close();
     if (res.records[0] === undefined) return null;

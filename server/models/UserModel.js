@@ -225,7 +225,7 @@ const getBlockedList = async uuid => {
           ...user,
       })
     }
-    return historic
+    return historic;
   } catch(error) { Log.error(error, "getBlockedList", __filename) }
 }
 
@@ -470,17 +470,18 @@ async function uuidFromUsername(username) { // refacto possible avec getUserByUs
   } catch(err) { console.log(err) }
 }
 
-const createReportTicket = async (userUuid, targetUuid) => {
+const createReportTicket = async (userUuid, targetUserId) => {
   try {
     await session.run(`
+      MATCH (u:User {uuid: $userUuid})
       CREATE (r:Report {
-        from: $from,
+        from: u.userId,
         to: $to,
         dateTime: DateTime()
       })
     `, {
-      from: userUuid,
-      to: targetUuid
+      userUuid,
+      to: targetUserId
     })
   } catch(error) { Log.error(error, `createReportTicket`, __filename) }
 }
@@ -516,7 +517,7 @@ async function addPicture(uuid, publicId) {
     `, {uuid: uuid})
     const photos = res.records[0].get(0)
     photos.push(publicId.toString());
-    console.log(photos);
+    // console.log(photos);
     await session.run(`
       MATCH (u:User {uuid: $uuid})
       SET u.photos = $photos

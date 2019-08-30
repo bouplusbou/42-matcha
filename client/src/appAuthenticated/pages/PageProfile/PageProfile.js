@@ -41,7 +41,7 @@ export default function PageProfile(props) {
             setIsLoading(true);
             const username = props.match.params.username ? `/${props.match.params.username}` : "";
             const profile = await axios.get(`/users${username}?authToken=${authToken}`)
-            if (profile.data.profile.inSearch === false || profile.data.profile.blockedBy) {
+            if ((profile.data.profile.inSearch === false || profile.data.profile.blockedBy) && isSubscribed) {
                 setRedirectState(true)
             } 
             if (isSubscribed) {

@@ -46,9 +46,7 @@ const Infos = styled.div `
 `;
 
 export default function InfosSection() {
-const authToken = localStorage.getItem('token');
-
-
+    const authToken = localStorage.getItem('token');
     const profile = useContext(ProfileContext);
     const infosList = [
         { info: profile.age !== null ? `${profile.age} years old` : "", icon: faCalendarAlt },
@@ -56,17 +54,17 @@ const authToken = localStorage.getItem('token');
         { info: profile.lookingFor, icon: faSearch }
     ]
     
-    const handleReport = event => {
+    const handleReport = () => {
         const confirm = window.confirm("Do you really want to report that user ?");
         if (confirm) {
-            axios.post(`/users/reportUser?authToken=${authToken}`, {targetUsername: profile.username})
+            axios.post(`/users/reportUser?authToken=${authToken}`, {targetUserId: profile.userId})
         }
     }
 
-    const handleBlock = event => {
+    const handleBlock = () => {
         const confirm = window.confirm('Do you really want to block this user ?');
         if (confirm) {
-            axios.post(`/users/blockUser?authToken=${authToken}`, {targetUsername: profile.username});
+            axios.post(`/users/blockUser?authToken=${authToken}`, {targetUserId: profile.userId});
         }
     }
 

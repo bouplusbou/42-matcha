@@ -236,14 +236,14 @@ const userIdFromUuid = (req, res) => {
 
 const reportUser = async (req, res) => {
       const uuid = await getUuidFromToken(req, res);
-      const target = await UserModel.getUserByUsername(req.body.targetUsername);
-      await UserModel.createReportTicket(uuid, target.uuid);
+      const { targetUserId } = req.body;
+      await UserModel.createReportTicket(uuid, targetUserId);
 }
 
 const blockUser = async (req, res) => {
       const uuid = await getUuidFromToken(req, res);
-      const target = await UserModel.getUserByUsername(req.body.targetUsername);
-      await UserModel.createRelationship("blocked", uuid, target.uuid);
+      const { targetUserId } = req.body;
+      await UserModel.createRelationship("blocked", uuid, targetUserId);
 }
 
 module.exports = {
