@@ -31,7 +31,9 @@ export default function PageProfile(props) {
 
     const { socket } = useContext(AppContext);
     const [profileState, setProfileState] = useState({
-        uplopadPicture: uploadPicture
+        uplopadPicture: uploadPicture,
+        birthDate: '',
+        city: ''
     });
     const [redirect, setRedirect] = useState(false);
     const [isLoadingState, setIsLoading] = useState(true);
@@ -44,6 +46,7 @@ export default function PageProfile(props) {
             setIsLoading(true);
             const username = props.match.params.username ? `/${props.match.params.username}` : "";
             const profile = await axios.get(`/users${username}?authToken=${authToken}`)
+            console.log(profile);
             if ((profile.data === "unknown user" || profile.data.profile.inSearch === false ||
                 profile.data.profile.blockedBy ||
                 profile.data.profile.blocked) && isSubscribed) {

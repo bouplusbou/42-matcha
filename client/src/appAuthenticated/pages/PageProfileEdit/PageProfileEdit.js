@@ -35,14 +35,17 @@ export default function PageProfileEdit() {
         let isSubscribed = true;
         async function fetchProfile() {
             const profile = await axios.get(`/users?authToken=${authToken}`)
-            if (isSubscribed) setProfileState({ ...profile.data.profile });
+            console.log(profile);
+            if (isSubscribed) setProfileState({ 
+                ...profile.data.profile,
+            });
         }
         if (authToken) fetchProfile();
         return () => isSubscribed = false;
     }, [authToken])
 
     const switchTab = event => {
-        const selectedTab = event.target.id;
+        const selectedTab = event.currentTarget.id;
         setEditState({ tab: selectedTab })
     }
 

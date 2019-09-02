@@ -54,17 +54,17 @@ export default function EditMenu(props) {
     return (
         <StyledSection>
             <ButtonContainer>
-                {props.selectedTab === "profile" ? 
+                {props.selectedTab === "profile" ?
                     <StyledSelectedButton><FontAwesomeIcon icon={faUser} size={"3x"}/>PROFILE</StyledSelectedButton> :
-                    <StyledButton id="profile" onClick={props.handleClick}><FontAwesomeIcon icon={faUser} size={"3x"}/> PROFILE</StyledButton>
+                    <StyledButton id="profile" onClick={props.handleClick}><FontAwesomeIcon id="profile" icon={faUser} size={"3x"}/> PROFILE</StyledButton>
                 }
                 {props.selectedTab === "account" ? 
                     <StyledSelectedButton><FontAwesomeIcon icon={faCog} size={"3x"}/>ACCOUNT</StyledSelectedButton> :                    
-                    <StyledButton id="account" onClick={props.handleClick}><FontAwesomeIcon icon={faCog} size={"3x"} /> ACCOUNT</StyledButton>
+                    <StyledButton id="account" onClick={props.handleClick}><FontAwesomeIcon id="account" icon={faCog} size={"3x"} /> ACCOUNT</StyledButton>
                 }
                 {props.selectedTab === "blockedList" ? 
                     <StyledSelectedButton><FontAwesomeIcon icon={faEyeSlash} size={"3x"}/>BLOCKED USERS</StyledSelectedButton> :                    
-                    <StyledButton id="blockedList" onClick={props.handleClick}><FontAwesomeIcon icon={faEyeSlash} size={"3x"} />BLOCKED USERS</StyledButton>
+                    <StyledButton id="blockedList" onClick={props.handleClick}><FontAwesomeIcon id="blockedList" icon={faEyeSlash} size={"3x"} />BLOCKED USERS</StyledButton>
                 }
             </ButtonContainer>
         </StyledSection>

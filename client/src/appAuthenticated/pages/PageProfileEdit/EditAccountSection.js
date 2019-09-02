@@ -13,6 +13,7 @@ const StyledSection = styled.section `
     height:700px;
     border-radius:0 ${props => props.theme.borderRadius} ${props => props.theme.borderRadius} 0;
     background-color:#2b2c2e;
+    width:100%;
     @media (max-width: 1000px) { 
         border-radius:0;
     }
@@ -98,7 +99,9 @@ export default function InfosSection() {
     
     const authToken = localStorage.getItem('token');
     const profile = useContext(ProfileContext);
-    const [valueState, setValueState] = useState({ ...profile })
+    const [valueState, setValueState] = useState({ 
+        ...profile,
+    })
     
     const [errorState, setErrorState] = useState({});
     
@@ -115,8 +118,9 @@ export default function InfosSection() {
             setErrorState({ ...newErrorState });
         }
         setValueState({ ...valueState, [name]: value });
-        if (name !== "newPasswordConf")
-        setEditState({ ...editState, [name]: value });
+        if (name !== "newPasswordConf" || name !== "emailConf"){
+            setEditState({ ...editState, [name]: value });
+        }
     };
 
     
@@ -150,32 +154,38 @@ export default function InfosSection() {
     
     const SubmitChanges = async () => {
         if (Object.keys(editState).length > 0) {
-            await axios.post(`/users/updateProfile?authToken=${authToken}`, editState)
-                .then(res => { setValueState({ redirect: true }) })
+            // if (Object.keys(editState).includes('prevPassword') || Object.keys(editState).includes('newPassword') || Object.keys(editState).includes('prevPasswordConf')) {
+            //     if (!Object.keys(editState).includes('prevPassword') || !Object.keys(editState).includes('newPassword') || !Object.keys(editState).includes('prevPasswordConf')) {
+            //         console.log("????")
+            //         return
+            //     }
+            // }
+            axios.post(`/users/updateProfile?authToken=${authToken}`, editState)
+                .then(res => { setValueState({ redirect:true }) })
                 .catch(error => {
                     const errors = error.response.data.errors;
                     if (errors.includes('emailTaken')) {
-                        setErrorState({
-                            ...errorState,
-                            [`emailError`]: true,
-                            [`emailHelper`]: "This email is already taken.",
-                        })
-                    }
-                    if (errors.includes('usernameTaken')) {
-                        setErrorState({
-                            ...errorState,
-                            [`usernameError`]: true,
-                            [`usernameHelper`]: "This username is already used.",
-                        })
-                    }
-                    if (errors.includes('wrongCurrentPassword')) {
-                        setErrorState({
-                            ...errorState,
-                            [`passwordError`]: true,
-                            [`passwordHelper`]: "Wrong current password",
-                        })
-                    }
-                })
+                    setErrorState({
+                        ...errorState,
+                        [`emailError`]: true,
+                        [`emailHelper`]: "This email is already taken.",
+                    })
+                }
+                if (errors.includes('usernameTaken')) {
+                    setErrorState({
+                        ...errorState,
+                        [`usernameError`]: true,
+                        [`usernameHelper`]: "This username is already used.",
+                    })
+                }
+                if (errors.includes('wrongCurrentPassword')) {
+                    setErrorState({
+                        ...errorState,
+                        [`passwordError`]: true,
+                        [`passwordHelper`]: "Wrong current password",
+                    })
+                }
+            })
         } else {
             setValueState({ redirect:true })
         }

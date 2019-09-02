@@ -85,7 +85,7 @@ export default function UsernameRow(props) {
         `
         
         return (
-            <Tooltip title={props.connected === 'true' ? "Online" : props.lastConnection.toString()}>
+            <Tooltip title={props.connected === 'true' ? "Online" : props.lastConnection}>
                 <StyledIcon
                     connected={props.connected}
                     icon={props.connected === 'true' ? faCircle : faDotCircle}

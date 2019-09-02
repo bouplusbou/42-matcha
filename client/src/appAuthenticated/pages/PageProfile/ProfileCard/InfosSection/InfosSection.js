@@ -65,7 +65,7 @@ export default function InfosSection() {
 
     const InfoCase = (props) => {
         let info;
-        if (props.icon === faSearch) {
+        if (props.info && props.icon === faSearch) {
             info = props.info.map(info => info.charAt(0).toUpperCase() + info.slice(1));
             info = info.join(' - ')
         }

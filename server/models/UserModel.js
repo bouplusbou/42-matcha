@@ -29,7 +29,8 @@ const createUser = async (email, firstName, lastName, username, password, city, 
         photos: $photos,
         avatarIndex: 0,
         bio: "",
-        score: 0.0
+        score: 0.0,
+        lastConnection: DateTime({timezone: 'Europe/Paris'})
         })
     `, {
       uuid: uuid,
@@ -86,6 +87,7 @@ const uuidExists = async uuid => {
 
 const updateProfile = async (uuid, editedValues) => {
   try {
+    console.log(editedValues)
     if (editedValues.newPassword)
       editedValues.password = await bcrypt.hash(editedValues.newPassword, 10);
     if (editedValues.photos && editedValues.photos.length === 0)
@@ -174,7 +176,7 @@ const getRelationWithUser = async (uuid, targetUuid) => {
       match: res.records[0].get(`likedBy`) && res.records[0].get(`liked`),
     }
     return ret;
-  } catch(error) { Log.error(error, "getProfile", __filename) }
+  } catch(error) { Log.error(error, "getRelationWithUser", __filename) }
 }
 
 const getHistoric = async (uuid, type) => {
@@ -307,10 +309,13 @@ const createMatch = async (userId1, userId2) => {
 
 const deleteMatch = async (userId1, userId2) => {
   await session.run(`
-  MATCH (m:Match { userIds: $userIds })
-  DELETE m
+  MATCH (m:Match)
+  WHERE $userId1 IN m.userIds AND $userId2 IN m.userIds
+  WITH m
+  MATCH (msg:Message {matchId: m.matchId})
+  DELETE m, msg
   `, {
-      userIds: [userId1, userId2],
+      userId1, userId2
   })
 }
 

@@ -126,7 +126,7 @@ const updateProfile = async (req, res) => {
                   UserModel.deleteAllRelationships(profile.userId);
             if (keys.includes('email')) { 
                   if (!emailIsOK(req.body.email)) errors.push('invalidEmail');
-                  if (UserModel.emailExists(req.body.email)) errors.push('emailTaken')
+                  if (await UserModel.emailExists(req.body.email)) errors.push('emailTaken')
             };
             if (keys.includes('firstName') && !firstNameIsOK(req.body.firstName)) { errors.push('invalidFirstName') };
             if (keys.includes('lastName') && !lastNameIsOK(req.body.lastName)) { errors.push('invalidLastName') };
@@ -136,7 +136,7 @@ const updateProfile = async (req, res) => {
             };
             if (keys.includes('newPassword')) {
                   bcrypt.compare(req.body.prevPassword, user.password, (error, res) => {
-                        if (error) error.push('wrongCurrentPassword')
+                        if (!res) errors.push('wrongCurrentPassword') 
                   });
                   if (!passwordIsOK(req.body.newPassword)) errors.push('invalidPassword');
             }
@@ -144,7 +144,7 @@ const updateProfile = async (req, res) => {
                   res.status(400).json({errors});
             } else {
                   if (keys.includes('gender') || keys.includes('birthDate'))
-                        UserModel.deleteAllRelationships(profile.userId);
+                        await UserModel.deleteAllRelationships(profile.userId);
                   await UserModel.updateProfile(uuid, req.body);
                   res.status(200).json({ message: 'Profile updated.' });
             }

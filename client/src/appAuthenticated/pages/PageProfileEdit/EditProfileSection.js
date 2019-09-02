@@ -15,6 +15,7 @@ const StyledSection = styled.section `
     display:flex;
     padding:1rem;
     height:700px;
+    width:100%;
 
     align-items:center;
     flex-direction:column;
@@ -59,7 +60,7 @@ const GridForm = styled.form `
     ". cancelButton cancelButton submitButton submitButton .";
     grid-column-gap: 1rem;
     grid-row-gap: 2rem;
-    @media (max-width: 1000px) {
+    /* @media (max-width: 1000px) {
         grid-template-areas:
         "firstName"
         "lastName"
@@ -71,7 +72,7 @@ const GridForm = styled.form `
         "tagSelect"
         "submitButton"
         "cancelButton";
-    }
+    } */
 `
 
 const FirstNameTextField = styled(StyledTextField) `grid-area:firstName;`
@@ -301,15 +302,6 @@ const authToken = localStorage.getItem('token');
     const SubmitChanges = async () => {
         if (Object.keys(editedValuesState).length > 0) {
             const gender = editedValuesState.gender || valueState.gender;
-            if (Object.keys(editedValuesState).includes('gender') ||
-                Object.keys(editedValuesState).includes('birthDate') ||
-                Object.keys(editedValuesState).includes('orientation')) {
-                const confirm = window.confirm('Changing your gender/birthdate/orientation will erase all your relationships.\n\nAre you sure?')
-                if (confirm) {
-                    const res = await axios.post(`/users/updateProfile?authToken=${authToken}`, editedValuesState);
-                    if (res.status === 200) setValueState({ redirect: true })
-                } else { setValueState({ redirect: true }) }
-            }
             if (Object.keys(editedValuesState).includes('gender')) {
                 if (gender === "non-binary") { editedValuesState.lookingFor = ["non-binary"] }
             }
@@ -324,6 +316,15 @@ const authToken = localStorage.getItem('token');
                 if (editedValuesState.orientation === "bisexual") {
                     editedValuesState.lookingFor = ["female", "male"];
                 }
+            }
+            if (Object.keys(editedValuesState).includes('gender') ||
+                Object.keys(editedValuesState).includes('birthDate') ||
+                Object.keys(editedValuesState).includes('orientation')) {
+                const confirm = window.confirm('Changing your gender/birthdate/orientation will erase all your relationships.\n\nAre you sure?')
+                if (confirm) {
+                    const res = await axios.post(`/users/updateProfile?authToken=${authToken}`, editedValuesState);
+                    if (res.status === 200) setValueState({ redirect: true })
+                } else { setValueState({ redirect: true }) }
             }
             const res = await axios.post(`/users/updateProfile?authToken=${authToken}`, editedValuesState);
             if (res.status === 200) setValueState({ redirect: true })

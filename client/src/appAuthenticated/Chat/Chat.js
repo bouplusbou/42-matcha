@@ -287,6 +287,8 @@ export default function ChatComp() {
     if (socket !== null && authToken) {
       socket.on('reloadDiscussions', async () => {
           const resAll = await axios.get(`/chat/discussions?authToken=${authToken}`);
+          // setCurrentDiscussionInfo(null);
+          setCurrentDiscussionMessages(null); 
           setDiscussions(resAll.data.discussions);
       });
       return () => socket.off('reloadDiscussions');
