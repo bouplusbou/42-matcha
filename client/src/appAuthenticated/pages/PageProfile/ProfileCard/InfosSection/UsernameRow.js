@@ -131,7 +131,7 @@ export default function UsernameRow(props) {
                 <Fragment>
                 {profile.photos.length < 5 && <PhotoUploadButton/>}
                 <Link to="/profile/edit">
-                    <EditButton icon={faCog} size={"2x"} onClick={profile.openEdit}/>
+                    <EditButton icon={faCog} size={"2x"} onClick={profile.openEdit} style={{marginLeft:'1rem'}}/>
                 </Link>
                 </Fragment> :
                 <LikeButton/>

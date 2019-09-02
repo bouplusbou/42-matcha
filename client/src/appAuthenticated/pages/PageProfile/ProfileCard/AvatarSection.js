@@ -83,7 +83,9 @@ export default function AvatarSection(props) {
                 </ScoreContainer>
             </StyledSection>
             <Modal open={open} onClose={CloseModal}>
+                <div>
                 <PhotosModal handleClose={CloseModal}/>
+                </div>
             </Modal>
         </Fragment>
     )

@@ -10,10 +10,12 @@ import { Image } from 'cloudinary-react';
 
 const StyledSection = styled.section `
     padding:1rem;
-    width:100%;
     height:700px;
     border-radius:0 ${props => props.theme.borderRadius} ${props => props.theme.borderRadius} 0;
     background-color:#2b2c2e;
+    @media (max-width: 1000px) { 
+        border-radius:0;
+    }
 `
 
 const StyledDiv = styled.div `
@@ -81,7 +83,7 @@ const authToken = localStorage.getItem('token');
         const handleClick = event => {
             const params = {data: {
                 type: "blocked",
-                username: props.user.username,
+                targetUserId: props.user.userId,
             }};
             axios.delete(`/users/deleteRelationship?authToken=${authToken}`, params);
         }

@@ -6,7 +6,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight, faArrowLeft, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import ProfileContext from '../contexts/ProfileContext';
 
-
 const ModalContainer = styled.div `
     display:flex;
     height:100%;
@@ -27,7 +26,9 @@ const MainImgContainer = styled.div `
 const ImgButtonContainer = styled.div `
     display:flex;
     align-items:space-between;
+    justify-content:space-between;
     height:2rem;
+    width:20rem;
 `
 
 const StyledImgButton = styled(FontAwesomeIcon) `
@@ -56,6 +57,9 @@ const ThumbnailContainer = styled.div `
     max-height:6rem;
     max-width:1000px;
     justify-content:center;
+    @media (max-width: 740px) {
+        display:none;
+    }
 `
 
 
@@ -118,8 +122,8 @@ const authToken = localStorage.getItem('token');
             <MainImgContainer>
                 {profile.account &&
                     <ImgButtonContainer>
-                        <StyledImgButton icon={faTrashAlt} onClick={handleDelete}/>
-                        <p onClick={handleSetAsProfile}>Set as profile pic</p>
+                        <StyledImgButton icon={faTrashAlt} onClick={handleDelete} size={'lg'} style={{color:'#FF5B6C'}}/>
+                        <p onClick={handleSetAsProfile} style={{margin:'0', color:'#FF5B6C', fontWeight:"bold"}}>Set as profile pic</p>
                     </ImgButtonContainer>
                 }
                 <MainImg cloudName="matchacn" publicId={photosState[currentIndexState]}/>

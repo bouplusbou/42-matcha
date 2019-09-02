@@ -155,6 +155,8 @@ const getRelationWithUser = async (uuid, targetUuid) => {
     RETURN
     exists((u)-[:LIKED]->(t)) AS liked,
     exists((t)-[:LIKED]->(u)) AS likedBy,
+    exists((u)-[:VISITED]->(t)) AS visited,
+    exists((t)-[:VISITED]->(u)) AS visitedBy,
     exists((t)-[:BLOCKED]->(u)) AS blockedBy,
     exists((u)-[:BLOCKED]->(t)) AS blocked
     `, {
@@ -165,6 +167,8 @@ const getRelationWithUser = async (uuid, targetUuid) => {
     const ret = {
       liked: res.records[0].get(`liked`),
       likedBy: res.records[0].get(`likedBy`),
+      visited: res.records[0].get('visited'),
+      visitedBy: res.records[0].get('visitedBy'),
       blocked: res.records[0].get(`blocked`),
       blockedBy: res.records[0].get(`blockedBy`),
       match: res.records[0].get(`likedBy`) && res.records[0].get(`liked`),
@@ -182,7 +186,7 @@ const getHistoric = async (uuid, type) => {
       t AS user,
       duration.between(date(t.birthDate),date()).years AS age,
       toString(r.timestamp) AS timestamp
-      ORDER BY r.timestamp 
+      ORDER BY r.timestamp DESC
     `, { uuid: uuid })
     session.close();
     const historic = []
@@ -524,12 +528,42 @@ async function addPicture(uuid, publicId) {
     `, {uuid: uuid})
     const photos = res.records[0].get(0)
     photos.push(publicId.toString());
-    // console.log(photos);
     await session.run(`
       MATCH (u:User {uuid: $uuid})
       SET u.photos = $photos
     `, { uuid, publicId, photos })
   } catch(err) { console.log(err) }
+}
+
+async function deleteAllRelationships(userId) {
+  try {
+    await session.run(`
+      MATCH (u:User {userId: $userId})
+      OPTIONAL MATCH (u)-[l:LIKED]-()
+      OPTIONAL MATCH (u)-[v:VISITED]-()
+      OPTIONAL MATCH (m:Match)
+      WHERE $userId IN m.userIds
+      DELETE l, v, m
+    `, {userId})
+  } catch(err) { console.log(err) }
+}
+
+const blockUser = async (userId, targetUserId) => {
+  try {
+    res = await session.run(`
+      MATCH (u:User {userId: $userId}), (t:User {userId: $targetUserId})
+      OPTIONAL MATCH (u)-[l:LIKED]-(t)
+      OPTIONAL MATCH (u)-[v:VISITED]-(t)
+      OPTIONAL MATCH (m:Match)
+      WHERE $userId IN m.userIds AND $targetUserId IN m.userIds
+      CREATE (u)-[:BLOCKED]->(t)
+      DELETE l, v, m
+    `, {
+      userId,
+      targetUserId,
+    })
+    session.close();
+  } catch(error) { Log.error(error, "blockUser", __filename) }
 }
 
 module.exports = {
@@ -562,5 +596,7 @@ module.exports = {
   setlastConnection,
   createMatch,
   deleteMatch,
-  addPicture
+  addPicture,
+  deleteAllRelationships,
+  blockUser
 }
