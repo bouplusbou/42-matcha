@@ -6,7 +6,6 @@ import { faUser, faCog, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 const StyledSection = styled.section `
     display:flex;
     min-width:300px;
-    min-height:375px;
     padding:20px 0;
 
     border-radius:${props => props.theme.borderRadius} 0 0 ${props => props.theme.borderRadius};
@@ -15,9 +14,7 @@ const StyledSection = styled.section `
     box-shadow: inset -50px 0px 56px -51px rgba(0,0,0,0.65);
     @media (max-width: 1000px) { 
         border-radius:0;
-    }
-    @media (max-width: 740px) {
-        height:300px;
+        padding:0px;
     }
 `
 
@@ -26,6 +23,9 @@ const ButtonContainer = styled.div `
     display:flex;
     flex-direction:column;
     margin:auto;
+    @media (max-width: 700px) { 
+        flex-direction:row;
+    }
 `
 
 const StyledButton = styled.button `

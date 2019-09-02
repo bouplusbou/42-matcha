@@ -1,11 +1,11 @@
-import React, { useContext, Fragment } from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCalendarAlt, faSearch, faMapMarkedAlt, faFlag, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { faCalendarAlt, faSearch, faMapMarkedAlt, faEllipsisH } from '@fortawesome/free-solid-svg-icons';
 import ProfileContext from '../../../../../contexts/ProfileContext';
 import UsernameRow from './UsernameRow';
 import TagChip from '../../../../../components/TagChip';
-import axios from 'axios';
+import { Menu, MenuItem, Button } from '@material-ui/core';
 
 
 const StyledSection = styled.section `
@@ -43,39 +43,41 @@ const Infos = styled.div `
     justify-content:center;
     align-items:center;
     color: ${props => props.theme.color.lightRed};
+    @media (max-width: 600px) { 
+        flex-direction:column;
+        margin-top:1rem;
+        margin-bottom:0;
+    }
 `;
 
 export default function InfosSection() {
-    const authToken = localStorage.getItem('token');
+    const [anchorEl, setAnchorEl] = React.useState(null);
+  
+    function openMenu(event) { setAnchorEl(event.currentTarget); }
+    function closeMenu() { setAnchorEl(null); }
+
     const profile = useContext(ProfileContext);
     const infosList = [
         { info: profile.age !== null ? `${profile.age} years old` : "", icon: faCalendarAlt },
         { info: profile.city, icon: faMapMarkedAlt },
         { info: profile.lookingFor, icon: faSearch }
     ]
-    
-    const handleReport = () => {
-        const confirm = window.confirm("Do you really want to report that user ?");
-        if (confirm) {
-            axios.post(`/users/reportUser?authToken=${authToken}`, {targetUserId: profile.userId})
-        }
-    }
 
-    const handleBlock = () => {
-        const confirm = window.confirm('Do you really want to block this user ?');
-        if (confirm) {
-            axios.post(`/users/blockUser?authToken=${authToken}`, {targetUserId: profile.userId});
+    const InfoCase = (props) => {
+        let info;
+        if (props.icon === faSearch) {
+            info = props.info.map(info => info.charAt(0).toUpperCase() + info.slice(1));
+            info = info.join(' - ')
         }
-    }
-
-    const InfoCase = (props) => { 
         const StyledCase = styled.div `
             display:flex;
             flex:1;
             height:4rem;
             justify-content:center;
             align-items:center;
-            :not(:first-child) { border-left:1px solid #a275f0; }
+            @media (max-width: 600px) {
+                margin-bottom:1rem;
+            }
         `;
     
         const StyledIcon = styled(FontAwesomeIcon) `
@@ -90,7 +92,7 @@ export default function InfosSection() {
         return (
             <StyledCase>
                 <StyledIcon icon={props.icon} size={"2x"}/>
-                <StyledSpan><strong>{props.info}</strong></StyledSpan>
+                <StyledSpan><strong>{props.icon === faSearch ? info : props.info}</strong></StyledSpan>
             </StyledCase>
         )      
     }
@@ -114,10 +116,20 @@ export default function InfosSection() {
                 {profile.tags.map((tag, index)=> <TagChip tag={tag} key={index}/>)}
             </Tags>
             {!profile.account && 
-                <Fragment>
-                    <FontAwesomeIcon onClick={handleReport} icon={faFlag} size={"2x"}/>
-                    <FontAwesomeIcon onClick={handleBlock} icon={faEyeSlash} size={"2x"}/>
-                </Fragment>
+                <div style={{width:'100%', display:'flex', flexDirection:'row-reverse'}}>
+                    <Button aria-controls="simple-menu" aria-haspopup="true" onClick={openMenu} >
+                        <FontAwesomeIcon icon={faEllipsisH} size={"lg"}/>
+                    </Button>
+                    <Menu
+                        anchorEl={anchorEl}
+                        keepMounted
+                        open={Boolean(anchorEl)}
+                        onClose={closeMenu}
+                    >
+                        <MenuItem onClick={profile.reportUser}>Report</MenuItem>
+                        <MenuItem onClick={profile.blockUser}>Block</MenuItem>
+                    </Menu>
+                </div>
             }
         </StyledSection>
     )

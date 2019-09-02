@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const config = require('../middlewares/config');
 const Log = require(`../tools/Log`);
 const cloudinary = require(`../tools/Cloudinary`);
+const bcrypt = require('bcrypt')
 
 
 const emailIsOK = email => {
@@ -87,8 +88,9 @@ const getCurrentProfile = async (req, res) => {
 const getProfile = async (req, res) => {
       try {
             const uuid = await getUuidFromToken(req, res);
-            if (uuid) {
-                  const reqUser = await UserModel.getUserByUsername(req.params.username);
+            const reqUser = await UserModel.getUserByUsername(req.params.username);
+            if (reqUser === null) res.send('unknown user');
+            else {
                   const user = await UserModel.getProfileByUuid(uuid);
                   const profile = await UserModel.getProfileByUuid(reqUser.uuid);
                   profile.account = false;
@@ -104,9 +106,11 @@ const getProfile = async (req, res) => {
                         profile.likedBy = ret.likedBy;
                         profile.blocked = ret.blocked;
                         profile.blockedBy = ret.blockedBy;
+                        profile.visited = ret.visited;
+                        profile.visitedBy = ret.visitedBy;
                         profile.inSearch = user.lookingFor.includes(profile.gender) ? true : false;
                   }
-                  res.json({profile: profile})
+                  res.status(200).json({profile: profile});
             }
       } catch (error) { Log.error(error, `getProfile`, __filename) }
 }
@@ -114,7 +118,33 @@ const getProfile = async (req, res) => {
 const updateProfile = async (req, res) => {
       try {
             const uuid = await getUuidFromToken(req, res);
-            if (uuid) {
+            const profile = await UserModel.getProfileByUuid(uuid);
+            const user = await UserModel.getUserByUsername(profile.username)
+            const keys = Object.keys(req.body);
+            const errors = [];
+            if (keys.includes('gender') || keys.includes('orientation') || keys.includes('birthDate') || keys.includes('lookingFor'))
+                  UserModel.deleteAllRelationships(profile.userId);
+            if (keys.includes('email')) { 
+                  if (!emailIsOK(req.body.email)) errors.push('invalidEmail');
+                  if (UserModel.emailExists(req.body.email)) errors.push('emailTaken')
+            };
+            if (keys.includes('firstName') && !firstNameIsOK(req.body.firstName)) { errors.push('invalidFirstName') };
+            if (keys.includes('lastName') && !lastNameIsOK(req.body.lastName)) { errors.push('invalidLastName') };
+            if (keys.includes('username')) {
+                  if (!usernameIsOK(req.body.username)) errors.push('invalidUsername');
+                  if (!UserModel.usernameExists(req.body.username)) errors.push('usernameTaken')
+            };
+            if (keys.includes('newPassword')) {
+                  bcrypt.compare(req.body.prevPassword, user.password, (error, res) => {
+                        if (error) error.push('wrongCurrentPassword')
+                  });
+                  if (!passwordIsOK(req.body.newPassword)) errors.push('invalidPassword');
+            }
+            if (errors.length > 0) {
+                  res.status(400).json({errors});
+            } else {
+                  if (keys.includes('gender') || keys.includes('birthDate'))
+                        UserModel.deleteAllRelationships(profile.userId);
                   await UserModel.updateProfile(uuid, req.body);
                   res.status(200).json({ message: 'Profile updated.' });
             }
@@ -238,12 +268,15 @@ const reportUser = async (req, res) => {
       const uuid = await getUuidFromToken(req, res);
       const { targetUserId } = req.body;
       await UserModel.createReportTicket(uuid, targetUserId);
+      res.status(200).send('User reported.');
 }
 
 const blockUser = async (req, res) => {
       const uuid = await getUuidFromToken(req, res);
+      const user = await UserModel.getProfileByUuid(uuid);
       const { targetUserId } = req.body;
-      await UserModel.createRelationship("blocked", uuid, targetUserId);
+      await UserModel.blockUser(user.userId, targetUserId);
+      res.status(200).send('User blocked.');
 }
 
 module.exports = {

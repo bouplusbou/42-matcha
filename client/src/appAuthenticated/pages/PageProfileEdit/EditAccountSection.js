@@ -5,13 +5,17 @@ import { faTimes, faCheck, faUser } from '@fortawesome/free-solid-svg-icons';
 import { TextField } from '@material-ui/core';
 import ProfileContext from '../../../contexts/ProfileContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import axios from 'axios';
+import { Redirect } from 'react-router-dom';
 
 const StyledSection = styled.section `
     padding:1rem;
-    width:100%;
     height:700px;
     border-radius:0 ${props => props.theme.borderRadius} ${props => props.theme.borderRadius} 0;
     background-color:#2b2c2e;
+    @media (max-width: 1000px) { 
+        border-radius:0;
+    }
 `
 
 const StyledTextField = styled(TextField) `
@@ -92,6 +96,7 @@ const CancelButton = styled(StyledButton) `
 
 export default function InfosSection() {
     
+    const authToken = localStorage.getItem('token');
     const profile = useContext(ProfileContext);
     const [valueState, setValueState] = useState({ ...profile })
     
@@ -110,7 +115,7 @@ export default function InfosSection() {
             setErrorState({ ...newErrorState });
         }
         setValueState({ ...valueState, [name]: value });
-        if (name !== "newPasswordConf" && name !== 'prevPassword')
+        if (name !== "newPasswordConf")
         setEditState({ ...editState, [name]: value });
     };
 
@@ -143,8 +148,37 @@ export default function InfosSection() {
         })
     }
     
-    function SubmitChanges() {
-        profile.closeAndSaveEdit(editState);
+    const SubmitChanges = async () => {
+        if (Object.keys(editState).length > 0) {
+            await axios.post(`/users/updateProfile?authToken=${authToken}`, editState)
+                .then(res => { setValueState({ redirect: true }) })
+                .catch(error => {
+                    const errors = error.response.data.errors;
+                    if (errors.includes('emailTaken')) {
+                        setErrorState({
+                            ...errorState,
+                            [`emailError`]: true,
+                            [`emailHelper`]: "This email is already taken.",
+                        })
+                    }
+                    if (errors.includes('usernameTaken')) {
+                        setErrorState({
+                            ...errorState,
+                            [`usernameError`]: true,
+                            [`usernameHelper`]: "This username is already used.",
+                        })
+                    }
+                    if (errors.includes('wrongCurrentPassword')) {
+                        setErrorState({
+                            ...errorState,
+                            [`passwordError`]: true,
+                            [`passwordHelper`]: "Wrong current password",
+                        })
+                    }
+                })
+        } else {
+            setValueState({ redirect:true })
+        }
     }
 
     return (
@@ -218,6 +252,7 @@ export default function InfosSection() {
                     <CancelButton onClick={SubmitChanges}><FontAwesomeIcon icon={faTimes} size={'lg'}/></CancelButton>
                     <SubmitButton onClick={SubmitChanges}><FontAwesomeIcon icon={faCheck} size={'lg'}/></SubmitButton>
             </GridForm>
+            {valueState.redirect && <Redirect to='/profile'/>}
         </StyledSection>
     )
 }

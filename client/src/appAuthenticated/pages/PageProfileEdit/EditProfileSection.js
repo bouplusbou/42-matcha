@@ -14,13 +14,16 @@ import { Redirect } from 'react-router-dom';
 const StyledSection = styled.section `
     display:flex;
     padding:1rem;
-    width:100%;
     height:700px;
 
     align-items:center;
     flex-direction:column;
     border-radius:0 ${props => props.theme.borderRadius} ${props => props.theme.borderRadius} 0;
 
+    @media (max-width: 1000px) { 
+        border-radius:0;
+        height:800px;
+    }
     background-color:#2b2c2e;
 `
 
@@ -46,23 +49,35 @@ const GridForm = styled.form `
     width:100%;
     display:grid;
     grid-template-columns:1fr 1fr 1fr 1fr 1fr 1fr;
-    grid-template-rows:3.5rem 3.5rem 3.5rem 8rem 10rem auto;
+    grid-template-rows:3.5rem 3.5rem 3.5rem auto 8rem 10rem auto;
     grid-template-areas:
     "firstName firstName firstName lastName lastName lastName"
     "birthDate birthDate location location location location"
-    "gender gender orientation orientation lookingFor lookingFor"
+    "gender gender orientation orientation . ."
     "biography biography biography biography biography biography"
     "tagSelect tagSelect tagSelect tagSelect tagSelect tagSelect"
     ". cancelButton cancelButton submitButton submitButton .";
     grid-column-gap: 1rem;
     grid-row-gap: 2rem;
+    @media (max-width: 1000px) {
+        grid-template-areas:
+        "firstName"
+        "lastName"
+        "birthDate"
+        "location"
+        "gender"
+        "orientation"
+        "biography"
+        "tagSelect"
+        "submitButton"
+        "cancelButton";
+    }
 `
 
 const FirstNameTextField = styled(StyledTextField) `grid-area:firstName;`
 const LastNameTextField = styled(StyledTextField) `grid-area:lastName;`
 const GenderTextField = styled(StyledTextField) `grid-area:gender;`
 const OrientationTextField = styled(StyledTextField) `grid-area:orientation;`
-const LookingForTextField = styled(StyledTextField) `grid-area:lookingFor;`
 const BirthDateTextField = styled(StyledTextField) `grid-area:birthDate;`
 const BiographyTextField = styled(StyledTextField) `
     grid-area:biography;
@@ -100,6 +115,9 @@ const SubmitButton = styled(StyledButton) `
         color:${props => props.theme.color.purple};
         background-color:#2b2c2e;
     }
+    @media (max-width: 1000px) { 
+        margin-top:4rem;
+    }
 `
 
 const CancelButton = styled(StyledButton) `
@@ -107,6 +125,9 @@ const CancelButton = styled(StyledButton) `
     border:2px solid ${props => props.theme.color.purple};
     color:${props => props.theme.color.purple};
     height:2rem;
+    @media (max-width: 1000px) { 
+        margin-top:4rem;
+    }
 `
 
 const StyledAlgoliaPlaces = styled(AlgoliaPlaces) `
@@ -278,9 +299,35 @@ const authToken = localStorage.getItem('token');
     }
 
     const SubmitChanges = async () => {
-        if (Object.keys(editedValuesState).length > 0)
-            await axios.post(`/users/updateProfile?authToken=${authToken}`, editedValuesState)
-        setValueState({ redirect:true })
+        if (Object.keys(editedValuesState).length > 0) {
+            const gender = editedValuesState.gender || valueState.gender;
+            if (Object.keys(editedValuesState).includes('gender') ||
+                Object.keys(editedValuesState).includes('birthDate') ||
+                Object.keys(editedValuesState).includes('orientation')) {
+                const confirm = window.confirm('Changing your gender/birthdate/orientation will erase all your relationships.\n\nAre you sure?')
+                if (confirm) {
+                    const res = await axios.post(`/users/updateProfile?authToken=${authToken}`, editedValuesState);
+                    if (res.status === 200) setValueState({ redirect: true })
+                } else { setValueState({ redirect: true }) }
+            }
+            if (Object.keys(editedValuesState).includes('gender')) {
+                if (gender === "non-binary") { editedValuesState.lookingFor = ["non-binary"] }
+            }
+            if (Object.keys(editedValuesState).includes('orientation')) {
+                if (editedValuesState.orientation === "homosexual") {
+                    editedValuesState.lookingFor = [gender];
+                }
+                if (editedValuesState.orientation === "straight") {
+                    if (gender === "female") editedValuesState.lookingFor = ["male"];
+                    if (gender === "male") editedValuesState.lookingFor = ["female"];
+                }
+                if (editedValuesState.orientation === "bisexual") {
+                    editedValuesState.lookingFor = ["female", "male"];
+                }
+            }
+            const res = await axios.post(`/users/updateProfile?authToken=${authToken}`, editedValuesState);
+            if (res.status === 200) setValueState({ redirect: true })
+        } else { setValueState({ redirect:true }) }
     }
 
     function handleInputChange(value) {
@@ -291,7 +338,6 @@ const authToken = localStorage.getItem('token');
             })
         }
     }
-
         
     return (
         <StyledSection>
@@ -372,22 +418,6 @@ const authToken = localStorage.getItem('token');
                     <option value="homosexual">Homosexuel</option>
                     <option value="bisexual">Bisexual</option>
                 </OrientationTextField>
-                <LookingForTextField
-                    select
-                    label="Looking For"
-                    name="lookingFor"
-                    SelectProps={{
-                        native: true,
-                    }}
-                    value={valueState.lookingFor}
-                    onChange={handleValueChange}
-                    variant="outlined"
-                >
-                    <option value="men">Man</option>
-                    <option value="women">Woman</option>
-                    <option value="men or women">Man or Woman</option>
-                    <option value="non-binary">Non-binary</option>
-                </LookingForTextField>
                 <BiographyTextField
                     label="Biography"
                     name="bio"
