@@ -179,6 +179,7 @@ const authToken = localStorage.getItem('token');
     const [errorState, setErrorState] = useState({});
 
     const [editedValuesState, setEditedValueState] = useState({});
+    const [redirect, setRedirect] = useState(false);
     
     const [tagsList, setTagsList] = useState([]);
     const Tags = valueState.tags && valueState.tags.map((tag, index) => <TagChip deletable={true} tag={tag} key={index} index={index} onDelete={deleteTag}/>)
@@ -323,12 +324,13 @@ const authToken = localStorage.getItem('token');
                 const confirm = window.confirm('Changing your gender/birthdate/orientation will erase all your relationships.\n\nAre you sure?')
                 if (confirm) {
                     const res = await axios.post(`/users/updateProfile?authToken=${authToken}`, editedValuesState);
-                    if (res.status === 200) setValueState({ redirect: true })
-                } else { setValueState({ redirect: true }) }
+                    if (res.status === 200) setRedirect(true)
+                } else { setRedirect(true) }
+            } else {
+                const res = await axios.post(`/users/updateProfile?authToken=${authToken}`, editedValuesState);
+                if (res.status === 200) setRedirect(true)
             }
-            const res = await axios.post(`/users/updateProfile?authToken=${authToken}`, editedValuesState);
-            if (res.status === 200) setValueState({ redirect: true })
-        } else { setValueState({ redirect:true }) }
+        } else { setRedirect(true) }
     }
 
     function handleInputChange(value) {
@@ -452,7 +454,7 @@ const authToken = localStorage.getItem('token');
                 <CancelButton onClick={SubmitChanges}><FontAwesomeIcon icon={faTimes} size={'lg'}/></CancelButton>
                 <SubmitButton onClick={SubmitChanges}><FontAwesomeIcon icon={faCheck} size={'lg'}/></SubmitButton>
             </GridForm>
-            {valueState.redirect && <Redirect to='/profile'/>}
+            {redirect && <Redirect to='/profile'/>}
         </StyledSection>
     )
 }

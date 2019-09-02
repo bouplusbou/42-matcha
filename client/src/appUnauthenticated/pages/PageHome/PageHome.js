@@ -73,10 +73,7 @@ const CTA = styled(Link)`
     box-shadow: none;
   }
 `;
-const Footer = styled.section`
-  flex-shrink: 0;
-  background-color: ${props => props.theme.color.white};
-`;
+
 const Header = styled.header`
   display: flex;
   justify-content: space-between;
@@ -128,9 +125,6 @@ const PageHome = () => (
           <img src={'./home_photo.png'} alt="A couple having fun"/>
         </PhotoWrapper>
       </Wrapper>
-      <Footer>
-        <p>My sticky footer can be found here.</p>
-      </Footer>
     </Body>
   </Fragment>
 );

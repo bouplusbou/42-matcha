@@ -293,7 +293,7 @@ export default function ChatComp() {
       });
       return () => socket.off('reloadDiscussions');
     }
-  }, [socket, authToken, setDiscussions]);
+  }, [socket, authToken, setDiscussions, setCurrentDiscussionMessages]);
 
   useEffect(() => {
     if (socket !== null && authToken) {

@@ -23,7 +23,6 @@ const createUser = async (email, firstName, lastName, username, password, city, 
         password: $password,
         confirmed: $confirmed,
         hash: $hash,
-        fame: $fame,
         city: $city,
         latLng: $latLng,
         photos: $photos,
@@ -42,7 +41,6 @@ const createUser = async (email, firstName, lastName, username, password, city, 
       password: hashedPassword,
       confirmed: false,
       hash: hash,
-      fame: 100,
       city: city,
       latLng: latLng,
       photos: ["profilePlaceholder"]
@@ -87,7 +85,6 @@ const uuidExists = async uuid => {
 
 const updateProfile = async (uuid, editedValues) => {
   try {
-    console.log(editedValues)
     if (editedValues.newPassword)
       editedValues.password = await bcrypt.hash(editedValues.newPassword, 10);
     if (editedValues.photos && editedValues.photos.length === 0)

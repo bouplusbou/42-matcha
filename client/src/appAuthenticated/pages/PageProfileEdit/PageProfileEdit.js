@@ -35,7 +35,6 @@ export default function PageProfileEdit() {
         let isSubscribed = true;
         async function fetchProfile() {
             const profile = await axios.get(`/users?authToken=${authToken}`)
-            console.log(profile);
             if (isSubscribed) setProfileState({ 
                 ...profile.data.profile,
             });
