@@ -20,7 +20,6 @@ const StyledSection = styled.section `
 
 const Tags = styled.div `
     display:flex;
-    justify-content:space-between;
     margin-top:auto;
     flex-wrap:wrap;
     width:100%;
