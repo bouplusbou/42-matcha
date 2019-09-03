@@ -194,7 +194,6 @@ const createRelationship = async (req, res) => {
       try {
             const uuid = await getUuidFromToken(req, res);
             const user = await UserModel.getProfileByUuid(uuid);
-            console.log(user.photos.length)
             if (req.body.type === "liked" && user.photos.length === 0) {
                   res.status(400).send('Cannot create relationship')
             } else {

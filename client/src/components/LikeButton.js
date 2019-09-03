@@ -15,6 +15,9 @@ const StyledButton = styled.button `
         :hover {
             cursor:pointer;
         }
+        :active {
+            box-shadow:0 0 0 0;
+        }
     `;
 
     const StyledLikeButton = styled(StyledButton) `

@@ -46,10 +46,29 @@ const StyledNames = styled.p `
 `
 
 const EditButton = styled(FontAwesomeIcon) `
-    color:${props => props.theme.color.purple};
+        color:${props => props.theme.color.purple};
+        :hover {
+            cursor:pointer;
+        }
+        `
+
+const SettingsButton = styled.div `
+        border-radius:1000px;
+        border:2px solid ${props => props.theme.color.purple};
+        box-shadow: 0px 0px 20px -1px ${props => props.theme.color.purple};
+        height:55px;
+        width:55px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        :not(:last-child) {
+        margin-right:1.5rem;
+        }
+        :active {
+            box-shadow:0 0 0 0;
+            cursor:pointer;
+        }
 `
-
-
 
 const GenderIcon = (props) => {
     const icons = {
@@ -97,7 +116,7 @@ export default function UsernameRow(props) {
 
     const PhotoUploadButton = () => {
         return(
-            <Fragment>
+            <SettingsButton>
                 <input
                    accept="image/*"
                    style={{ display: 'none' }}
@@ -108,7 +127,7 @@ export default function UsernameRow(props) {
                 <label htmlFor="uploadFileButton">
                     <EditButton icon={faPlus} size={"2x"}/>
                 </label>
-            </Fragment>
+            </SettingsButton>
         )
     }
 
@@ -131,7 +150,9 @@ export default function UsernameRow(props) {
                 <Fragment>
                 {profile.photos.length < 5 && <PhotoUploadButton/>}
                 <Link to="/profile/edit">
-                    <EditButton icon={faCog} size={"2x"} onClick={profile.openEdit} style={{marginLeft:'1rem'}}/>
+                    <SettingsButton>
+                    <EditButton icon={faCog} size={"2x"} onClick={profile.openEdit}/>
+                    </SettingsButton>
                 </Link>
                 </Fragment> :
                 <LikeButton/>
