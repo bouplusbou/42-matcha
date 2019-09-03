@@ -25,8 +25,8 @@ const createUser = async (email, firstName, lastName, username, password, city, 
         hash: $hash,
         city: $city,
         latLng: $latLng,
-        photos: $photos,
-        avatarIndex: 0,
+        photos: [],
+        avatarIndex: 0.0,
         bio: "",
         score: 0.0,
         lastConnection: DateTime({timezone: 'Europe/Paris'})
@@ -443,7 +443,8 @@ async function hasFullProfile(uuid) {
       RETURN u.lookingFor AS lookingFor, 
       u.gender AS gender,
       u.birthDate AS birthDate,
-      u.orientation AS orientation
+      u.orientation AS orientation,
+      u.photos AS photos
     `,
     { uuid: uuid });
     session.close();
@@ -452,7 +453,8 @@ async function hasFullProfile(uuid) {
     const gender = res.records[0].get('gender');
     const birthDate = res.records[0].get('birthDate');
     const orientation = res.records[0].get('orientation');
-    return { lookingFor, gender, birthDate, orientation };
+    const hasPhoto = res.records[0].get('photos').length > 0;
+    return { lookingFor, gender, birthDate, orientation, hasPhoto };
   } catch(err) { console.log(err) }
 }
 

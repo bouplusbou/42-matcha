@@ -92,15 +92,23 @@ const LikeButton = (props) => {
                     type: "liked",
                     targetUserId: profile.userId,
                 }}
-                axios.delete(`/users/deleteRelationship?authToken=${authToken}`, params); 
-                createNotif('unliked');
+                axios.delete(`/users/deleteRelationship?authToken=${authToken}`, params)
+                    .then(res => {
+                        createNotif('unliked')
+                        profile.setRefresh(p => (!p));
+                    })
+                    .catch(err => { window.alert("You need to have at least 1 picture to like a user.") })
             } else {
                 const params = {
                     type: "liked",                
                     targetUserId: profile.userId,
                 }
-                const res = await axios.post(`/users/createRelationship?authToken=${authToken}`, params);
-                createNotif(res.data.type);
+                axios.post(`/users/createRelationship?authToken=${authToken}`, params)
+                    .then(res => {
+                        createNotif(res.data.type)
+                        profile.setRefresh(p => (!p));
+                    })
+                    .catch(err => { window.alert("You need to have at least 1 picture to like a user.") })
             }
             profile.setRefresh(p => (!p));
     }

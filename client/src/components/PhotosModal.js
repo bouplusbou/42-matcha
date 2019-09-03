@@ -17,7 +17,7 @@ const ModalContainer = styled.div `
 
 const MainImgContainer = styled.div `
     display:flex;
-    height:50vh;
+    max-height:50vh;
     margin: 5rem 0 2rem 0;
     flex-direction:column-reverse;
     align-items:center;       

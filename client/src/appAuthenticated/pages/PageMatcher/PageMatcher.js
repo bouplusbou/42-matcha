@@ -71,6 +71,7 @@ export default function PageMatcher() {
         if (res.data.fields.birthDate === null) missingFields.push('your birthdate');
         if (res.data.fields.gender === null) missingFields.push('your gender');
         if (res.data.fields.orientation === null) missingFields.push('your sexual orientation');
+        if (res.data.fields.hasPhoto === false) missingFields.push('your photo');
         if (res.data.fields.lookingFor === null) missingFields.push('who you are looking for');
         if (missingFields.length !== 0) {
           if (isSubscribed) {

@@ -15,6 +15,16 @@ app.use(bodyParser.urlencoded({limit: '10mb', extended: true}))
 app.use(cookieParser());
 app.use('/api', router);
 
+var path = require("path");
+
+app.get('/*', function(req, res) {
+  res.sendFile(path.join(__dirname, '/../client/public/index.html'), function(err) {
+    if (err) {
+      res.status(500).send(err)
+    }
+  })
+})
+
 io.use(async (client, next) => {
   const token = client.handshake.query.token;
   jwt.verify(token, config.jwtSecret, async (err, decoded) => {
