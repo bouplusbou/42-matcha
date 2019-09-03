@@ -15,6 +15,9 @@ const StyledButton = styled.button `
         :hover {
             cursor:pointer;
         }
+        :active {
+            box-shadow:0 0 0 0;
+        }
     `;
 
     const StyledLikeButton = styled(StyledButton) `
@@ -84,22 +87,22 @@ const LikeButton = (props) => {
     };
     
     const handleClick = async event => {
-        if (profile.liked) {
-            const params = {data: {
-                type: "liked",
-                targetUserId: profile.userId,
-            }}
-            axios.delete(`/users/deleteRelationship?authToken=${authToken}`, params); 
-            createNotif('unliked');
-        } else {
-            const params = {
-                type: "liked",                
-                targetUserId: profile.userId,
+            if (profile.liked) {
+                const params = {data: {
+                    type: "liked",
+                    targetUserId: profile.userId,
+                }}
+                axios.delete(`/users/deleteRelationship?authToken=${authToken}`, params); 
+                createNotif('unliked');
+            } else {
+                const params = {
+                    type: "liked",                
+                    targetUserId: profile.userId,
+                }
+                const res = await axios.post(`/users/createRelationship?authToken=${authToken}`, params);
+                createNotif(res.data.type);
             }
-            const res = await axios.post(`/users/createRelationship?authToken=${authToken}`, params);
-            createNotif(res.data.type);
-        }
-        profile.setRefresh(p => (!p));
+            profile.setRefresh(p => (!p));
     }
 
     if (profile.liked && profile.likedBy)

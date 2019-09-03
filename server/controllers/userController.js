@@ -193,8 +193,13 @@ const removeTag = async (req, res) => {
 const createRelationship = async (req, res) => {
       try {
             const uuid = await getUuidFromToken(req, res);
-            const type = await UserModel.createRelationship(req.body.type, uuid, req.body.targetUserId);
-            res.status(200).json({ type })
+            const user = await UserModel.getProfileByUuid(uuid);
+            if (req.body.type === "liked" && user.photos.length === 0) {
+                  res.status(400).send('Cannot create relationship')
+            } else {
+                  const type = await UserModel.createRelationship(req.body.type, uuid, req.body.targetUserId);
+                  res.status(200).json({ type })
+            }
       } catch (error) { Log.error(error, `createRelationship`, __filename) }
 }
 

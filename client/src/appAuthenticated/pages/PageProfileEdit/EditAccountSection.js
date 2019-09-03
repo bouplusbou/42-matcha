@@ -102,6 +102,7 @@ export default function InfosSection() {
     const [valueState, setValueState] = useState({ 
         ...profile,
     })
+    const [redirect, setRedirect] = useState(false);
     
     const [errorState, setErrorState] = useState({});
     
@@ -153,15 +154,16 @@ export default function InfosSection() {
     }
     
     const SubmitChanges = async () => {
-        if (Object.keys(editState).length > 0) {
-            // if (Object.keys(editState).includes('prevPassword') || Object.keys(editState).includes('newPassword') || Object.keys(editState).includes('prevPasswordConf')) {
-            //     if (!Object.keys(editState).includes('prevPassword') || !Object.keys(editState).includes('newPassword') || !Object.keys(editState).includes('prevPasswordConf')) {
-            //         console.log("????")
-            //         return
-            //     }
-            // }
+        if (Object.keys(editState).length > 0 && Object.keys(errorState).length === 0) {
+            console.log(editState);
+            if (Object.keys(editState).includes('prevPassword') || Object.keys(editState).includes('newPassword') || Object.keys(editState).includes('newPasswordConf')) {
+                if (!Object.keys(editState).includes('prevPassword') || !Object.keys(editState).includes('newPassword') || !Object.keys(editState).includes('newPasswordConf')) {
+                    console.log("????")
+                    return
+                }
+            }
             axios.post(`/users/updateProfile?authToken=${authToken}`, editState)
-                .then(res => { setValueState({ redirect:true }) })
+                .then(res => { setRedirect(true) })
                 .catch(error => {
                     const errors = error.response.data.errors;
                     if (errors.includes('emailTaken')) {
@@ -187,7 +189,7 @@ export default function InfosSection() {
                 }
             })
         } else {
-            setValueState({ redirect:true })
+            setRedirect(true)
         }
     }
 
@@ -262,7 +264,7 @@ export default function InfosSection() {
                     <CancelButton onClick={SubmitChanges}><FontAwesomeIcon icon={faTimes} size={'lg'}/></CancelButton>
                     <SubmitButton onClick={SubmitChanges}><FontAwesomeIcon icon={faCheck} size={'lg'}/></SubmitButton>
             </GridForm>
-            {valueState.redirect && <Redirect to='/profile'/>}
+            {redirect && <Redirect to='/profile'/>}
         </StyledSection>
     )
 }

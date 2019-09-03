@@ -43,7 +43,6 @@ const createUser = async (email, firstName, lastName, username, password, city, 
       hash: hash,
       city: city,
       latLng: latLng,
-      photos: ["profilePlaceholder"]
     });
     session.close();
     sendEmail('confirmUser', email, hash);
@@ -87,8 +86,6 @@ const updateProfile = async (uuid, editedValues) => {
   try {
     if (editedValues.newPassword)
       editedValues.password = await bcrypt.hash(editedValues.newPassword, 10);
-    if (editedValues.photos && editedValues.photos.length === 0)
-      editedValues.photos = ["https://res.cloudinary.com/matchacn/image/upload/v1566436361/profilePlaceholder.png"];
     let cypher = "MATCH (u:User {uuid: $uuid})\n";
     for (var key in editedValues) { cypher += `SET u.${key} = $${key}\n` }
     await session.run(cypher, {
@@ -239,6 +236,8 @@ const createRelationship = async (type, userUuid, targetUserId) => {
     if (type === 'disliked') points = -10.0;
     res = await session.run(`
       MATCH (u:User {uuid: $userUuid}), (t:User {userId: $targetUserId})
+      OPTIONAL MATCH (u)-[dr:${type.toUpperCase()}]->(t)
+      DELETE dr
       CREATE (u)-[r:${type.toUpperCase()}]->(t)
       WITH u, r, t, (CASE WHEN t.score + $points < 0 THEN 0.0 ELSE t.score + $points END) AS newScore
       SET t.score = newScore
@@ -285,6 +284,7 @@ const deleteRelationship = async (type, userId, targetUserId) => {
 }
 
 const createMatch = async (userId1, userId2) => {
+  await deleteMatch(userId1, userId2);
   const res = await session.run(`
   MATCH (u1:User {userId: $userId1}), (u2:User {userId: $userId2})
   SET u1.score = u1.score + 500

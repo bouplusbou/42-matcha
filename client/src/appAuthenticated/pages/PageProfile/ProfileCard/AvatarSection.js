@@ -74,7 +74,7 @@ export default function AvatarSection(props) {
 
     return (
         <Fragment>
-            <StyledSection avatar={cloudinaryCore.url(profile.photos[profile.avatarIndex])} onClick={OpenModal}>
+            <StyledSection avatar={profile.photos.length > 0 ? cloudinaryCore.url(profile.photos[profile.avatarIndex]) : "https://res.cloudinary.com/matchacn/image/upload/v1566436361/profilePlaceholder.png"} onClick={OpenModal}>
                 <ScoreContainer>
                     <Score>
                         <ScoreIcon icon={faFireAlt}/>

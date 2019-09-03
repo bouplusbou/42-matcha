@@ -70,7 +70,7 @@ export default function UserListItem(props) {
     return (
         <ProfileProvider value={{...profileState, setRefresh}}>
             <StyledDiv>
-                <ProfilePhoto cloudName='matchacn' publicId={props.photos[props.avatarIndex]}/>
+                <ProfilePhoto cloudName='matchacn' publicId={props.photos.length > 0 ? props.photos[props.avatarIndex] : "profilePlaceholder"}/>
                 <InfosContainer to={`/profile/${props.username}`}>
                     <Username color={props.color}>{props.username}</Username>
                     <Age>{props.age}, {props.city}</Age>

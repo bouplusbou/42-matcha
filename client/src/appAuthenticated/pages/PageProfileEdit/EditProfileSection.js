@@ -171,6 +171,8 @@ const authToken = localStorage.getItem('token');
     
     const profile = useContext(ProfileContext);
     const [valueState, setValueState] = useState({
+        gender: "male",
+        orientation: "straight",
         ...profile,
         newTag: "",
         redirect: false,
@@ -202,6 +204,7 @@ const authToken = localStorage.getItem('token');
 
     function handleValueChange(event) {
         const {name, value} = event.target;
+        console.log(value);
         if (!valueIsValid(name, value)) {
             displayErrorText(name);
         } else {
@@ -243,7 +246,7 @@ const authToken = localStorage.getItem('token');
             const newBirthDate = new Date(value);
             const maxBirthDate = new Date().setFullYear(new Date().getFullYear() - 18);
             const minBirthDate = new Date().setFullYear(new Date().getFullYear() - 50);
-            if (newBirthDate > maxBirthDate || newBirthDate < minBirthDate)
+            if (newBirthDate > maxBirthDate || newBirthDate < minBirthDate || value === "")
                 return false
         }
         const regex = {
@@ -301,7 +304,8 @@ const authToken = localStorage.getItem('token');
     }
 
     const SubmitChanges = async () => {
-        if (Object.keys(editedValuesState).length > 0) {
+        console.log(Object.keys(errorState).length)
+        if (Object.keys(editedValuesState).length > 0 && Object.keys(errorState).length === 0) {
             const gender = editedValuesState.gender || valueState.gender;
             if (Object.keys(editedValuesState).includes('gender')) {
                 if (gender === "non-binary") { editedValuesState.lookingFor = ["non-binary"] }
@@ -330,7 +334,9 @@ const authToken = localStorage.getItem('token');
                 const res = await axios.post(`/users/updateProfile?authToken=${authToken}`, editedValuesState);
                 if (res.status === 200) setRedirect(true)
             }
-        } else { setRedirect(true) }
+        } else { 
+            if (Object.keys(errorState).length === 0 ) setRedirect(true) 
+        }
     }
 
     function handleInputChange(value) {
