@@ -267,7 +267,8 @@ const deleteRelationship = async (type, userId, targetUserId) => {
     const res = await session.run(`
       MATCH (u:User {userId: $userId}), (t:User {userId: $targetUserId})
       MATCH (u)-[r:${type.toUpperCase()}]->(t)
-      OPTIONAL MATCH (m:Match {userIds: $userIds})
+      OPTIONAL MATCH (m:Match)
+      WHERE $userId IN m.userIds AND $targetUserId IN m.userIds
       WITH r, m, t, (CASE WHEN t.score + $points < 0 THEN 0.0 ELSE t.score + $points END) AS newScore
       SET t.score = newScore
       DELETE r
@@ -276,7 +277,6 @@ const deleteRelationship = async (type, userId, targetUserId) => {
       userId,
       targetUserId,
       points,
-      userIds: [userId, targetUserId]
     })
     if (type === "liked" && res.records[0].get(`match`)) {
       deleteMatch(userId, targetUserId);
@@ -309,7 +309,7 @@ const deleteMatch = async (userId1, userId2) => {
   MATCH (m:Match)
   WHERE $userId1 IN m.userIds AND $userId2 IN m.userIds
   WITH m
-  MATCH (msg:Message {matchId: m.matchId})
+  OPTIONAL MATCH (msg:Message {matchId: m.matchId})
   DELETE m, msg
   `, {
       userId1, userId2

@@ -286,14 +286,26 @@ export default function ChatComp() {
   useEffect(() => {
     if (socket !== null && authToken) {
       socket.on('reloadDiscussions', async () => {
-          const resAll = await axios.get(`/chat/discussions?authToken=${authToken}`);
-          // setCurrentDiscussionInfo(null);
-          setCurrentDiscussionMessages(null); 
-          setDiscussions(resAll.data.discussions);
+        const resAll = await axios.get(`/chat/discussions?authToken=${authToken}`);
+        setDiscussions(resAll.data.discussions);
       });
       return () => socket.off('reloadDiscussions');
     }
-  }, [socket, authToken, setDiscussions, setCurrentDiscussionMessages]);
+  }, [socket, authToken, setDiscussions, setCurrentDiscussionInfo, setCurrentDiscussionMessages]);
+
+   useEffect(() => {
+    if (socket !== null && authToken) {
+      socket.on('unliked', async () => {
+        setCurrentDiscussionInfo(null);
+        setCurrentDiscussionMessages(null); 
+        const resAll = await axios.get(`/chat/discussions?authToken=${authToken}`);
+        setDiscussions(resAll.data.discussions);
+        const resMsg = await axios.get(`/chat/unreadMessagesNb?authToken=${authToken}`);
+        setUnreadMessagesNb(resMsg.data.nb);
+      });
+      return () => socket.off('unliked');
+    }
+  }, [socket, authToken, setDiscussions, setUnreadMessagesNb, setCurrentDiscussionInfo, setCurrentDiscussionMessages]);
 
   useEffect(() => {
     if (socket !== null && authToken) {
@@ -414,7 +426,7 @@ export default function ChatComp() {
           }
           <ChatWindow>
             <MessagesSection ref={refDiv}>
-            {currentDiscussionMessages && currentDiscussionMessages !== 'no msg yet' && currentDiscussionMessages.map((msg, index) => {
+            {currentDiscussionInfo && currentDiscussionMessages && currentDiscussionMessages !== 'no msg yet' && currentDiscussionMessages.map((msg, index) => {
               return msg.type === 'received' ?
               <ReceivedMessageBlock key={index}>
                 <Avatar cloudName='matchacn' publicId={currentDiscussionInfo.youAvatar}></Avatar>

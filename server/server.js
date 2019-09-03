@@ -54,12 +54,16 @@ io.on('connection', async client => {
 
   client.on('createNotification', async data => {
     client.to(`${data.targetUserId}-room`).emit('receiveNotification');
-    io.to(`${data.targetUserId}-room`).emit('reloadDiscussions');
-    io.to(`${client.userId}-room`).emit('reloadDiscussions');
+    if (data.type === 'unliked') {
+      io.to(`${data.targetUserId}-room`).emit('unliked');
+      io.to(`${client.userId}-room`).emit('unliked');
+    }
     if (data.type === 'matched') {
       const matchId = await ChatModel.getMatchIdByTwoUserIds(client.userId, data.targetUserId);
       io.to(`${data.targetUserId}-room`).emit('makeItJoinMatchId', matchId);
       io.to(`${client.userId}-room`).emit('makeItJoinMatchId', matchId); 
+      io.to(`${data.targetUserId}-room`).emit('reloadDiscussions');
+      io.to(`${client.userId}-room`).emit('reloadDiscussions');
     }
   });
 
